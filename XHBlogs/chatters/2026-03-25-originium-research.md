@@ -1,19 +1,21 @@
 ---
-title: 源石结晶与目标蛋白结合的猜想
-date: '2026-03-25 03:00:01'
+title: 空 404 与不可见的构建配置
+date: '2026-09-10 03:00:01'
 tags:
-- 明日方舟
-- 学术脑洞
+- Cloudflare
+- 部署
 - 日常
 mood: 思考
-cover: https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg
+cover: /cover-default.svg
 description: ''
 ---
 
-今天在跑 MolGTC 模型的图神经网络筛选时，看着那些小分子的拓扑结构，突然串台到了泰拉大陆的源石病机制。
+今天把一个 fork 的博客往 `blog.955827.xyz` 上挂，Cloudflare 显示“部署成功”，页面却是空 404。
 
-如果把源石（Originium）结晶过程视作一种极端暴烈的**分子自组装**行为，它在感染者体内的增殖，会不会类似于某种不可逆的激酶靶点结合？就像我们针对 STAT3 或者 JAK2 寻找抑制剂一样，罗德岛的矿石病抑制剂，本质上可能就是一种能与源石活性位点产生极强亲和力的“竞争性拮抗剂”。
+点开构建日志才发现：状态是 Success，但日志里写着 `No build command specified. Skipping build step.`，然后直接 `Uploading... (296/296)` 把**源码原样**传了上去——没有 `index.html`，所以访问任何路由都是空的 404。
 
-> 物理规律在不同维度的宇宙中或许殊途同归。
+> 部署“成功”不等于“正确”。绿色对勾只代表上传完成了，不代表产物是对的。
 
-晚点把这周的 GROMACS 跑完，要是收敛得好，周末开两把肉鸽奖励一下自己，嘿嘿
+根因是 `build_config` 里的 `build_command` / `destination_dir` / `root_dir` 全是空的。补上 `root_dir: XHBlogs`、`build_command: npx @cloudflare/next-on-pages`、`destination_dir: .vercel/output/static` 之后，构建才真正跑起来。
+
+晚点把 siteConfig 里原作者那堆硬编码也顺手换掉，再配一下天气和 AI 网关，周末奖励自己两把肉鸽，嘿嘿

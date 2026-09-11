@@ -18,18 +18,20 @@ export const siteConfig = {
   avatarUrl: "https://github.com/Bortala5827.png",
 
   // 3. 网站背景设置 (二选一)
-  // 如果想用纯图片背景，请在下面 bgImage 写路径，并将 useGradient 设为 false
-  useGradient: false,
+  // useGradient=true 使用 themeColors 流光渐变，不依赖任何外部图片（已移除原作者图床）；
+  // 想换成你自己的照片背景：把图片放进 public/ 后设 useGradient:false 并在 bgImages 填路径。
+  useGradient: true,
   themeColors: ["#a18cd1", "#fbc2eb", "#a1c4fd", "#c2e9fb"], // 呼吸流动的颜色组合
-// 修改这里：变成图片数组
-  bgImages: ["https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4acdb5.jpg", "https://bu.dusays.com/2026/03/24/69c26fe4d9486.jpg"],
+  bgImages: [],
 
-  // 4. 文章默认封面图 (当 Markdown 没写 cover 时显示)
-  defaultPostCover: "https://bu.dusays.com/2026/03/24/69c1e38b346cb.jpg",
+  // 4. 文章默认封面图 (当 Markdown 没写 cover 时显示，本地 SVG，不依赖外链)
+  defaultPostCover: "/cover-default.svg",
 
   // 5. 首页照片墙预览图
-  photoWallImage: "https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg",
-  cloudMusicIds: ["1809646618", "3361076230", "1859390262"],
+  photoWallImage: "/cover-default.svg",
+  // 网易云歌单 ID：留空 -> 音乐挂件会提示“请配置 cloudMusicIds”。
+  // 换成你自己的歌单：在下面填 NetEase 歌曲 ID 数组，例如 ["123456","654321"]
+  cloudMusicIds: [],
   social: {
     github: "Bortala5827",
     gitee: "",
@@ -39,7 +41,7 @@ export const siteConfig = {
     wechat: "",
   },
   counts: {
-    photos: 128, // 照片墙数量可以手动写死或动态计算
+    photos: 0, // 照片墙数量：albums 为空时写 0；有照片后在 data/albums.ts 填
   },
   chatterTitle: "云端杂谈", // 你可以改成任何你喜欢的名字
   chatterDescription: "代码、产品与 RCJ 生态的碎片记录",

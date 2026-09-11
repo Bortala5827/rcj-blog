@@ -27,8 +27,8 @@ export const siteConfig = {
   // 4. 文章默认封面图 (当 Markdown 没写 cover 时显示，本地 SVG，不依赖外链)
   defaultPostCover: "/cover-default.svg",
 
-  // 5. 首页照片墙预览图
-  photoWallImage: "/cover-default.svg",
+  // 5. 首页照片墙预览图（已接入本地个人照片，避免外链）
+  photoWallImage: "/blog-photo-1.png",
   // 网易云歌单 ID：留空 -> 音乐挂件会提示“请配置 cloudMusicIds”。
   // 换成你自己的歌单：在下面填 NetEase 歌曲 ID 数组，例如 ["123456","654321"]
   cloudMusicIds: [], // 网易云外链模式已弃用；改用下方 music（R2 自托管）
@@ -40,7 +40,7 @@ export const siteConfig = {
     url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || 'https://__REPLACE_WITH_R2_PUBLIC_URL__/soba-ni-iru-ne.mp3',
     title: '陪在你身边', // そばにいるね 的中文呈现，避免直接露出原日文标题
     artist: '——',
-    cover: '/cover-default.svg',
+    cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链
   },
   social: {
     github: "Bortala5827",
@@ -51,7 +51,7 @@ export const siteConfig = {
     wechat: "",
   },
   counts: {
-    photos: 0, // 照片墙数量：albums 为空时写 0；有照片后在 data/albums.ts 填
+    photos: 2, // 照片墙数量：data/albums.ts 中“生活碎片”相册含 2 张
   },
   chatterTitle: "云端杂谈", // 你可以改成任何你喜欢的名字
   chatterDescription: "代码、产品与 RCJ 生态的碎片记录",

@@ -11,4 +11,16 @@
 export interface Photo { url: string; caption?: string; }
 export interface Album { id: string; title: string; description: string; cover: string; date: string; photos: Photo[]; }
 
-export const albums: Album[] = [];
+export const albums: Album[] = [
+  {
+    id: "life-slices",
+    title: "生活碎片",
+    description: "日常里随手截下的光",
+    cover: "/blog-photo-1.png",
+    date: "2026.08",
+    photos: [
+      { url: "/blog-photo-1.png", caption: "随手一拍" },
+      { url: "/blog-photo-2.jpg", caption: "某一刻" },
+    ],
+  },
+];

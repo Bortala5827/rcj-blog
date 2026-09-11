@@ -31,7 +31,17 @@ export const siteConfig = {
   photoWallImage: "/cover-default.svg",
   // 网易云歌单 ID：留空 -> 音乐挂件会提示“请配置 cloudMusicIds”。
   // 换成你自己的歌单：在下面填 NetEase 歌曲 ID 数组，例如 ["123456","654321"]
-  cloudMusicIds: [],
+  cloudMusicIds: [], // 网易云外链模式已弃用；改用下方 music（R2 自托管）
+  // 🌟 R2 自托管音乐（替代网易云外链，避免第三方依赖与地区限制 / 版权灰区）
+  // url 填 rcj-sing bucket 开启公开访问后的 r2.dev 直链，例如 https://pub-xxxx.r2.dev/soba-ni-iru-ne.mp3
+  // 也可通过 CF Pages 环境变量 NEXT_PUBLIC_MUSIC_R2_URL 覆盖（优先于下方写死值）。
+  music: {
+    source: 'r2',
+    url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || 'https://__REPLACE_WITH_R2_PUBLIC_URL__/soba-ni-iru-ne.mp3',
+    title: '陪在你身边', // そばにいるね 的中文呈现，避免直接露出原日文标题
+    artist: '——',
+    cover: '/cover-default.svg',
+  },
   social: {
     github: "Bortala5827",
     gitee: "",

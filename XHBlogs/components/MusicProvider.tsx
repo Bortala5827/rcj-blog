@@ -109,8 +109,28 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    if (siteConfig.cloudMusicIds?.length > 0) fetchMusicData();
-    else setIsLoading(false);
+    // 🌟 R2 自托管模式：直接用配置里的直链，不经过网易云 API
+    const m = siteConfig.music;
+    const r2Url = m?.url;
+    const r2Ready = m?.source === 'r2' && !!r2Url && !r2Url.includes('__REPLACE');
+
+    if (r2Ready) {
+      const single = [{
+        id: 'r2-local',
+        title: m?.title || '未知歌曲',
+        artist: m?.artist || '未知歌手',
+        cover: m?.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
+        src: r2Url as string,
+        lrcUrl: null,
+        lyrics: [],
+      }];
+      setPlaylist(single);
+      setIsLoading(false);
+    } else if (siteConfig.cloudMusicIds?.length > 0) {
+      fetchMusicData();
+    } else {
+      setIsLoading(false);
+    }
 
     return () => { isMounted = false; };
   }, []);

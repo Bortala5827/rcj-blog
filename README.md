@@ -1,5 +1,7 @@
 # 🌟 欢迎使用 XHBlogs！
 
+> **Fork 声明（CC BY-NC 4.0）**：本项目基于 [heiehiehi/XinghuisamaBlogs](https://github.com/heiehiehi/XinghuisamaBlogs) 二次修改发布。原作者：**XingHuiSama（heiehiehi）**。原许可 **严禁商业用途**，详见文末「许可证」。本 fork 部署于 Cloudflare Pages（非 Vercel），构建链路使用 `@cloudflare/next-on-pages`。
+
 这是一个采用 Next.js 构建的高颜值、毛玻璃（Glassmorphism）风格个人博客系统。本项目自带完善的前端展示与独立的本地后台控制台，支持 Markdown 沉浸式写作、草稿管理以及便捷的图床配置。
 
 本指南将带你从零开始，轻松部署并使用 XHBlogs。

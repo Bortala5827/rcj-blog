@@ -35,7 +35,7 @@ def main():
     if not os.path.exists(".git"):
         print("🪄 初始化 Git 环境...")
         run_cmd("git init")
-        run_cmd("git remote add origin https://github.com/heiehiehi/XinghuisamaBlogs.git")
+        run_cmd("git remote add origin https://github.com/Bortala5827/xinghui-fork.git")
 
     # 3. 拉取更新
     print_step("[1/4] 连接云端获取最新代码...")

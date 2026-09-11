@@ -1,6 +1,8 @@
 # 🌟 欢迎使用 XHBlogs！
 
-> **Fork 声明（CC BY-NC 4.0）**：本项目基于 [heiehiehi/XinghuisamaBlogs](https://github.com/heiehiehi/XinghuisamaBlogs) 二次修改发布。原作者：**XingHuiSama（heiehiehi）**。原许可 **严禁商业用途**，详见文末「许可证」。本 fork 部署于 Cloudflare Pages（非 Vercel），构建链路使用 `@cloudflare/next-on-pages`。
+> **原作者（请务必保留署名）**：本项目由 **XingHuiSama（[@heiehiehi](https://github.com/heiehiehi)）** 创作，原仓库 [heiehiehi/XinghuisamaBlogs](https://github.com/heiehiehi/XinghuisamaBlogs)。原作采用 **CC BY-NC 4.0** 许可，**禁止任何形式的商业用途**。
+>
+> **本仓库为 Fork 二次修改版**：由 Bortala（[@Bortala5827](https://github.com/Bortala5827)）在其基础上个性化修改，并部署于 **Cloudflare Pages**（非 Vercel），构建链路使用 `@cloudflare/next-on-pages`。所有修改均在遵守原许可（署名 + 非商用）的前提下进行，原作的著作权与署名权始终归 XingHuiSama 所有。
 
 这是一个采用 Next.js 构建的高颜值、毛玻璃（Glassmorphism）风格个人博客系统。本项目自带完善的前端展示与独立的本地后台控制台，支持 Markdown 沉浸式写作、草稿管理以及便捷的图床配置。
 

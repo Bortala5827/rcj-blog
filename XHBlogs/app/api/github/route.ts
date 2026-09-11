@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 export async function POST(req: Request) {
   try {
     // 1. 读取 Gitalk 发过来的数据

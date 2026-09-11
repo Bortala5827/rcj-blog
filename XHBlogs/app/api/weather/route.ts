@@ -1,6 +1,8 @@
 // app/api/weather/route.ts
 import { NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
 export async function GET() {
   const token = process.env.QWEATHER_KEY;
   const locationId = "101010100"; // 北京

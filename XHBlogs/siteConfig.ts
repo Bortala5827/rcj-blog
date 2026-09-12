@@ -33,11 +33,14 @@ export const siteConfig = {
   // 换成你自己的歌单：在下面填 NetEase 歌曲 ID 数组，例如 ["123456","654321"]
   cloudMusicIds: [], // 网易云外链模式已弃用；改用下方 music（R2 自托管）
   // 🌟 自托管音乐（替代网易云外链，避免第三方依赖与地区限制 / 版权灰区）
-  // 优先走 R2 公开域名（rcj-sing 桶，已开启 Public access），key = soba-ni-iru-ne.webm；
-  // 若 R2 不可用，可用 CF Pages 环境变量 NEXT_PUBLIC_MUSIC_R2_URL 覆盖，或回退仓库 public/soba-ni-iru-ne.webm。
+  // 【2026-09-12 改】默认改为**同源文件** public/soba-ni-iru-ne.webm：
+  //   实测 r2.dev 直链在部分网络（尤其国内）加载失败 → 音频永远 00:00 并报「音源不可用」；
+  //   改由 blog.955827.xyz 自身的 CF CDN 分发，用户能打开站点就一定能加载音频。
+  //   R2 原地址保留备选：https://pub-33cbba9a540847778b48cbc906aea2ad.r2.dev/soba-ni-iru-ne.webm
+  //   （日后若给 R2 绑了自定义域名，可用 NEXT_PUBLIC_MUSIC_R2_URL 覆盖回来）
   music: {
-    source: 'r2',
-    url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || 'https://pub-33cbba9a540847778b48cbc906aea2ad.r2.dev/soba-ni-iru-ne.webm',
+    source: 'local',
+    url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || '/soba-ni-iru-ne.webm',
     title: '陪在你身边', // そばにいるね 的中文呈现，避免直接露出原日文标题
     artist: '——',
     cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链

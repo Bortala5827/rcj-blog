@@ -128,7 +128,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
 
     const m = siteConfig.music;
     const r2Url = m?.url;
-    const r2Ready = m?.source === 'r2' && !!r2Url && !r2Url.includes('__REPLACE');
+    // 只要配置了可用地址（同源 /soba-ni-iru-ne.webm 或 R2 直链）即可作为常驻曲
+    const r2Ready = !!r2Url && !String(r2Url).includes('__REPLACE');
 
     // R2 自托管曲目作为默认常驻曲（陪在你身边）
     const r2Track = r2Ready

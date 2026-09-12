@@ -96,63 +96,27 @@ input[type=range]::-webkit-slider-thumb {
   scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
 }
 
-
-/* ===== 东方元素：宣纸质感 / 墨色分隔 / 朱砂点缀 / 竖排短句 ===== */
+/* ===== 东方元素：宣纸质感 / 墨线 / 朱砂 / 竖排短句 ===== */
 @layer base {
-  :root {
-    --ink: #2b2b2b;
-    --cinnabar: #9e2b25;
-  }
-  .dark {
-    --ink: #e8e4d9;
-    --cinnabar: #c8553d;
-  }
+  :root { --ink: #2b2b2b; --cinnabar: #9e2b25; }
+  .dark { --ink: #e8e4d9; --cinnabar: #c8553d; }
 }
-
-/* 宣纸/和纸质感：极低透明噪点，不干扰阅读 */
 body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+  z-index: 1; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-
-/* 竖排短句（取自「博观而约取」），手机端隐藏 */
 body::after {
   content: "\535A\89C2\7EA6\53D6";
-  position: fixed;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  writing-mode: vertical-rl;
-  letter-spacing: 0.35em;
-  font-size: 11px;
-  opacity: 0.16;
-  color: var(--cinnabar);
-  pointer-events: none;
-  z-index: 1;
+  position: fixed; right: 16px; top: 50%; transform: translateY(-50%);
+  writing-mode: vertical-rl; letter-spacing: 0.35em; font-size: 11px;
+  opacity: 0.16; color: var(--cinnabar); pointer-events: none; z-index: 1;
 }
-
-@media (max-width: 768px) {
-  body::after { display: none; }
-}
-
-/* 墨色渐隐分隔线 */
+@media (max-width: 768px) { body::after { display: none; } }
 .ink-divider {
-  height: 1px;
-  border: 0;
+  height: 1px; border: 0;
   background: linear-gradient(90deg, transparent, rgba(43,43,43,0.22) 18%, rgba(43,43,43,0.22) 82%, transparent);
 }
 .dark .ink-divider {
   background: linear-gradient(90deg, transparent, rgba(232,228,217,0.22) 18%, rgba(232,228,217,0.22) 82%, transparent);
 }
-
-/* 引用块改为朱砂细线，呼应国风 */
-.prose blockquote {
-  border-left: 3px solid var(--cinnabar);
-  padding-left: 1rem;
-  font-style: normal;
-}
+.prose blockquote { border-left: 3px solid var(--cinnabar); padding-left: 1rem; font-style: normal; }

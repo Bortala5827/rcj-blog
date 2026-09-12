@@ -212,6 +212,9 @@ export function MusicProvider({ children }: { children: ReactNode }) {
           }
         })
         .catch(() => { if (isMounted) setCurrentLyric("\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a"); });
+    } else {
+      // 无 LRC 的自托管曲目（如 R2）：直接提示纯享音乐，避免永远停留在「正在缓冲」
+      setCurrentLyric("\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a");
     }
 
     if (isPlaying && audioRef.current) {

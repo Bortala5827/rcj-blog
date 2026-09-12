@@ -281,8 +281,9 @@ export default function AdminDashboard() {
     );
   }
 
+  // w-full 不能省：flex 子项上的 mx-auto 会让它退化成 fit-content 宽度（宽度随内容波动、观感不居中）
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 md:px-10 flex flex-col md:flex-row gap-6 max-w-[1600px] mx-auto relative z-10">
+    <div className="w-full min-h-screen pt-20 pb-10 px-4 md:px-10 flex flex-col md:flex-row gap-6 max-w-[1600px] mx-auto relative z-10">
       {/* 左侧中枢导航栏 */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}

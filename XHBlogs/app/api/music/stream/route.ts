@@ -9,8 +9,12 @@ import { NextRequest } from 'next/server'
 //  3. 第三方 Meting 实例（api.injahow.cn / api.i-meto.com）已不可达，之前的"瞬时 302 跳过去"
 //     方案因此彻底失效（音频元素一直 networkState=2 卡住）。
 //
-// 现在的方案：服务端按顺序尝试多个解析通道，拿到直链后 **统一 https 化**，再 302 给浏览器，
+// 现在的方案：服务端按顺序尝试多个解析通道，拿到直链后校验「是不是真的网易音频 CDN」
+// （挡掉 /404 封锁页和 st.music.163.com 风控验证页）并统一 https 化，再 302 给浏览器，
 // 音频由浏览器直连网易 CDN 缓冲（不占 Worker 带宽）。任一通道成功即返回；全失败给 404 JSON。
+//
+// 版权/会员受限的歌（如 周杰伦《晴天》id=186016）实测三个通道全拿不到音频 → 直接 404，
+// 前端会提示「音源不可用」，不再假装缓冲。
 //
 // 排障：/api/music/stream?id=xxx&debug=1 会返回每个通道的真实结果，不再需要猜。
 export const runtime = 'edge'
@@ -25,13 +29,28 @@ function fetchT(url: string, init: RequestInit, ms: number): Promise<Response> {
   return fetch(url, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(timer))
 }
 
-/** 网易 CDN 直链常带 http:// 前缀，页面是 https，必须升级协议否则被混合内容拦掉 */
-function httpsify(u: string | null | undefined): string | null {
-  if (!u) return null
+/** 网易 CDN 直链常带 http:// 前缀，页面是 https，必须升级协议否则被混合内容拦掉；
+ *  同时必须挡掉「看起来像成功、其实是别的页面」的情况：
+ *   - /404                    → 网易对数据中心 IP 的封锁页
+ *   - st.music.163.com/encrypt-pages → 版权受限歌曲的风控验证页（enhance 会返回它）*/
+function isPlayableCdn(u: string | null | undefined): boolean {
+  if (!u) return false
   const s = String(u).trim()
-  if (!/^https?:\/\//i.test(s)) return null
-  if (/\/404(\?|$)/.test(s)) return null
-  return s.replace(/^http:\/\//i, 'https://')
+  if (!/^https?:\/\//i.test(s)) return false
+  if (/\/404(\?|$)/.test(s)) return false
+  if (/encrypt-pages|verifyType=/.test(s)) return false
+  try {
+    const host = new URL(s).hostname.toLowerCase()
+    // 只认网易音频 CDN（m801./m701./m8.…music.126.net）；API/页面域名一律拒绝
+    return host.endsWith('.music.126.net')
+  } catch {
+    return false
+  }
+}
+
+function httpsify(u: string | null | undefined): string | null {
+  if (!isPlayableCdn(u)) return null
+  return String(u).trim().replace(/^http:\/\//i, 'https://')
 }
 
 function pickJsonUrl(text: string): string | null {
@@ -62,8 +81,9 @@ async function viaGdstudio(id: string): Promise<Probe> {
         5000,
       )
       const t = await r.text()
-      const u = httpsify(pickJsonUrl(t))
-      detail[br] = { status: r.status, url: u, snippet: t.slice(0, 160) }
+      const rawUrl = pickJsonUrl(t)
+      const u = httpsify(rawUrl)
+      detail[br] = { status: r.status, rawUrl, url: u, snippet: t.slice(0, 160) }
       if (u) return { url: u, detail }
     } catch (e) {
       detail[br] = { error: String(e) }

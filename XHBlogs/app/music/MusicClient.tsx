@@ -107,6 +107,9 @@ export default function MusicClient() {
     else if (typeof selectSong === 'function') selectSong(index);
   };
 
+  // 歌单总数 = D1 里的网易云条目 + 自托管曲（「陪在你身边」，source='local'）
+  const playlistTotal = importedIds.length + (playlist.some((s: any) => s.id === 'r2-local') ? 1 : 0);
+
   const filteredPlaylist = useMemo(() => {
     if (!searchQuery.trim()) return playlist;
     const lowerQuery = searchQuery.toLowerCase();
@@ -240,10 +243,10 @@ export default function MusicClient() {
                     <div className="mb-3 shrink-0 flex items-center gap-2">
                       <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
                         <Disc3 size={14} /> 云端歌单
-                        {importedIds.length > 0 && <span className="bg-indigo-500 text-white rounded-full px-1.5 text-[10px]">{importedIds.length}</span>}
+                        {playlistTotal > 0 && <span className="bg-indigo-500 text-white rounded-full px-1.5 text-[10px]">{playlistTotal}</span>}
                       </span>
                       <span className="text-[10px] text-slate-400 font-medium">
-                        {importedIds.length > 0 ? `已同步 ${importedIds.length} 首 · 后台管理` : '歌单由后台维护'}
+                        {playlistTotal > 0 ? `已同步 ${playlistTotal} 首 · 后台管理` : '歌单由后台维护'}
                       </span>
                     </div>
                     <div className="relative w-full max-w-md mx-auto group mb-4 md:mb-8 shrink-0">

@@ -92,6 +92,11 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const IMPORT_STORAGE_KEY = 'rcj_imported_netease_ids';
   const [importedIds, setImportedIds] = useState<string[]>([]);
   const [cloudSynced, setCloudSynced] = useState(false);
+  // 云端（D1）里那条自托管曲（source='local'，如「陪在你身边」）：
+  //   null        = 云端没连上（用 siteConfig 兜底）
+  //   {present:false} = 云端明确没有它（后台删过）→ 歌单里就不显示
+  //   {present:true, meta} = 云端有 → 用库里的标题/歌手/封面/地址
+  const [cloudLocal, setCloudLocal] = useState<{ present: boolean; meta?: any } | null>(null);
 
   const readLocal = useCallback((): string[] => {
     try {
@@ -111,9 +116,14 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       const r = await fetch('/api/music/ids', { cache: 'no-store' });
       const d = await r.json();
       if (!d || d.ok !== true || !Array.isArray(d.ids)) return; // 没绑 D1：沿用本地缓存
+      const items: any[] = Array.isArray(d.items) ? d.items : [];
+      // 网易云条目：歌单主体（换设备/清缓存都在 D1 里）
       const serverIds: string[] = d.ids.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x));
       setImportedIds(serverIds);
       writeLocal(serverIds);
+      // 自托管曲（source='local'）也由 D1 说了算：库里有 → 显示，后台删了 → 不显示
+      const localItem = items.find((i: any) => String(i?.source || 'netease') === 'local');
+      setCloudLocal(localItem ? { present: true, meta: localItem } : { present: false });
       setCloudSynced(true);
     } catch { /* 云端不可达：沿用本地缓存 */ }
   }, [writeLocal]);
@@ -148,18 +158,22 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     const m = siteConfig.music;
-    const r2Url = m?.url;
-    // 只要配置了可用地址（同源 /soba-ni-iru-ne.webm 或 R2 直链）即可作为常驻曲
-    const r2Ready = !!r2Url && !String(r2Url).includes('__REPLACE');
+    // 自托管曲（「陪在你身边」）的权威来源是 D1：
+    //   云端有这条记录 → 用它（标题/歌手/封面/地址都可在库里改）；
+    //   云端明确没有（后台删过）→ 歌单里不出现；
+    //   云端没连上（未绑 D1 / 离线）→ 退回 siteConfig，本地开发与旧行为不变。
+    const localMeta: any = cloudLocal?.present ? cloudLocal.meta || {} : null;
+    const localUrl = (localMeta?.url || m?.url) as string | undefined;
+    const wantLocal = cloudLocal === null ? true : !!cloudLocal.present;
+    const localReady = wantLocal && !!localUrl && !String(localUrl).includes('__REPLACE');
 
-    // R2 自托管曲目作为默认常驻曲（陪在你身边）
-    const r2Track = r2Ready
+    const r2Track = localReady
       ? [{
           id: 'r2-local',
-          title: m?.title || '未知歌曲',
-          artist: m?.artist || '未知歌手',
-          cover: m?.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
-          src: r2Url as string,
+          title: localMeta?.name || m?.title || '未知歌曲',
+          artist: localMeta?.artist || m?.artist || '未知歌手',
+          cover: localMeta?.cover || m?.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
+          src: localUrl as string,
           lrcUrl: null,
           lyrics: [] as any[],
         }]

@@ -60,6 +60,8 @@ export default function AdminDashboard() {
   const [queryResult, setQueryResult] = useState<any>(null);
   const [queryError, setQueryError] = useState('');
   const [cloudState, setCloudState] = useState<'idle' | 'synced' | 'local'>('idle');
+  // D1 里的自托管曲（source='local'，即「陪在你身边」）：与网易云 ID 一样是库里的一条记录
+  const [localItem, setLocalItem] = useState<any | null>(null);
 
   // 读歌单：云端（D1）优先，取不到则退回本地缓存
   useEffect(() => {
@@ -191,18 +193,45 @@ export default function AdminDashboard() {
   const clearAll = () => {
     persist([]);
     setDetails({});
+    setLocalItem(null);
     removeFromCloud('all');
   };
 
-  // R2 默认常驻曲目（与 /music 同源）
   const m = siteConfig.music;
-  const r2Track = m ? {
-    id: 'r2-local',
-    title: m.title || '默认曲目',
-    artist: m.artist || '——',
-    cover: m.cover || '',
-    source: 'r2' as const,
-  } : null;
+
+  // 自托管曲（「陪在你身边」）：权威来源是 D1 里那条 source='local' 的记录；
+  // 云端还没连上（未绑 D1 / 离线）时才退回 siteConfig 兜底。
+  const localTrack = localItem
+    ? {
+        id: 'r2-local',
+        title: localItem.name || m?.title || '默认曲目',
+        artist: localItem.artist || m?.artist || '——',
+        cover: localItem.cover || m?.cover || '',
+      }
+    : cloudState === 'synced'
+      ? null
+      : m
+        ? { id: 'r2-local', title: m.title || '默认曲目', artist: m.artist || '——', cover: m.cover || '' }
+        : null;
+
+  // 从歌单移除 / 重新加回自托管曲（都写 D1，前台 /music 跟着变）
+  const removeLocalTrack = async () => {
+    setLocalItem(null);
+    await removeFromCloud('r2-local');
+  };
+
+  const restoreLocalTrack = async () => {
+    const meta = {
+      id: 'r2-local',
+      name: m?.title || '陪在你身边',
+      artist: m?.artist || '——',
+      cover: m?.cover || '',
+      url: m?.url || '/soba-ni-iru-ne.webm',
+      source: 'local' as const,
+    };
+    const ok = await addToCloud({ ...meta, id: 'r2-local' });
+    if (ok) setLocalItem({ ...meta, source: 'local' });
+  };
 
   const menuItems = [
     { id: 'dashboard', name: '全息仪表盘', icon: '🌌' },
@@ -362,22 +391,31 @@ export default function AdminDashboard() {
             {/* 真实歌单：R2 默认曲 + 已导入网易云 */}
             <p className="text-[10px] font-black text-slate-400 uppercase ml-1 mb-3">当前播放歌单（与 /music 实时同步）</p>
             <div className="max-h-[420px] overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-              {/* R2 默认曲目 */}
-              {r2Track && (
-                <div className="flex justify-between items-center p-3 bg-white/40 dark:bg-slate-800/40 rounded-2xl border border-indigo-500/20">
+              {/* 自托管曲（「陪在你身边」）：和网易云歌曲一样是 D1 里的一条记录，可删可恢复 */}
+              {localTrack ? (
+                <div className="flex justify-between items-center p-3 bg-white/40 dark:bg-slate-800/40 rounded-2xl border border-indigo-500/20 group">
                   <div className="flex items-center gap-3">
-                    {r2Track.cover ? (
-                      <img src={r2Track.cover} alt="cover" referrerPolicy="no-referrer" className="w-10 h-10 rounded-lg object-cover shadow-sm" />
+                    {localTrack.cover ? (
+                      <img src={localTrack.cover} alt="cover" referrerPolicy="no-referrer" className="w-10 h-10 rounded-lg object-cover shadow-sm" />
                     ) : (
                       <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">🎧</div>
                     )}
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-800 dark:text-white">{r2Track.title}</span>
-                      <span className="text-[10px] text-slate-500 font-medium">{r2Track.artist}</span>
+                      <span className="text-sm font-bold text-slate-800 dark:text-white">{localTrack.title}</span>
+                      <span className="text-[10px] text-slate-500 font-medium">{localTrack.artist}</span>
                     </div>
                   </div>
-                  <span className="text-[10px] font-black text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-full">R2 默认</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-full">自托管</span>
+                    <button onClick={removeLocalTrack} title="从歌单移除" className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center">✕</button>
+                  </div>
                 </div>
+              ) : (
+                cloudState === 'synced' && (
+                  <button onClick={restoreLocalTrack} className="w-full p-3 rounded-2xl border border-dashed border-indigo-500/40 text-[11px] font-black text-indigo-500 hover:bg-indigo-500/5 transition-colors">
+                    ＋ 把「{m?.title || '陪在你身边'}」加回歌单
+                  </button>
+                )
               )}
 
               {ids.length === 0 && (

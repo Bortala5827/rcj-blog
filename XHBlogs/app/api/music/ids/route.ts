@@ -13,18 +13,39 @@ export const runtime = 'edge'
 //
 // 接口：
 //   GET    /api/music/ids            -> { ok, ids: string[], items: [...] }
-//   POST   /api/music/ids            -> body { id, name?, artist?, cover? }  需要 x-rcj-pass
-//   DELETE /api/music/ids?id=xxx     -> 需要 x-rcj-pass
+//   POST   /api/music/ids            -> body { id, name?, artist?, cover?, url?, source? }  需要 x-rcj-pass
+//                                        source='local' 时写入自托管曲（id 固定 r2-local）
+//   DELETE /api/music/ids?id=xxx     -> 需要 x-rcj-pass（id 可为数字 ID 或 r2-local）
 //
 // 若项目没绑 D1（例如本地 next dev），GET 返回 ok:false，前端静默退回本地缓存，不会报错。
+
+// 歌单条目：既能放网易云 ID，也能放站点自托管的曲目
+//   source='netease'：id 为网易云歌曲 ID，播放走 /api/music/stream
+//   source='local'  ：id 固定为 'r2-local'（自托管曲，如「陪在你身边」），url 为同源/R2 地址
+const LOCAL_ID = 'r2-local'
 
 const TABLE = `CREATE TABLE IF NOT EXISTS music_ids (
   id TEXT PRIMARY KEY,
   name TEXT,
   artist TEXT,
   cover TEXT,
+  url TEXT,
+  source TEXT NOT NULL DEFAULT 'netease',
   added_at INTEGER NOT NULL
 )`
+
+// 老表补列：SQLite 没有 ADD COLUMN IF NOT EXISTS，重复执行会抛错，逐个 try 忽略即可
+const MIGRATIONS = [
+  `ALTER TABLE music_ids ADD COLUMN url TEXT`,
+  `ALTER TABLE music_ids ADD COLUMN source TEXT NOT NULL DEFAULT 'netease'`,
+]
+
+async function ensureTable(db: any) {
+  await db.prepare(TABLE).run()
+  for (const sql of MIGRATIONS) {
+    try { await db.prepare(sql).run() } catch { /* 列已存在 */ }
+  }
+}
 
 function getDB(): any | null {
   try {
@@ -62,11 +83,15 @@ export async function GET() {
     return NextResponse.json({ ok: false, ids: [], reason: 'no-d1-binding' })
   }
   try {
-    await db.prepare(TABLE).run()
+    await ensureTable(db)
     const res = await db
-      .prepare('SELECT id, name, artist, cover, added_at FROM music_ids ORDER BY added_at ASC')
+      .prepare('SELECT id, name, artist, cover, url, source, added_at FROM music_ids ORDER BY added_at ASC')
       .all()
-    const items = (res?.results || []).map((r: any) => ({ ...r, id: String(r.id) }))
+    const items = (res?.results || []).map((r: any) => ({
+      ...r,
+      id: String(r.id),
+      source: String(r.source || 'netease'),
+    }))
     return NextResponse.json(
       { ok: true, ids: items.map((i: any) => i.id), items },
       { headers: { 'Cache-Control': 'no-store' } },
@@ -90,20 +115,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'bad_json' }, { status: 400 })
   }
 
-  const id = numId(body?.id)
+  const source = body?.source === 'local' ? 'local' : 'netease'
+  const id = source === 'local' ? LOCAL_ID : numId(body?.id)
   if (!id) return NextResponse.json({ ok: false, error: 'bad_id' }, { status: 400 })
 
   try {
-    await db.prepare(TABLE).run()
+    await ensureTable(db)
+    // 自托管曲固定 added_at=1 → 永远排在歌单第一位
+    const addedAt = source === 'local' ? 1 : Date.now()
     await db
       .prepare(
-        `INSERT INTO music_ids (id, name, artist, cover, added_at) VALUES (?, ?, ?, ?, ?)
+        `INSERT INTO music_ids (id, name, artist, cover, url, source, added_at) VALUES (?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            name = COALESCE(excluded.name, music_ids.name),
            artist = COALESCE(excluded.artist, music_ids.artist),
-           cover = COALESCE(excluded.cover, music_ids.cover)`,
+           cover = COALESCE(excluded.cover, music_ids.cover),
+           url = COALESCE(excluded.url, music_ids.url),
+           source = excluded.source`,
       )
-      .bind(id, body?.name ?? null, body?.artist ?? null, body?.cover ?? null, Date.now())
+      .bind(id, body?.name ?? null, body?.artist ?? null, body?.cover ?? null, body?.url ?? null, source, addedAt)
       .run()
     const res = await db.prepare('SELECT id FROM music_ids ORDER BY added_at ASC').all()
     return NextResponse.json({ ok: true, ids: (res?.results || []).map((r: any) => String(r.id)) })
@@ -121,11 +151,11 @@ export async function DELETE(request: NextRequest) {
 
   const raw = request.nextUrl.searchParams.get('id')
   try {
-    await db.prepare(TABLE).run()
+    await ensureTable(db)
     if (raw === 'all') {
       await db.prepare('DELETE FROM music_ids').run()
     } else {
-      const id = numId(raw)
+      const id = raw === LOCAL_ID ? LOCAL_ID : numId(raw)
       if (!id) return NextResponse.json({ ok: false, error: 'bad_id' }, { status: 400 })
       await db.prepare('DELETE FROM music_ids WHERE id = ?').bind(id).run()
     }

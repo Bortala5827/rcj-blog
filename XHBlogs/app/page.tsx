@@ -129,10 +129,6 @@ export default function Home() {
                       <ThemeToggleBlock />
                     </div>
                   </div>
-                    <div className="sm:col-span-1 flex flex-col min-h-[120px]">
-                      <ThemeToggleBlock />
-                    </div>
-                  </div>
 
                 </div>
               </div>

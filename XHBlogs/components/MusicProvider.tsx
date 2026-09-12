@@ -58,6 +58,10 @@ interface MusicContextType {
   setVolume: (value: number) => void;
   toggleMute: () => void;
   togglePlayMode: () => void;
+  // 网易云 ID 导入（后台管理面板的精髓）
+  importedIds: string[];
+  addMusicId: (rawId: string) => void;
+  removeMusicId: (id: string) => void;
 }
 
 const MusicContext = createContext<MusicContextType | null>(null);
@@ -80,14 +84,72 @@ export function MusicProvider({ children }: { children: ReactNode }) {
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // ===== 网易云 ID 导入：后台管理面板“导入网易云音乐的 id”的精髓，本地持久化 =====
+  const IMPORT_STORAGE_KEY = 'rcj_imported_netease_ids';
+  const [importedIds, setImportedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(IMPORT_STORAGE_KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          setImportedIds(arr.filter((id: any) => typeof id === 'string' && /^\d+$/.test(id)));
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const addMusicId = (rawId: string) => {
+    const clean = (rawId || '').toString().trim();
+    // 兼容粘贴网易云分享链接，提取其中的数字 ID
+    const matched = clean.match(/\d{4,}/);
+    const id = matched ? matched[0] : clean;
+    if (!/^\d+$/.test(id)) return;
+    setImportedIds((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      try { localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
+  const removeMusicId = (id: string) => {
+    setImportedIds((prev) => {
+      const next = prev.filter((x) => x !== id);
+      try { localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
   useEffect(() => {
     let isMounted = true;
+
+    const m = siteConfig.music;
+    const r2Url = m?.url;
+    const r2Ready = m?.source === 'r2' && !!r2Url && !r2Url.includes('__REPLACE');
+
+    // R2 自托管曲目作为默认常驻曲（陪在你身边）
+    const r2Track = r2Ready
+      ? [{
+          id: 'r2-local',
+          title: m?.title || '未知歌曲',
+          artist: m?.artist || '未知歌手',
+          cover: m?.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
+          src: r2Url as string,
+          lrcUrl: null,
+          lyrics: [] as any[],
+        }]
+      : [];
+
+    // 网易云歌单 = 配置里的固定 ID + 后台导入的 ID（外链直连，无需版权文件落地）
+    const neteaseIds = [...(siteConfig.cloudMusicIds || []), ...importedIds];
+
     const fetchMusicData = async () => {
       try {
-        const res = await fetch(`/api/music?ids=${siteConfig.cloudMusicIds.join(',')}`);
+        const res = await fetch(`/api/music?ids=${neteaseIds.join(',')}`);
         const rawResults = await res.json();
-
-        const mergedPlaylist = rawResults
+        const merged = rawResults
           .filter((song: any) => song && song.url && !song.error)
           .map((song: any) => ({
             id: song.id || Math.random().toString(),
@@ -96,44 +158,31 @@ export function MusicProvider({ children }: { children: ReactNode }) {
             cover: song.cover || song.pic || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
             src: song.url,
             lrcUrl: null,
-            lyrics: song.lrc ? parseLrc(song.lrc) : []
+            lyrics: song.lrc ? parseLrc(song.lrc) : [],
           }));
-
-        if (isMounted) {
-          if (mergedPlaylist.length > 0) setPlaylist(mergedPlaylist);
-          else setCurrentLyric("云端链路受阻");
-          setIsLoading(false);
-        }
+        if (!isMounted) return;
+        const playlist = [...r2Track, ...merged];
+        if (playlist.length > 0) setPlaylist(playlist);
+        else setCurrentLyric("云端链路受阻");
+        setIsLoading(false);
       } catch (error) {
-        if (isMounted) { setCurrentLyric("网络初始化失败"); setIsLoading(false); }
+        if (!isMounted) return;
+        const playlist = [...r2Track];
+        if (playlist.length > 0) setPlaylist(playlist);
+        else setCurrentLyric("网络初始化失败");
+        setIsLoading(false);
       }
     };
 
-    // 🌟 R2 自托管模式：直接用配置里的直链，不经过网易云 API
-    const m = siteConfig.music;
-    const r2Url = m?.url;
-    const r2Ready = m?.source === 'r2' && !!r2Url && !r2Url.includes('__REPLACE');
-
-    if (r2Ready) {
-      const single = [{
-        id: 'r2-local',
-        title: m?.title || '未知歌曲',
-        artist: m?.artist || '未知歌手',
-        cover: m?.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
-        src: r2Url as string,
-        lrcUrl: null,
-        lyrics: [],
-      }];
-      setPlaylist(single);
-      setIsLoading(false);
-    } else if (siteConfig.cloudMusicIds?.length > 0) {
+    if (neteaseIds.length > 0) {
       fetchMusicData();
     } else {
+      if (r2Track.length > 0) setPlaylist(r2Track);
       setIsLoading(false);
     }
 
     return () => { isMounted = false; };
-  }, []);
+  }, [importedIds]);
 
   useEffect(() => {
     if (playlist.length === 0) return;

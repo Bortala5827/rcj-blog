@@ -99,20 +99,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // 1) 直连流式透传（若出口未被封则最优）
-    const direct = await streamOuter(id, range)
-    if (direct) {
-      const ct = direct.headers.get('content-type') || ''
-      const respHeaders = new Headers()
-      respHeaders.set('Content-Type', ct.includes('audio') ? ct : 'audio/mpeg')
-      respHeaders.set('Accept-Ranges', 'bytes')
-      respHeaders.set('Cache-Control', 'public, max-age=3600')
-      const cr = direct.headers.get('content-range')
-      if (cr) respHeaders.set('Content-Range', cr)
-      return new Response(direct.body, { status: direct.status, headers: respHeaders })
-    }
-
-    // 2) 解析出网易 CDN 直链 -> 302 让浏览器直连（避开 CF 边缘 IP 封锁）
+    // 1) 优先用外部解析 API（injahow 实测可用）取直链 -> 302 让浏览器直连
     for (const s of API_STRATEGIES) {
       try {
         const r = await fetchT(s.url(id), { headers: s.headers || { 'User-Agent': UA }, redirect: 'follow' }, 6000)
@@ -124,6 +111,19 @@ export async function GET(request: NextRequest) {
       } catch {
         /* 换下一个策略 */
       }
+    }
+
+    // 2) 直连流式透传兜底（若出口未被封则最优）
+    const direct = await streamOuter(id, range)
+    if (direct) {
+      const ct = direct.headers.get('content-type') || ''
+      const respHeaders = new Headers()
+      respHeaders.set('Content-Type', ct.includes('audio') ? ct : 'audio/mpeg')
+      respHeaders.set('Accept-Ranges', 'bytes')
+      respHeaders.set('Cache-Control', 'public, max-age=3600')
+      const cr = direct.headers.get('content-range')
+      if (cr) respHeaders.set('Content-Range', cr)
+      return new Response(direct.body, { status: direct.status, headers: respHeaders })
     }
 
     return new Response('audio not available', { status: 502 })

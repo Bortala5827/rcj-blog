@@ -1,380 +1,75 @@
-# 🌟 欢迎使用 XHBlogs！
+# rcj-blog
 
-> **原作者（请务必保留署名）**：本项目由 **XingHuiSama（[@heiehiehi](https://github.com/heiehiehi)）** 创作，原仓库 [heiehiehi/XinghuisamaBlogs](https://github.com/heiehiehi/XinghuisamaBlogs)。原作采用 **CC BY-NC 4.0** 许可，**禁止任何形式的商业用途**。
->
-> **本仓库为 Fork 二次修改版**：由 Bortala（[@Bortala5827](https://github.com/Bortala5827)）在其基础上个性化修改，并部署于 **Cloudflare Pages**（非 Vercel），构建链路使用 `@cloudflare/next-on-pages`。所有修改均在遵守原许可（署名 + 非商用）的前提下进行，原作的著作权与署名权始终归 XingHuiSama 所有。
+我自己的博客 / 记事本，Next.js 写的，跑在 Cloudflare Pages 上。
 
-这是一个采用 Next.js 构建的高颜值、毛玻璃（Glassmorphism）风格个人博客系统。本项目自带完善的前端展示与独立的本地后台控制台，支持 Markdown 沉浸式写作、草稿管理以及便捷的图床配置。
+- 线上：<https://blog.955827.xyz>
+- 仓库：<https://github.com/Bortala5827/rcj-blog>（Private）
 
-本指南将带你从零开始，轻松部署并使用 XHBlogs。
-
----
-## 语言
-
-[![English](https://img.shields.io/badge/Language-English-blue.svg)](README_en.md)
-[![中文](https://img.shields.io/badge/语言-中文-red.svg)](README.md)
-
-## 写在前面
-
-### 更新摘要 (版本0.3.1~0.3.2)
-
-#### 1. 新增个人关于动态
-
-> 关于动态类贡献度及日志显示
-
-#### 2. 修复部分富文本编辑器bug
-
-> 修补目前存在的编辑器bug，如超链接无法显示，引用无法显示等
-
-#### 3. 新增灵境与等级系统
-
-> 类创意工坊功能，等级系统可在 设置->个人名片设置 中关闭
-
-#### 4. 网易云音乐显示bug，已修复
-
-> 已更换API，修复网易云音乐显示bug。更新即可
-
-## 一、快速开始部署
-
-### 1. 环境配置
-
-在开始之前，请确保你的电脑已安装以下运行环境，否则后续程序将无法正常启动：
-
-- **Node.js** (推荐版本 v18.x 或以上)
-- **包管理器** (npm)
-- **Git** (用于拉取代码与版本控制)
-- **Python** (建议版本 3.10 及以上，本系统在 3.10 环境下测试通过)
-- *可选：云存储/图床服务（后续会有详细配置说明）*
-
-### 2. 博客源码更新
-
-为了让你能轻松跟上项目的最新功能，请使用更新器对源码进行更新！
-使用更新器，你不需要再手动对比代码、不用担心拉取更新会引发冲突，更不用害怕辛辛苦苦写的文章和配置文件被覆盖！
-
-🛠️ 更新步骤：
-
-第一步：获取无损更新器 (仅首次需要)
-
-#### 1 下载项目根目录下的 update.bat 和 update.py 文件。
-
-#### 2  将下载好的 update.bat 和 update.py 移动到你本地博客项目的最外层根目录（也就是和 my-blog-manager、XHBlogs 文件夹放在一起的地方）。
-
-如下图所示
-
-![img.png](picture/333.png)
-
-#### 3 双击update.bat文件实现更新，如果闪退 请使用cmd运行update.py文件
-
-### 3. 快速开始
-
-#### ① 启动脚本
-
-当你完成上述环境的配置后，恭喜你，最基础的准备工作已经搞定了！
-首先，进入 `my-blog-manager` 文件夹（**⚠️ 注意：请绝对不要重命名此文件夹，否则会导致环境路径解析失败！**）
-
-双击运行文件夹中的启动脚本：
-`Start.bat`
-脚本会自动检测并安装所需的依赖包。等待环境配置完成后，程序会自动唤起精美的后台控制台。
-
-#### ② 部署你的博客到 Cloudflare Pages
-
-> **提示**：本项目已适配 **Cloudflare Pages**，构建链路使用 `@cloudflare/next-on-pages`，与 Cloudflare 边缘网络原生契合，免费额度友好、全球 CDN 加速。原作者的 Vercel 部署方式已替换为 Cloudflare Pages。
->
-> **前提**：请确保已安装 Git，并拥有一个 GitHub 账号。**接下来的步骤请务必按顺序操作！**
-
-> **请确保你已完成以下操作**：
->
-> **第一步：本地全局配置**
-
-设置用户名
-
-`git config --global user.name "你的Github用户名"`
-
-设置邮箱（必须是你在 GitHub 绑定的邮箱）
-
-`git config --global user.email "你绑定在Github的邮箱@example.com"`
-
-> **第二步：初始化本地仓库**
->
-> 进入你的项目文件夹，执行以下CMD命令行操作：(及前端部署文件夹，这里是XHBlogs)
-
-1. 初始化 Git 仓库，生成隐藏的 .git 文件夹
-   `git init`
-2. 将所有文件添加到暂存区（注意后面有个点）
-   `git add .`
-3. 提交到本地版本库，并添加备注
-   `git commit -m "first commit"`
-
-**1. 配置本地物理路径**
-打开控制台的“设置”页面。
-在拉取的源码中，包含 `XHBlogs-mananger` 和 `XHBlogs` 两个核心文件夹。请在控制台中指定 `XHBlogs` 的本地物理路径。
-
-![选择物理路径](picture/Pasted%20image%2020260427111646.png)
-
-例如：`F:\Test2\XHBlogs`
-
-![填入本地BLOG物理路径](picture/Pasted%20image%2020260427112311.png)
-
-> **关键步骤**：填入路径后，请务必点击 **[测试路径]** 进行连通性验证！！！验证通过后，再点击下方的 **[保存双轨配置]**。
-
-**2. 在 GitHub 创建私有仓库**
-登录 GitHub，新建一个用于托管博客源码的仓库（建议设置为 **Private 私有仓库** 以保护数据隐私）。
-
-![创建仓库](picture/Pasted%20image%2020260427112905.png)
-
-仓库名称可自定义。
-
-![仓库命名](picture/Pasted%20image%2020260427113030.png)
-
-获取该仓库的 SSH 地址，并将其复制粘贴到控制台的“B线”配置中：
-
-![复制SSH](picture/Pasted%20image%2020260427113120.png)
-
-源码分支填写为 `main`。确认无误后，再次点击 **[保存双轨配置]**。
-
-**3. 获取并配置部署密钥**
-点击控制台中的 **[获取B线专属密钥]** 按钮：
-
-![专属密钥](picture/98b965b5-6193-4690-a478-fe1a9abd594e.png)
-
-进入你的 GitHub 仓库页面，导航至 `Settings` -> `Deploy keys` 界面：
-
-![Deploy Keys](picture/Pasted%20image%2020260427113705.png)
-
-将刚才复制的密钥填入 `Key` 框中，`Title` 可随意命名（例如：`XHBlogs-Deploy-Key`）。
-
-> **🚨 严重警告**：下方的 **Allow write access** 选项必须勾选！！！
-> 设置完毕后，点击 **Add key** 保存。
-
-**4. 初始化并推送源码**
-返回本地控制台，点击 **[智能初始化双轨环境]**，静待程序执行完毕。
-完成后，点击 **[仅同步源码]** 按钮：
-
-![仅同步源码](picture/Pasted%20image%2020260427121539.png)
-
-程序将开始向 GitHub 推送代码。**在此期间，请千万不要切换页面或关闭窗口**：
-
-![同步进度](picture/Pasted%20image%2020260427121702.png)
-
-进度条完成后，说明前端静态页面源码已成功托管至 GitHub。
-
-> **此处可能出现无法推送bug**：
->
-> **请尝试**
->
-> 将SSH仓库地址改成如下图所示再进行初始化及同步源码
->
-> ![img.png](picture/img.png)
-
-**5. 部署至 Cloudflare Pages 平台**
-访问 [Cloudflare 官网](https://www.cloudflare.com/) 注册账号，进入 **Workers & Pages** 控制台，点击 **Create** → **Pages** → **Connect to Git**，关联你在第 2 步推送到 GitHub 的仓库（即 `xinghui-fork`）。
-
-在构建设置中填写：
-
-- **构建命令（Build command）**：`npx --yes next-on-pages`
-- **输出目录（Build output directory）**：`.vercel/output/static`
-- **根目录（Root directory）**：`XHBlogs`
-
-点击 **Save and Deploy**，Cloudflare 边缘节点会自动拉取代码并构建你的博客。构建完成后，你就能在分配的 `*.pages.dev` 地址访问你的专属网站了！
-
-> **提示**：之后每次向 `main` 分支推送代码，Cloudflare Pages 都会自动触发重新构建与部署，无需手动操作。
+> **来源与许可**
+> Fork 自 [heiehiehi/XinghuisamaBlogs](https://github.com/heiehiehi/XinghuisamaBlogs)，
+> 原作者 **XingHuiSama（[@heiehiehi](https://github.com/heiehiehi)）**，许可 **CC BY-NC 4.0**（署名 + 非商用）。
+> 署名与许可原样保留，不做商业用途。
 
 ---
 
-### 问题 1：我要怎么样绑定自己的专属域名？
+## 我改了什么
 
-**答：** 域名可在任意注册商购买（如阿里云、腾讯云、Cloudflare Registrar 等），建议将 DNS 解析统一托管在 Cloudflare。
+| 项 | 原作者 | 我这边 |
+| --- | --- | --- |
+| 部署平台 | Vercel | **Cloudflare Pages**（`@cloudflare/next-on-pages`，git 绑定自动构建） |
+| 音乐挂件 | 网易云外链 | **R2 自托管音频**为主，网易云 ID 仍可通过后台导入 |
+| 图床 / 封面 | 外链图床 | 本地 `public/` 资源 + 本地 `cover-default.svg` 默认封面 |
+| 图片依赖 | README 满屏截图（`picture/`） | **全删**，文档纯文字 |
+| 个人定位 | 原作者信息 | `siteConfig.ts` / `about` 改为 RCJ Lab 口径 |
+| 友链 | 原作者列表 | 只留自己的 |
 
-首先登录阿里云控制台，进入【域名管理】页面：
+其余功能（Markdown 写作、后台控制台、AI 猫猫、评论、说说）沿用原作。
 
-![域名管理](picture/Pasted%20image%2020260427123636.png)
+## 目录结构
 
-点击对应域名右侧的【解析】按钮：
+| 路径 | 说明 |
+| --- | --- |
+| `XHBlogs/` | **Next.js 前端主体**，部署的就是这个目录（Root directory） |
+| `my-blog-manager/` | 本地后台控制台（`Start.bat` 启动，Python 环境）⚠️ **不要改这个文件夹名**，改路径解析会崩 |
+| `update.py` / `update.bat` | 原作者的无损更新器，保留未改 |
+| `LICENSE` | CC BY-NC 4.0 |
+| `UpdateLog.md` | 原作者的更新日志 |
 
-![点击解析](picture/Pasted%20image%2020260427123737.png)
+## 我的部署参数
 
-接着回到 Cloudflare Pages 项目控制台，进入 **Custom domains** 选项卡，点击 **Set up a custom domain**：
+Cloudflare Pages → 项目 **`rcj-blog`** → Connect to Git（`Bortala5827/rcj-blog`）：
 
-![点击加号](picture/Pasted%20image%2020260427123156.png)
+| 设置项 | 值 |
+| --- | --- |
+| Production branch | `main` |
+| Root directory | `XHBlogs` |
+| Build command | `npx --yes next-on-pages` |
+| Build output | `.vercel/output/static` |
+| 自定义域 | `blog.955827.xyz` |
 
-![进入设置](picture/Pasted%20image%2020260427123838.png)
+**push 到 `main` 就会自动重新构建**，不需要手动上传。
 
-输入你购买的域名（例如 `blog.955827.xyz`），点击 **Continue** 保存：
+## 日常写东西的流程
 
-![输入域名](picture/afb9fe5f-bf1e-4a8a-ae6b-379938f0924d.png)
+1. `my-blog-manager/Start.bat` 起本地控制台
+2. 写文章 / 改设置 → **暂存到操作队列** → **更新本地** → **同步 Blog**
+3. 控制台里 **仅同步源码**（push 到 `main`）
+4. Cloudflare Pages 自动构建完成，线上刷新即可
 
-添加后，Cloudflare 会给出相应的 DNS 记录（通常是 CNAME 指向你的 `*.pages.dev` 地址）。若你的域名 DNS 已托管在 Cloudflare，系统可一键自动添加；否则请将记录手动添加到你的 DNS 解析服务商：
+## 后台与音乐
 
-![添加记录](picture/Pasted%20image%2020260427124533.png)
+- 后台口令：`199527`（只在当前浏览器会话内有效）——见 `XHBlogs/app/admin/page.tsx`
+- 后台可干的事：歌单管理（贴网易云 ID 导入）、光影画廊、系统配置、全息仪表盘
+- 音乐播放：`siteConfig.music.source === 'r2'`，走 R2 公开域名 `pub-33cbba9a540847778b48cbc906aea2ad.r2.dev`
+- 网易云那两首外链歌：`/api/music/stream?id=X` 只做**瞬时 302** 跳到解析地址（原因见下）
 
-> **注意**：添加记录时，请务必仔细核去记录类型和记录值（Value）！
+## 踩过的坑（备忘）
 
-配置完成后等待几分钟（DNS 传播需要时间），在 Cloudflare 页面刷新状态即可！！
+- **网易云封了 Cloudflare 边缘 IP**：`music.163.com/song/media/outer/url` 从 CF 请求会被 302 到 `/404`，所以服务端既不能直连也不能流式透传；现在改成路由瞬时 302 到解析 API，音频交给浏览器自己缓冲。
+- **别给流式响应加 `Content-Length`**：长度对不上 Cloudflare 会掐断，返回 502 播放失败。
+- **AI 猫猫**要线上生效，得在 Pages 的环境变量里放 `GEMINI_API_KEY`。
+- 本地 `next-on-pages` 构建在 Windows 下偶发 `spawn npx ENOENT` / `.next` 清理失败，属本机沙箱问题，Cloudflare 的 Linux 构建不受影响。
 
-![Refresh](picture/Pasted%20image%2020260427124625.png)
+## 许可
 
-当状态显示为正常后，你就可以通过自己的专属域名访问博客了！（例如：`www.xinghuisama.top`）。
-
----
-
-## 二、更新设置及上传文件
-
-为了保护数据安全，本控制台采用了**“操作暂存区”**机制。**请特别注意！！** 许多设置在修改后，必须主动执行“更新到本地”才能真正保存。需要执行此操作时，界面上方通常会有高亮提示。
-
-**操作示例：修改个人简介**
-
-![修改简介](picture/Pasted%20image%2020260427125314.png)
-
-修改内容后，点击 **[暂存到操作队列]**：
-
-![暂存队列](picture/Pasted%20image%2020260427125430.png)
-
-此时上方工具箱会提示待办操作。你可以随时撤销（清空全部），或者点击 **[更新本地]**。
-
-> ⚠️ 注意：点击“更新本地”后，数据仅仅保存在了你的本地控制台环境中。
-
-如果你希望让这些修改在前端博客页面生效，你必须继续点击 **[同步 Blog]**（前提是前端博客的物理路径已正确配置）：
-
-![同步Blog](picture/Pasted%20image%2020260427125800.png)
-
-博客文章、说说（碎碎念）、杂谈等所有内容的发布与修改，均遵循此流程。
-
-> **💡 黄金法则**：暂存队列 -> 更新本地 -> 同步Blog
-
----
-
-## 三、如何推送你的修改到线上网页？
-
-当你在本地完成了满意的创作或设置调整，想要将其发布到公网让所有人看到时：
-
-请牢记，在执行了任何实质性修改并点击 **[同步Blog]** 后，请打开控制台的同步部署页面：
-
-![打开同步](picture/Pasted%20image%2020260427130216.png)
-
-确认“B线”地址正确无误，点击 **[仅同步源码]**。
-等待 Cloudflare Pages 自动捕获 `main` 分支的更新并重新构建部署。稍作喝杯茶的功夫，你就能在线上页面看到最新鲜的内容了！
-
----
-
-## 四、图床配置
-
-为了优化写作体验，控制台深度整合了图床上传功能。本指南推荐使用“去不图床”（[https://7bu.top](https://7bu.top)）。
-如果你习惯使用纯外链，工具台也完美支持直接插入图片 URL。如果想接入其他支持标准 API 的图床，也欢迎极客们自行尝试。
-
-**配置流程：**
-
-![图床配置](picture/Pasted%20image%2020260427124930.png)
-
-填入对应的 API Token 等信息后，你可以点击 **[发送探针测试Token]**，实时检验图床接口是否畅通。
-
----
-
-## 五、AI 猫猫助理设置
-
-博客系统内置了一只聪明的 AI 猫猫助理（默认接入 Gemini 模型）。极客玩家也可以通过修改源码接入其他大语言模型。
-
-首先，你需要申请一个 Gemini 的 API Key（申请教程网络资源丰富，在此不赘述）。拿到 API Key 后，在控制台进行如下配置：
-
-![猫猫设置](picture/Pasted%20image%2020260427134211.png)
-
-在本地设定好猫猫的专属系统提示词（性格）后，我们需要让线上环境也拥有调用 AI 的能力。请登录 Cloudflare Pages 项目控制台：
-
-![Cloudflare Pages环境](picture/Pasted%20image%2020260427134538.png)
-
-在项目设置中找到 `Environment Variables`（环境变量）：
-
-![搜索变量](picture/Pasted%20image%2020260427134633.png)
-
-进入你的博客工程详情：
-
-![项目工程](picture/Pasted%20image%2020260427134703.png)
-
-确保作用域（环境）包含线上环境，点击 **Add Environment Variables**：
-
-![添加变量](picture/Pasted%20image%2020260427135004.png)
-
-安全地注入你的密钥：
-
-- **Key** 输入：`GEMINI_API_KEY`
-- **Value** 输入：你的真实 API 密钥
-
-![输入API](picture/Pasted%20image%2020260427135044.png)
-
-点击保存。下一次重新部署时，猫猫助理就会在线上苏醒了。
-
----
-
-## 六、评论系统配置
-
-本博客的评论系统基于 GitHub Issues（Gitalk 等类似方案）。你需要在 GitHub 创建一个 **Public（公开）** 仓库来专门存储网友的留言。
-
-在控制台评论设置中，填入你的 GitHub 用户名以及这个公开仓库的名称：
-
-![评论设置](picture/a3b44842-696b-4764-9cdf-882cd8792729.png)
-
-**接下来，配置 OAuth 授权以允许访客登录留言：**
-
-1. 登录 GitHub，点击右上角个人头像，进入 **Settings**（设置）。
-2. 滑动到左侧菜单栏最底部，点击 **Developer settings**。
-3. 在左侧选择 **OAuth Apps**，点击右上角的 **New OAuth App**。
-
-**关键应用信息填写指南：**
-
-
-| 字段名称                       | 填写建议                                                                           |
-| ------------------------------ | ---------------------------------------------------------------------------------- |
-| **Application name**           | 自定义名称，例如：`My-Blog-Comments`                                               |
-| **Homepage URL**               | 你的博客**首页完整地址** (例如 `https://www.xinghuisama.top`)                      |
-| **Application description**    | 可选填                                                                             |
-| **Authorization callback URL** | **核心参数**：必须填写你的博客域名。如果经常本地调试，可填 `http://localhost:3000` |
-
-**提取核心密钥：**
-
-1. 提交注册（Register application）。
-2. 在跳转页面即可看到 **Client ID**，这是所需的第一项数据。
-3. 点击下方的 **Generate a new client secret** 生成密钥。
-4. **🚨 立刻将这串密钥复制并妥善保存！** 出于安全机制，离开此页面后该密钥将永远隐藏。
-
-将这组 `Client ID` 和 `Client Secret` 准确填入控制台的对应栏目中，保存即可激活评论功能。
-
----
-
-## 七、网易云音乐挂件设置
-
-![歌单设置](picture/Pasted%20image%2020260427141049.png)
-
-想给博客配上 BGM 吗？
-通过电脑浏览器打开 **网易云音乐网页版**。搜索并进入你喜欢的歌曲详情页，观察浏览器地址栏，URL 中的数字即为歌曲的专属 ID：
-
-![网易云ID](picture/Pasted%20image%2020260427141235.png)
-
-将这串 ID 复制并粘贴到控制台的搜索框中，即可一键将该歌曲收录进你的博客歌单库！
-
-![添加歌曲](picture/Pasted%20image%2020260427141356.png)
-
----
-
-## 写在最后
-
-XHBLogs 还有诸多隐藏的细节功能，期待极客朋友们在实际使用中慢慢探索。本项目旨在提供一套开箱即用的前端静态展示与后台管理方案。如果你是资深开发者，觉得控制台操作仍有优化空间，完全可以基于 Next.js 源码进行二次开发，甚至手搓 Markdown 进行部署！
-
-**如果你觉得这个项目对你有帮助，请务必在 GitHub 上为我点亮一颗 ⭐ Star！每一颗星都是博主持续维护更新的最大动力。谢谢大家！**
-
-## 许可证
-
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
-
-> 本项目采用 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) 许可协议。允许免费学习、分享和二次修改后发布（二次开源发布需提及原作者），但**严禁用于任何商业用途**。
-
-
----
-
-## 关于作者 & 我的网址
-
-- **博主**：Bortala（小样儿）—— 全栈独立开发者，围绕 `955827.xyz` 生态做产品。
-- **博客地址**：[https://blog.955827.xyz](https://blog.955827.xyz)
-- **主站生态**：[https://955827.xyz](https://955827.xyz)
-- **GitHub**：[@Bortala5827](https://github.com/Bortala5827)
-- **部署平台**：Cloudflare Pages（构建链路 `@cloudflare/next-on-pages`）
-
-> 本项目为 XingHuiSama 原作的 Fork 二次修改版，已部署于 Cloudflare Pages（非原作者使用的 Vercel）。原作著作权与署名权始终归 XingHuiSama 所有，采用 CC BY-NC 4.0 许可，禁止商业用途。
+[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) —— 可自由学习、分享、二次修改（二次开源需提及原作者），**禁止任何商业用途**。

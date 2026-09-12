@@ -76,9 +76,9 @@
 `Start.bat`
 脚本会自动检测并安装所需的依赖包。等待环境配置完成后，程序会自动唤起精美的后台控制台。
 
-#### ② 部署你的博客到 Vercel
+#### ② 部署你的博客到 Cloudflare Pages
 
-> **提示**：本教程主要演示如何将项目部署至 Vercel，因为 Vercel 对 Next.js 框架有着最顶级的原生支持。
+> **提示**：本项目已适配 **Cloudflare Pages**，构建链路使用 `@cloudflare/next-on-pages`，与 Cloudflare 边缘网络原生契合，免费额度友好、全球 CDN 加速。原作者的 Vercel 部署方式已替换为 Cloudflare Pages。
 >
 > **前提**：请确保已安装 Git，并拥有一个 GitHub 账号。**接下来的步骤请务必按顺序操作！**
 
@@ -166,44 +166,24 @@
 >
 > ![img.png](picture/img.png)
 
-**5. 部署至 Vercel 平台**
-访问 Vercel 官网，注册账号并绑定你的 GitHub 授权！
+**5. 部署至 Cloudflare Pages 平台**
+访问 [Cloudflare 官网](https://www.cloudflare.com/) 注册账号，进入 **Workers & Pages** 控制台，点击 **Create** → **Pages** → **Connect to Git**，关联你在第 2 步推送到 GitHub 的仓库（即 `xinghui-fork`）。
 
-![绑定账号](picture/Pasted%20image%2020260427121844.png)
+在构建设置中填写：
 
-点击 `Add New...` 添加一个新的 Project，在 Import 列表中选择你刚刚推送到 GitHub 的仓库：
+- **构建命令（Build command）**：`npx --yes next-on-pages`
+- **输出目录（Build output directory）**：`.vercel/output/static`
+- **根目录（Root directory）**：`XHBlogs`
 
-![导入项目](picture/Pasted%20image%2020260427121939.png)
+点击 **Save and Deploy**，Cloudflare 边缘节点会自动拉取代码并构建你的博客。构建完成后，你就能在分配的 `*.pages.dev` 地址访问你的专属网站了！
 
-例如我选择的是 `XHBlogS2`：
-
-![选择项目](picture/Pasted%20image%2020260427122034.png)
-
-在 Framework Preset（框架预设）中选择 **Next.js**，然后点击 **Deploy** 按钮开始部署：
-
-![点击Deploy](picture/Pasted%20image%2020260427122141.png)
-
-静候 Vercel 服务器构建你的博客~~
-
-![部署中](picture/Pasted%20image%2020260427122245.png)
-
-撒花！部署成功后，点击预览图即可直接访问你的专属网站！
-
-![部署成功](picture/Pasted%20image%2020260427122338.png)
-
-在项目仪表盘（Dashboard）中，你可以随时查看部署状态与详细日志：
-
-![查看详情](picture/Pasted%20image%2020260427122453.png)
-
-Vercel 默认会为你分配一个免费的二级域名：
-
-![分配域名](picture/Pasted%20image%2020260427122553.png)
+> **提示**：之后每次向 `main` 分支推送代码，Cloudflare Pages 都会自动触发重新构建与部署，无需手动操作。
 
 ---
 
 ### 问题 1：我要怎么样绑定自己的专属域名？
 
-**答：** 这里以“阿里云”购买的域名为例（其他服务商如腾讯云、Cloudflare 等操作逻辑基本一致）。
+**答：** 域名可在任意注册商购买（如阿里云、腾讯云、Cloudflare Registrar 等），建议将 DNS 解析统一托管在 Cloudflare。
 
 首先登录阿里云控制台，进入【域名管理】页面：
 
@@ -213,23 +193,23 @@ Vercel 默认会为你分配一个免费的二级域名：
 
 ![点击解析](picture/Pasted%20image%2020260427123737.png)
 
-接着回到 Vercel，进入你的项目仪表盘，点击 **Settings**（或者直接点击域名旁的加号）：
+接着回到 Cloudflare Pages 项目控制台，进入 **Custom domains** 选项卡，点击 **Set up a custom domain**：
 
 ![点击加号](picture/Pasted%20image%2020260427123156.png)
 
 ![进入设置](picture/Pasted%20image%2020260427123838.png)
 
-在 Domains 选项卡中，输入你购买的域名（例如我的是 `xinghuisama.top`），点击 **Add** 保存：
+输入你购买的域名（例如 `blog.955827.xyz`），点击 **Continue** 保存：
 
 ![输入域名](picture/afb9fe5f-bf1e-4a8a-ae6b-379938f0924d.png)
 
-添加后，Vercel 会提供 `A` 记录和 `CNAME` 记录的配置参数。请将这些参数完整添加到阿里云的 DNS 解析设置中：
+添加后，Cloudflare 会给出相应的 DNS 记录（通常是 CNAME 指向你的 `*.pages.dev` 地址）。若你的域名 DNS 已托管在 Cloudflare，系统可一键自动添加；否则请将记录手动添加到你的 DNS 解析服务商：
 
 ![添加记录](picture/Pasted%20image%2020260427124533.png)
 
 > **注意**：添加记录时，请务必仔细核去记录类型和记录值（Value）！
 
-配置完成后等待几分钟（DNS 传播需要时间），在 Vercel 页面点击 **Refresh** 刷新状态！！
+配置完成后等待几分钟（DNS 传播需要时间），在 Cloudflare 页面刷新状态即可！！
 
 ![Refresh](picture/Pasted%20image%2020260427124625.png)
 
@@ -272,7 +252,7 @@ Vercel 默认会为你分配一个免费的二级域名：
 ![打开同步](picture/Pasted%20image%2020260427130216.png)
 
 确认“B线”地址正确无误，点击 **[仅同步源码]**。
-等待 GitHub Actions 或 Vercel 自动捕获更新。稍作喝杯茶的功夫，你就能在线上页面看到最新鲜的内容了！
+等待 Cloudflare Pages 自动捕获 `main` 分支的更新并重新构建部署。稍作喝杯茶的功夫，你就能在线上页面看到最新鲜的内容了！
 
 ---
 
@@ -297,9 +277,9 @@ Vercel 默认会为你分配一个免费的二级域名：
 
 ![猫猫设置](picture/Pasted%20image%2020260427134211.png)
 
-在本地设定好猫猫的专属系统提示词（性格）后，我们需要让线上环境也拥有调用 AI 的能力。请登录 Vercel：
+在本地设定好猫猫的专属系统提示词（性格）后，我们需要让线上环境也拥有调用 AI 的能力。请登录 Cloudflare Pages 项目控制台：
 
-![Vercel环境](picture/Pasted%20image%2020260427134538.png)
+![Cloudflare Pages环境](picture/Pasted%20image%2020260427134538.png)
 
 在项目设置中找到 `Environment Variables`（环境变量）：
 
@@ -385,3 +365,16 @@ XHBLogs 还有诸多隐藏的细节功能，期待极客朋友们在实际使用
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
 
 > 本项目采用 [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) 许可协议。允许免费学习、分享和二次修改后发布（二次开源发布需提及原作者），但**严禁用于任何商业用途**。
+
+
+---
+
+## 关于作者 & 我的网址
+
+- **博主**：Bortala（小样儿）—— 全栈独立开发者，围绕 `955827.xyz` 生态做产品。
+- **博客地址**：[https://blog.955827.xyz](https://blog.955827.xyz)
+- **主站生态**：[https://955827.xyz](https://955827.xyz)
+- **GitHub**：[@Bortala5827](https://github.com/Bortala5827)
+- **部署平台**：Cloudflare Pages（构建链路 `@cloudflare/next-on-pages`）
+
+> 本项目为 XingHuiSama 原作的 Fork 二次修改版，已部署于 Cloudflare Pages（非原作者使用的 Vercel）。原作著作权与署名权始终归 XingHuiSama 所有，采用 CC BY-NC 4.0 许可，禁止商业用途。

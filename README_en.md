@@ -80,9 +80,9 @@ Double-click to run the startup script in the folder:
 `Start.bat`
 The script will automatically detect and install the required dependencies. Once the environment configuration is complete, the program will launch the backend console.
 
-#### ② Deploy Your Blog to Vercel
+#### ② Deploy Your Blog to Cloudflare Pages
 
-> **Tip**: This tutorial primarily demonstrates how to deploy the project to Vercel, as Vercel provides native support for the Next.js framework.
+> **Tip**: This project is adapted for **Cloudflare Pages**, built with `@cloudflare/next-on-pages`, natively integrated with Cloudflare's edge network — generous free tier and global CDN. The original author's Vercel deployment has been replaced with Cloudflare Pages.
 > **Prerequisite**: Please ensure Git is installed and you have a GitHub account. **Be sure to follow the upcoming steps in order!**
 
 > **Please ensure you have completed the following operations**:
@@ -162,44 +162,24 @@ Once the progress bar is complete, the frontend static page source code has been
 > Change the SSH repository address as shown below before initializing and syncing the source code.
 > 
 
-**5. Deploy to the Vercel Platform**
-Visit the Vercel website, register an account, and bind your GitHub authorization.
+**5. Deploy to the Cloudflare Pages Platform**
+Visit the [Cloudflare website](https://www.cloudflare.com/), register an account, and go to the **Workers & Pages** console. Click **Create** → **Pages** → **Connect to Git**, and connect the repository you pushed to GitHub in Step 2 (i.e., `xinghui-fork`).
 
-![绑定账号](picture/Pasted%20image%2020260427121844.png)
+In the build settings, fill in:
 
-Click `Add New...` to add a new Project, and select the repository you just pushed to GitHub from the Import list:
+- **Build command**: `npx --yes next-on-pages`
+- **Build output directory**: `.vercel/output/static`
+- **Root directory**: `XHBlogs`
 
-![导入项目](picture/Pasted%20image%2020260427121939.png)
+Click **Save and Deploy**, and Cloudflare's edge nodes will automatically pull the code and build your blog. Once done, you can visit your site at the assigned `*.pages.dev` address!
 
-For example, I selected `XHBlogS2`:
-
-![选择项目](picture/Pasted%20image%2020260427122034.png)
-
-Select **Next.js** in Framework Preset, then click the **Deploy** button to start deployment:
-
-![点击Deploy](picture/Pasted%20image%2020260427122141.png)
-
-Wait for the Vercel server to build your blog.
-
-![部署中](picture/Pasted%20image%2020260427122245.png)
-
-Deployment successful! Click the preview image to visit your website directly.
-
-![部署成功](picture/Pasted%20image%2020260427122338.png)
-
-In the project Dashboard, you can check the deployment status and detailed logs at any time:
-
-![查看详情](picture/Pasted%20image%2020260427122453.png)
-
-Vercel will assign you a free subdomain by default:
-
-![分配域名](picture/Pasted%20image%2020260427122553.png)
+> **Tip**: Every time you push to the `main` branch, Cloudflare Pages will automatically trigger a rebuild and redeploy — no manual action needed.
 
 ---
 
 ### Question 1: How do I bind my custom domain name?
 
-**Answer:** Here is an example using a domain purchased from "Alibaba Cloud" (the operation logic for other providers like Tencent Cloud, Cloudflare, etc., is similar).
+**Answer:** Domains can be purchased from any registrar (Alibaba Cloud, Tencent Cloud, Cloudflare Registrar, etc.). It is recommended to host DNS resolution on Cloudflare.
 
 First, log in to the Alibaba Cloud console and enter the [Domain Name Management] page:
 
@@ -209,21 +189,21 @@ Click the [DNS Resolution] button on the right side of the corresponding domain:
 
 ![点击解析](picture/Pasted%20image%2020260427123737.png)
 
-Then return to Vercel, enter your project dashboard, and click **Settings** (or directly click the plus sign next to the domain name):
+Then return to the Cloudflare Pages project console, go to the **Custom domains** tab, and click **Set up a custom domain**:
 
 ![点击加号](picture/Pasted%20image%2020260427123156.png)
 
 ![进入设置](picture/Pasted%20image%2020260427123838.png)
 
-In the Domains tab, enter the domain you purchased (for example, mine is `xinghuisama.top`), and click **Add** to save:
+Enter the domain you purchased (e.g., `blog.955827.xyz`), and click **Continue** to save:
 
-After adding it, Vercel will provide the configuration parameters for the `A` record and `CNAME` record. Please add these parameters completely to your Alibaba Cloud DNS resolution settings:
+After adding it, Cloudflare will provide the corresponding DNS records (usually a CNAME pointing to your `*.pages.dev` address). If your domain DNS is hosted on Cloudflare, it can be added automatically; otherwise, add the records manually to your DNS provider:
 
 ![添加记录](picture/Pasted%20image%2020260427124533.png)
 
 > **Note**: When adding records, be sure to carefully check the record type and Value!
 
-After configuration is complete, wait a few minutes (DNS propagation takes time), and click **Refresh** on the Vercel page to update the status.
+After configuration is complete, wait a few minutes (DNS propagation takes time), then refresh the status on the Cloudflare page.
 
 ![Refresh](picture/Pasted%20image%2020260427124625.png)
 
@@ -266,7 +246,7 @@ Please remember, after making any substantial modifications and clicking **[Sync
 ![打开同步](picture/Pasted%20image%2020260427130216.png)
 
 Confirm that the "Line B" address is correct, and click **[Sync Source Code Only]**.
-Wait for GitHub Actions or Vercel to automatically capture the update. In a short time, you will see the latest content on the live page.
+Wait for Cloudflare Pages to automatically capture the `main` branch update and redeploy. In a short time, you will see the latest content on the live page.
 
 ---
 
@@ -291,9 +271,9 @@ First, you need to apply for a Gemini API Key. After obtaining the API Key, conf
 
 ![猫猫设置](picture/Pasted%20image%2020260427134211.png)
 
-After setting the exclusive system prompt (personality) for the cat locally, we need to give the online environment the ability to call the AI. Please log in to Vercel:
+After setting the exclusive system prompt (personality) for the cat locally, we need to give the online environment the ability to call the AI. Please log in to the Cloudflare Pages project console:
 
-![Vercel环境](picture/Pasted%20image%2020260427134538.png)
+![Cloudflare Pages环境](picture/Pasted%20image%2020260427134538.png)
 
 Find `Environment Variables` in the project settings:
 
@@ -399,3 +379,16 @@ XHBlogs has detailed features waiting to be explored during actual use. This pro
 #### 5. Environment Variables
 
 > Required environment variables have increased, please take note.
+
+
+---
+
+## About the Author & My Sites
+
+- **Author**: Bortala (小样儿) — a full-stack indie developer building products around the `955827.xyz` ecosystem.
+- **Blog**: [https://blog.955827.xyz](https://blog.955827.xyz)
+- **Main hub**: [https://955827.xyz](https://955827.xyz)
+- **GitHub**: [@Bortala5827](https://github.com/Bortala5827)
+- **Deploy platform**: Cloudflare Pages (built with `@cloudflare/next-on-pages`)
+
+> This project is a fork/modified version of XingHuiSama's original blog, deployed on **Cloudflare Pages** (not the original author's Vercel). All copyright and attribution remain with XingHuiSama; licensed under CC BY-NC 4.0, commercial use prohibited.

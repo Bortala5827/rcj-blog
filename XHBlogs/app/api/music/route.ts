@@ -76,7 +76,8 @@ export async function GET(request: NextRequest) {
           author: artistName,
           cover: song.album?.picUrl || '',
           pic: song.album?.picUrl || '',
-          url: `https://music.163.com/song/media/outer/url?id=${songId}.mp3`,
+          // 指向同源音频代理（服务端补 Referer/UA 并透传流），避免浏览器直连外链被混合内容/Referer 拦截
+          url: `/api/music/stream?id=${songId}`,
           lrc: lrcText,
         }
       } catch (error) {

@@ -23,6 +23,7 @@ type SongResult = {
   author?: string
   cover?: string
   pic?: string
+  coverRaw?: string
   url?: string
   lrc?: string
   error?: string
@@ -68,14 +69,17 @@ export async function GET(request: NextRequest) {
         }
 
         const artistName = song.artists?.[0]?.name || '未知歌手'
+        const cover = song.album?.picUrl || ''
 
         return {
           id: songId,
           name: song.name,
           artist: artistName,
           author: artistName,
-          cover: song.album?.picUrl || '',
-          pic: song.album?.picUrl || '',
+          // 封面也走同源代理：部分网络访问不到 *.music.126.net，直连会「破图」
+          cover: cover ? `/api/music/img?u=${encodeURIComponent(cover)}` : '',
+          pic: cover ? `/api/music/img?u=${encodeURIComponent(cover)}` : '',
+          coverRaw: cover,
           // 指向同源音频代理（服务端补 Referer/UA 并透传流），避免浏览器直连外链被混合内容/Referer 拦截
           url: `/api/music/stream?id=${songId}`,
           lrc: lrcText,

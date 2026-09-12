@@ -9,14 +9,17 @@ import { NextRequest } from 'next/server'
 //  3. 第三方 Meting 实例（api.injahow.cn / api.i-meto.com）已不可达，之前的"瞬时 302 跳过去"
 //     方案因此彻底失效（音频元素一直 networkState=2 卡住）。
 //
-// 现在的方案：服务端按顺序尝试多个解析通道，拿到直链后校验「是不是真的网易音频 CDN」
-// （挡掉 /404 封锁页和 st.music.163.com 风控验证页）并统一 https 化，再 302 给浏览器，
-// 音频由浏览器直连网易 CDN 缓冲（不占 Worker 带宽）。任一通道成功即返回；全失败给 404 JSON。
+// 现在的方案（2026-09-12 二次修订）：
+//   1) 先按顺序尝试多个解析通道拿到直链，校验「是不是真的网易音频 CDN」
+//      （挡掉 /404 封锁页和 st.music.163.com 风控验证页）并统一 https 化；
+//   2) 拿到直链后**优先由边缘同源代理**（透传 Range / 206，浏览器只连本站域名）——
+//      因为部分网络访问不到 *.music.126.net，表现就是「封面破图 + 播放 0:00/0:00」；
+//   3) 代理失败（边缘也取不到）才退回 302 直连网易 CDN（老行为）。
+//   全失败给 404 JSON，前端提示「音源不可用」。
 //
-// 版权/会员受限的歌（如 周杰伦《晴天》id=186016）实测三个通道全拿不到音频 → 直接 404，
-// 前端会提示「音源不可用」，不再假装缓冲。
+// 版权/会员受限的歌（如 周杰伦《晴天》id=186016）实测三个通道全拿不到音频 → 直接 404。
 //
-// 排障：/api/music/stream?id=xxx&debug=1 会返回每个通道的真实结果，不再需要猜。
+// 排障：/api/music/stream?id=xxx&debug=1 会返回每个通道的真实结果 + 边缘代理取字节的实测结果。
 export const runtime = 'edge'
 
 const UA =
@@ -151,6 +154,40 @@ const STRATEGIES: { name: string; run: (id: string) => Promise<Probe> }[] = [
   { name: 'meting', run: viaMeting },
 ]
 
+/** 同源代理：由边缘去取音频字节，再把流吐回浏览器（浏览器只需连本站域名）。
+ *  为什么需要：部分网络访问不到 *.music.126.net（封面破图 + 播放 0:00/0:00 同时出现就是它的特征）。
+ *  透传 Range/206 以支持拖动进度条；失败返回 null，调用方退回 302。 */
+async function proxyAudio(
+  url: string,
+  source: string,
+  range: string | null,
+  method: string,
+): Promise<Response | null> {
+  try {
+    const headers: Record<string, string> = { 'User-Agent': UA, Referer: 'https://music.163.com/' }
+    if (range) headers.Range = range
+    const r = await fetchT(url, { headers, redirect: 'follow', method: method === 'HEAD' ? 'HEAD' : 'GET' }, 15000)
+    if (!r.ok && r.status !== 206) return null
+    if (method === 'HEAD' || !r.body) {
+      return new Response(null, { status: 200, headers: { 'Accept-Ranges': 'bytes', 'X-Music-Mode': 'head' } })
+    }
+    const h = new Headers()
+    h.set('Content-Type', r.headers.get('content-type') || 'audio/mpeg')
+    h.set('Accept-Ranges', r.headers.get('accept-ranges') || 'bytes')
+    const cl = r.headers.get('content-length')
+    const cr = r.headers.get('content-range')
+    if (cl) h.set('Content-Length', cl)
+    if (cr) h.set('Content-Range', cr)
+    // 直链带时效签名，不能缓存
+    h.set('Cache-Control', 'no-store')
+    h.set('X-Music-Source', source)
+    h.set('X-Music-Mode', 'proxy')
+    return new Response(r.body, { status: r.status === 206 ? 206 : 200, headers: h })
+  } catch {
+    return null
+  }
+}
+
 export async function GET(request: NextRequest) {
   const raw = request.nextUrl.searchParams.get('id') || ''
   const matched = raw.match(/\d{4,}/)
@@ -168,30 +205,62 @@ export async function GET(request: NextRequest) {
       const t0 = Date.now()
       const r = await s.run(id)
       report[s.name] = { ok: !!r.url, ms: Date.now() - t0, ...r.detail }
+      if (r.url) {
+        // 顺手验证「边缘能不能真的取到音频字节」（同源代理是否可行）
+        const t1 = Date.now()
+        const head = await proxyAudio(r.url, s.name, 'bytes=0-1023', 'GET').catch(() => null)
+        report.proxy = {
+          source: s.name,
+          ok: !!head,
+          status: head?.status ?? null,
+          contentType: head?.headers.get('content-type') || null,
+          ms: Date.now() - t1,
+        }
+        // 真读一点字节，确认不是空响应
+        try {
+          report.proxy.sampleBytes = head ? (await head.arrayBuffer()).byteLength : 0
+        } catch {
+          report.proxy.sampleBytes = -1
+        }
+        break
+      }
     }
     return Response.json(report, { headers: { 'Cache-Control': 'no-store' } })
   }
 
-  // 生产：顺序尝试，首个成功即 302（瞬时返回，音频由浏览器直连 CDN）
+  const range = request.headers.get('range')
+  const method = request.method
+
+  // 生产：顺序尝试通道 —— 首选「同源代理」（浏览器只连本站，绕开 126.net 可达性问题），
+  // 代理失败才退回 302 直连（老行为，浏览器直连网易 CDN）。全失败给 404。
   const attempts: Record<string, any> = {}
   for (const s of STRATEGIES) {
     try {
       const r = await s.run(id)
-      if (r.url) {
-        return new Response(null, {
-          status: 302,
-          headers: {
-            Location: r.url,
-            'Cache-Control': 'public, max-age=300',
-            'X-Music-Source': s.name,
-          },
-        })
+      if (!r.url) {
+        attempts[s.name] = 'no-url'
+        continue
       }
-      attempts[s.name] = 'no-url'
+      const proxied = await proxyAudio(r.url, s.name, range, method)
+      if (proxied) return proxied
+      attempts[s.name] = 'proxy-failed->302'
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: r.url,
+          'Cache-Control': 'public, max-age=300',
+          'X-Music-Source': s.name,
+          'X-Music-Mode': 'redirect',
+        },
+      })
     } catch (e) {
       attempts[s.name] = String(e)
     }
   }
 
   return Response.json({ error: 'no_playable_url', id, attempts }, { status: 404 })
+}
+
+export async function HEAD(request: NextRequest) {
+  return GET(request)
 }

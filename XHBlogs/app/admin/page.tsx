@@ -6,11 +6,12 @@ import { siteConfig } from '../../siteConfig';
 import Navbar from '../../components/Navbar';
 import PageTransition from '../../components/PageTransition';
 import { useRouter } from 'next/navigation';
+import { ADMIN_PASS, adminHeaders } from '../../lib/adminPass';
 
-// 与 MusicProvider 共用同一个 localStorage key，使后台导入/删除的歌单直接反映在 /music
+// 与 MusicProvider 共用同一个 localStorage key（缓存）；云端（D1）为权威来源
 const STORAGE_KEY = 'rcj_imported_netease_ids';
 // 管理面板访问口令（客户端校验，仅作轻量防护；个人自娱博客足够）
-const ADMIN_PASSWORD = '199527';
+const ADMIN_PASSWORD = ADMIN_PASS;
 const UNLOCK_KEY = 'rcj_admin_unlocked';
 
 export default function AdminDashboard() {
@@ -48,24 +49,73 @@ export default function AdminDashboard() {
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryResult, setQueryResult] = useState<any>(null);
   const [queryError, setQueryError] = useState('');
+  const [cloudState, setCloudState] = useState<'idle' | 'synced' | 'local'>('idle');
 
-  // 读取 localStorage 中已导入的网易云 ID
+  // 读歌单：云端（D1）优先，取不到则退回本地缓存
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) {
-          setIds(arr.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x)));
+    let alive = true;
+    const readLocal = (): string[] => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x)) : [];
+      } catch { return []; }
+    };
+    const local = readLocal();
+    if (local.length) setIds(local);
+
+    fetch('/api/music/ids', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => {
+        if (!alive) return;
+        if (d && d.ok === true && Array.isArray(d.ids)) {
+          const serverIds = d.ids.filter((x: any) => typeof x === 'string');
+          setIds(serverIds);
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(serverIds)); } catch { /* ignore */ }
+          setCloudState('synced');
+        } else {
+          setCloudState('local');
         }
-      }
-    } catch { /* ignore */ }
+      })
+      .catch(() => { if (alive) setCloudState('local'); });
+
+    return () => { alive = false; };
   }, []);
 
-  // 持久化 + 同步状态
+  // 本地持久化（缓存）+ 云端同步
   const persist = useCallback((next: string[]) => {
     setIds(next);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+  }, []);
+
+  const addToCloud = useCallback(async (song: any) => {
+    try {
+      const r = await fetch('/api/music/ids', {
+        method: 'POST',
+        headers: adminHeaders({ 'content-type': 'application/json' }),
+        body: JSON.stringify({
+          id: song?.id,
+          name: song?.name,
+          artist: song?.artist || song?.author,
+          cover: song?.coverRaw || song?.cover,
+        }),
+      });
+      const d = await r.json();
+      if (d?.ok) { setCloudState('synced'); return true; }
+      setCloudState('local');
+      return false;
+    } catch { setCloudState('local'); return false; }
+  }, []);
+
+  const removeFromCloud = useCallback(async (id: string) => {
+    try {
+      const r = await fetch(`/api/music/ids?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: adminHeaders(),
+      });
+      const d = await r.json();
+      if (Array.isArray(d?.ids)) setIds(d.ids);
+    } catch { /* ignore */ }
   }, []);
 
   // 拉取所有已导入 ID 的封面/标题（真实查询）；逐个容错，不整体卡死
@@ -112,22 +162,26 @@ export default function AdminDashboard() {
     }
   };
 
-  const confirmAddMusic = () => {
+  const confirmAddMusic = async () => {
     if (!queryResult) return;
     const id = String(queryResult.id);
     if (!ids.includes(id)) persist([...ids, id]);
     setNewId('');
     setQueryResult(null);
+    // 同步到云端（D1）：换设备 / 清缓存都不会再丢
+    addToCloud({ ...queryResult, id });
   };
 
   const removeSong = (index: number) => {
-    const next = ids.filter((_, i) => i !== index);
-    persist(next);
+    const target = ids[index];
+    persist(ids.filter((_, i) => i !== index));
+    if (target) removeFromCloud(target);
   };
 
   const clearAll = () => {
     persist([]);
     setDetails({});
+    removeFromCloud('all');
   };
 
   // R2 默认常驻曲目（与 /music 同源）
@@ -247,7 +301,7 @@ export default function AdminDashboard() {
             {[
               { icon: '🌐', label: '部署平台', value: 'Cloudflare Pages', sub: 'git 绑定自动构建' },
               { icon: '🎶', label: '主曲目', value: m?.title || '陪在你身边', sub: 'R2 自托管 · WebM' },
-              { icon: '📥', label: '已导入网易云', value: `${ids.length} 首`, sub: '外链直连播放' },
+              { icon: '📥', label: '已导入网易云', value: `${ids.length} 首`, sub: cloudState === 'synced' ? '云端 D1 同步' : cloudState === 'local' ? '仅本地缓存' : '外链直连播放' },
               { icon: '🔗', label: '站点地址', value: 'blog.955827.xyz', sub: 'RCJ 生态 · Bortala' },
             ].map((card) => (
               <div key={card.label} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-5 shadow-lg hover:-translate-y-1 transition-transform">

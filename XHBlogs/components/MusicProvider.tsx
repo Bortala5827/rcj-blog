@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from 'react';
 import { siteConfig } from '../siteConfig';
+import { adminHeaders } from '../lib/adminPass';
 
 // 【增强版 LRC 歌词解析】
 function parseLrc(lrcText: string) {
@@ -61,7 +62,8 @@ interface MusicContextType {
   togglePlayMode: () => void;
   // 网易云 ID 导入（后台管理面板的精髓）
   importedIds: string[];
-  addMusicId: (rawId: string) => void;
+  cloudSynced: boolean; // 是否已成功与云端（D1）对齐
+  addMusicId: (rawId: string, meta?: { name?: string; artist?: string; cover?: string }) => void;
   removeMusicId: (id: string) => void;
 }
 
@@ -85,23 +87,61 @@ export function MusicProvider({ children }: { children: ReactNode }) {
 
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // ===== 网易云 ID 导入：后台管理面板“导入网易云音乐的 id”的精髓，本地持久化 =====
+  // ===== 网易云 ID 导入：后台管理面板“导入网易云音乐的 id”的精髓 =====
+  // 存储策略：Cloudflare D1 为准（换设备/清缓存都还在），localStorage 只做「即时渲染缓存」
   const IMPORT_STORAGE_KEY = 'rcj_imported_netease_ids';
   const [importedIds, setImportedIds] = useState<string[]>([]);
+  const [cloudSynced, setCloudSynced] = useState(false);
 
-  useEffect(() => {
+  const readLocal = useCallback((): string[] => {
     try {
       const raw = localStorage.getItem(IMPORT_STORAGE_KEY);
-      if (raw) {
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) {
-          setImportedIds(arr.filter((id: any) => typeof id === 'string' && /^\d+$/.test(id)));
-        }
-      }
-    } catch { /* ignore */ }
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter((id: any) => typeof id === 'string' && /^\d+$/.test(id)) : [];
+    } catch { return []; }
   }, []);
 
-  const addMusicId = (rawId: string) => {
+  const writeLocal = useCallback((ids: string[]) => {
+    try { localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(ids)); } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    // 1) 本地缓存先渲染（秒开，不闪烁）
+    const local = readLocal();
+    if (local.length) setImportedIds(local);
+
+    // 2) 再拉云端（D1）权威列表
+    fetch('/api/music/ids', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then(async (d) => {
+        if (!alive || !d || d.ok !== true || !Array.isArray(d.ids)) return; // 没绑 D1 就退回本地
+        const serverIds: string[] = d.ids.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x));
+        if (serverIds.length === 0 && local.length > 0) {
+          // 一次性迁移：把老 localStorage 里的 ID 推到云端
+          await Promise.all(
+            local.map((id) =>
+              fetch('/api/music/ids', {
+                method: 'POST',
+                headers: adminHeaders({ 'content-type': 'application/json' }),
+                body: JSON.stringify({ id }),
+              }).catch(() => null),
+            ),
+          );
+          setCloudSynced(true);
+          return;
+        }
+        if (!alive) return;
+        setImportedIds(serverIds);
+        writeLocal(serverIds);
+        setCloudSynced(true);
+      })
+      .catch(() => { /* 云端不可达：沿用本地缓存 */ });
+
+    return () => { alive = false; };
+  }, [readLocal, writeLocal]);
+
+  const addMusicId = (rawId: string, meta?: { name?: string; artist?: string; cover?: string }) => {
     const clean = (rawId || '').toString().trim();
     // 兼容粘贴网易云分享链接，提取其中的数字 ID
     const matched = clean.match(/\d{4,}/);
@@ -110,17 +150,27 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     setImportedIds((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
-      try { localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      writeLocal(next);
       return next;
     });
+    // 同步到云端（D1）；失败不影响本地体验
+    fetch('/api/music/ids', {
+      method: 'POST',
+      headers: adminHeaders({ 'content-type': 'application/json' }),
+      body: JSON.stringify({ id, name: meta?.name, artist: meta?.artist, cover: meta?.cover }),
+    }).catch(() => { /* 离线时留在本地，下次导入页面加载后再同步 */ });
   };
 
   const removeMusicId = (id: string) => {
     setImportedIds((prev) => {
       const next = prev.filter((x) => x !== id);
-      try { localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+      writeLocal(next);
       return next;
     });
+    fetch(`/api/music/ids?id=${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: adminHeaders(),
+    }).catch(() => { /* ignore */ });
   };
 
   useEffect(() => {
@@ -334,7 +384,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         togglePlay, nextSong, prevSong, handleSeek,
         playSong, selectSong: playSong, setVolume, toggleMute, togglePlayMode, // 暴露新方法
         // 网易云 ID 导入：必须暴露，否则 /music 切到「歌单」页签会 importedIds.length 崩溃
-        importedIds, addMusicId, removeMusicId
+        importedIds, cloudSynced, addMusicId, removeMusicId
     }}>
       {children}
       {currentSong && (

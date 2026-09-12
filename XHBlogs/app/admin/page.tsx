@@ -7,18 +7,43 @@ import Navbar from '../../components/Navbar';
 import PageTransition from '../../components/PageTransition';
 import { useRouter } from 'next/navigation';
 
-// 与 MusicProvider 共用同一个 localStorage key，使后台导入的歌单直接出现在 /music
+// 与 MusicProvider 共用同一个 localStorage key，使后台导入/删除的歌单直接反映在 /music
 const STORAGE_KEY = 'rcj_imported_netease_ids';
+// 管理面板访问口令（客户端校验，仅作轻量防护；个人自娱博客足够）
+const ADMIN_PASSWORD = '199527';
+const UNLOCK_KEY = 'rcj_admin_unlocked';
 
 export default function AdminDashboard() {
   const router = useRouter();
 
-  // 当前选中的功能模块（后台左侧导航）
-  const [activeTab, setActiveTab] = useState('music');
+  // 密码门
+  const [unlocked, setUnlocked] = useState(false);
+  const [pwdInput, setPwdInput] = useState('');
+  const [pwdError, setPwdError] = useState('');
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(UNLOCK_KEY) === '1') setUnlocked(true);
+    } catch { /* ignore */ }
+  }, []);
+
+  const doUnlock = () => {
+    if (pwdInput === ADMIN_PASSWORD) {
+      try { sessionStorage.setItem(UNLOCK_KEY, '1'); } catch { /* ignore */ }
+      setUnlocked(true);
+      setPwdError('');
+    } else {
+      setPwdError('口令错误，请重试');
+    }
+  };
+
+  // 当前选中的功能模块
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   // 歌单管理状态
   const [ids, setIds] = useState<string[]>([]);
   const [details, setDetails] = useState<Record<string, any>>({});
+  const [detailsLoading, setDetailsLoading] = useState(false);
   const [newId, setNewId] = useState('');
   const [queryLoading, setQueryLoading] = useState(false);
   const [queryResult, setQueryResult] = useState<any>(null);
@@ -43,9 +68,10 @@ export default function AdminDashboard() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
   }, []);
 
-  // 拉取所有已导入 ID 的封面/标题（真实查询）
+  // 拉取所有已导入 ID 的封面/标题（真实查询）；逐个容错，不整体卡死
   const loadDetails = useCallback(async (idList: string[]) => {
-    if (idList.length === 0) { setDetails({}); return; }
+    if (idList.length === 0) { setDetails({}); setDetailsLoading(false); return; }
+    setDetailsLoading(true);
     try {
       const res = await fetch(`/api/music?ids=${idList.join(',')}`);
       const data = await res.json();
@@ -54,6 +80,8 @@ export default function AdminDashboard() {
       setDetails(map);
     } catch {
       setDetails({});
+    } finally {
+      setDetailsLoading(false);
     }
   }, []);
 
@@ -75,6 +103,7 @@ export default function AdminDashboard() {
       const data = await res.json();
       const song = Array.isArray(data) ? data[0] : data;
       if (song && song.url && !song.error) setQueryResult(song);
+      else if (song?.error) setQueryError('该歌曲已下架或暂不可用');
       else setQueryError('未找到该歌曲，或外链暂不可用');
     } catch {
       setQueryError('查询失败，请检查网络');
@@ -96,12 +125,62 @@ export default function AdminDashboard() {
     persist(next);
   };
 
+  const clearAll = () => {
+    persist([]);
+    setDetails({});
+  };
+
+  // R2 默认常驻曲目（与 /music 同源）
+  const m = siteConfig.music;
+  const r2Track = m ? {
+    id: 'r2-local',
+    title: m.title || '默认曲目',
+    artist: m.artist || '——',
+    cover: m.cover || '',
+    source: 'r2' as const,
+  } : null;
+
   const menuItems = [
     { id: 'dashboard', name: '全息仪表盘', icon: '🌌' },
     { id: 'music', name: '歌单管理', icon: '🎵' },
     { id: 'gallery', name: '光影画廊', icon: '🖼️' },
     { id: 'settings', name: '系统核心配置', icon: '⚙️' },
   ];
+
+  // ============ 锁屏 ============
+  if (!unlocked) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 relative z-10">
+        <Navbar />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-sm bg-white/50 dark:bg-slate-900/50 backdrop-blur-2xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-8 shadow-2xl mt-10"
+        >
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-3xl shadow-lg shadow-indigo-500/30 mb-3">🔐</div>
+            <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-wider">管理面板已加锁</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">请输入访问口令</p>
+          </div>
+          <input
+            type="password"
+            value={pwdInput}
+            onChange={e => setPwdInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && doUnlock()}
+            placeholder="••••••"
+            className="w-full bg-white dark:bg-slate-800 border border-white/50 dark:border-slate-700 rounded-2xl px-4 py-3 text-center text-lg tracking-[0.4em] outline-none focus:ring-2 focus:ring-indigo-500/40 shadow-inner"
+          />
+          {pwdError && <p className="text-[11px] text-red-500 font-medium text-center mt-2">{pwdError}</p>}
+          <button
+            onClick={doUnlock}
+            className="w-full mt-4 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-black shadow-lg shadow-indigo-500/30 transition-all active:scale-95"
+          >
+            解 锁
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-20 pb-10 px-4 md:px-10 flex flex-col md:flex-row gap-6 max-w-[1600px] mx-auto relative z-10">
@@ -135,6 +214,13 @@ export default function AdminDashboard() {
             </button>
           ))}
         </div>
+
+        <button
+          onClick={() => { try { sessionStorage.removeItem(UNLOCK_KEY); } catch {} setUnlocked(false); }}
+          className="px-4 py-3 rounded-2xl bg-white/30 dark:bg-slate-800/30 text-slate-500 hover:text-red-500 font-bold text-sm border border-white/40 dark:border-slate-700/50 transition-colors"
+        >
+          🚪 锁定退出
+        </button>
       </motion.div>
 
       {/* 右侧工作区 */}
@@ -155,90 +241,168 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 min-h-[500px] shadow-lg">
-          {activeTab === 'music' && (
-            <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-slate-800/50 rounded-[40px] p-8 shadow-2xl">
-              <h2 className="text-xl font-black text-slate-800 dark:text-white mb-8">🎵 歌单管理与查询</h2>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                {/* 左：已导入的网易云 ID 列表 */}
-                <div className="space-y-3">
-                  <p className="text-[10px] font-black text-slate-400 uppercase ml-1 mb-4">当前歌单中的网易云 ID ({ids.length})</p>
-                  <div className="max-h-[400px] overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-                    {ids.length === 0 && (
-                      <p className="text-sm text-slate-400 py-6 text-center">还没有导入歌曲，右侧粘贴网易云 ID 试试 🎶</p>
-                    )}
-                    {ids.map((id, index) => {
-                      const detail = details[id];
-                      return (
-                        <div key={`${id}-${index}`} className="flex justify-between items-center p-3 bg-white/40 dark:bg-slate-800/40 rounded-2xl border border-white/20 group">
-                          <div className="flex items-center gap-3">
-                            {detail?.cover ? (
-                              <img src={detail.cover} alt="cover" className="w-10 h-10 rounded-lg object-cover shadow-sm" />
-                            ) : (
-                              <div className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 animate-pulse flex items-center justify-center text-xs">💿</div>
-                            )}
-                            <div className="flex flex-col">
-                              {detail ? (
-                                <>
-                                  <span className={`text-sm font-bold line-clamp-1 ${detail.error ? 'text-red-500' : 'text-slate-800 dark:text-white'}`}>{detail.name}</span>
-                                  {!detail.error && <span className="text-[10px] text-slate-500 font-medium">{detail.artist}</span>}
-                                </>
-                              ) : (
-                                <span className="text-xs text-slate-400">正在解析...</span>
-                              )}
-                              <span className="text-[10px] font-mono text-pink-500 mt-0.5">#{id}</span>
-                            </div>
-                          </div>
-                          <button onClick={() => removeSong(index)} className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center">✕</button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 右：校验并添加新 ID */}
-                <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-3xl p-6 space-y-6">
-                  <p className="text-[10px] font-black text-slate-400 uppercase">校验并添加新 ID</p>
-                  <div className="flex gap-2">
-                    <input type="text" placeholder="粘贴网易云歌曲 ID 或分享链接" value={newId} onChange={e => setNewId(e.target.value)} onKeyDown={e => e.key === 'Enter' && queryMusic()} className="flex-1 bg-white dark:bg-slate-900 border-none rounded-2xl px-4 py-3 text-sm outline-none shadow-sm" />
-                    <button onClick={queryMusic} disabled={queryLoading} className="px-6 py-3 bg-pink-500 text-white rounded-2xl text-xs font-black shadow-lg shadow-pink-500/20 disabled:opacity-50">
-                      {queryLoading ? "请求中..." : "真实查询"}
-                    </button>
-                  </div>
-
-                  <AnimatePresence>
-                    {queryResult && !queryResult.error && (
-                      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-3 bg-white dark:bg-slate-900 rounded-2xl border-2 border-green-500/30 flex justify-between items-center shadow-xl">
-                        <div className="flex items-center gap-3">
-                          <img src={queryResult.cover} alt="cover" className="w-10 h-10 rounded-lg object-cover" />
-                          <div>
-                            <p className="text-[10px] font-black text-green-600">获取成功</p>
-                            <p className="text-xs font-bold line-clamp-1">{queryResult.name}</p>
-                            <p className="text-[10px] text-slate-500">{queryResult.artist}</p>
-                          </div>
-                        </div>
-                        <button onClick={confirmAddMusic} className="px-3 py-2 bg-green-500 text-white rounded-xl text-[10px] font-black shrink-0 hover:bg-green-600 transition-colors">存入列表</button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {queryError && <p className="text-[11px] text-red-500 font-medium">{queryError}</p>}
-
-                  <div className="text-[11px] text-slate-400 leading-relaxed bg-white/40 dark:bg-slate-900/40 rounded-2xl p-4 border border-white/30">
-                    💡 网易云音乐支持外链直连，导入后歌曲通过 <code className="font-mono text-pink-500">/api/music</code> 实时解析封面与标题，并在 <span className="font-black text-indigo-500">/music</span> 页面直接播放，无需落地任何音频文件。
-                  </div>
-                </div>
+        {/* ============ 仪表盘 ============ */}
+        {activeTab === 'dashboard' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { icon: '🌐', label: '部署平台', value: 'Cloudflare Pages', sub: 'git 绑定自动构建' },
+              { icon: '🎶', label: '主曲目', value: m?.title || '陪在你身边', sub: 'R2 自托管 · WebM' },
+              { icon: '📥', label: '已导入网易云', value: `${ids.length} 首`, sub: '外链直连播放' },
+              { icon: '🔗', label: '站点地址', value: 'blog.955827.xyz', sub: 'RCJ 生态 · Bortala' },
+            ].map((card) => (
+              <div key={card.label} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-5 shadow-lg hover:-translate-y-1 transition-transform">
+                <div className="text-3xl mb-3">{card.icon}</div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{card.label}</p>
+                <p className="text-lg font-black text-slate-800 dark:text-white mt-1 truncate">{card.value}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">{card.sub}</p>
               </div>
-            </motion.section>
-          )}
+            ))}
+          </div>
+        )}
 
-          {activeTab !== 'music' && (
-            <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-slate-400 gap-4 pt-20">
-              <span className="text-6xl opacity-60">{menuItems.find(m => m.id === activeTab)?.icon}</span>
-              <p className="font-bold tracking-widest text-sm">该模块即将部署于此</p>
+        {/* ============ 歌单管理 ============ */}
+        {activeTab === 'music' && (
+          <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
+            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">🎵 歌单管理与查询</h2>
+
+            {/* 导入框 */}
+            <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-3xl p-5 mb-6 space-y-4">
+              <p className="text-[10px] font-black text-slate-400 uppercase">校验并添加新 ID（支持粘贴网易云分享链接，自动提取数字 ID）</p>
+              <div className="flex gap-2">
+                <input type="text" placeholder="例如 186016 或 https://music.163.com/song?id=186016" value={newId} onChange={e => setNewId(e.target.value)} onKeyDown={e => e.key === 'Enter' && queryMusic()} className="flex-1 bg-white dark:bg-slate-900 border-none rounded-2xl px-4 py-3 text-sm outline-none shadow-sm" />
+                <button onClick={queryMusic} disabled={queryLoading} className="px-6 py-3 bg-pink-500 text-white rounded-2xl text-xs font-black shadow-lg shadow-pink-500/20 disabled:opacity-50">
+                  {queryLoading ? "请求中..." : "真实查询"}
+                </button>
+              </div>
+              <AnimatePresence>
+                {queryResult && !queryResult.error && (
+                  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-3 bg-white dark:bg-slate-900 rounded-2xl border-2 border-green-500/30 flex justify-between items-center shadow-xl">
+                    <div className="flex items-center gap-3">
+                      <img src={queryResult.cover} alt="cover" referrerPolicy="no-referrer" className="w-10 h-10 rounded-lg object-cover" />
+                      <div>
+                        <p className="text-[10px] font-black text-green-600">获取成功</p>
+                        <p className="text-xs font-bold line-clamp-1">{queryResult.name}</p>
+                        <p className="text-[10px] text-slate-500">{queryResult.artist}</p>
+                      </div>
+                    </div>
+                    <button onClick={confirmAddMusic} className="px-3 py-2 bg-green-500 text-white rounded-xl text-[10px] font-black shrink-0 hover:bg-green-600 transition-colors">存入列表</button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {queryError && <p className="text-[11px] text-red-500 font-medium">{queryError}</p>}
+              <div className="text-[11px] text-slate-400 leading-relaxed bg-white/40 dark:bg-slate-900/40 rounded-2xl p-4 border border-white/30">
+                💡 网易云音乐支持外链直连，导入后歌曲通过 <code className="font-mono text-pink-500">/api/music</code> 实时解析封面与标题，并在 <span className="font-black text-indigo-500">/music</span> 页面直接播放，无需落地任何音频文件。
+              </div>
             </div>
-          )}
-        </div>
+
+            {/* 真实歌单：R2 默认曲 + 已导入网易云 */}
+            <p className="text-[10px] font-black text-slate-400 uppercase ml-1 mb-3">当前播放歌单（与 /music 实时同步）</p>
+            <div className="max-h-[420px] overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+              {/* R2 默认曲目 */}
+              {r2Track && (
+                <div className="flex justify-between items-center p-3 bg-white/40 dark:bg-slate-800/40 rounded-2xl border border-indigo-500/20">
+                  <div className="flex items-center gap-3">
+                    {r2Track.cover ? (
+                      <img src={r2Track.cover} alt="cover" referrerPolicy="no-referrer" className="w-10 h-10 rounded-lg object-cover shadow-sm" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center">🎧</div>
+                    )}
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-800 dark:text-white">{r2Track.title}</span>
+                      <span className="text-[10px] text-slate-500 font-medium">{r2Track.artist}</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black text-indigo-500 bg-indigo-500/10 px-2 py-1 rounded-full">R2 默认</span>
+                </div>
+              )}
+
+              {ids.length === 0 && (
+                <p className="text-sm text-slate-400 py-6 text-center">还没有导入网易云歌曲，上方粘贴 ID 试试 🎶</p>
+              )}
+
+              {ids.map((id, index) => {
+                const detail = details[id];
+                const isError = detail?.error;
+                return (
+                  <div key={`${id}-${index}`} className="flex justify-between items-center p-3 bg-white/40 dark:bg-slate-800/40 rounded-2xl border border-white/20 group">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {detail?.cover ? (
+                        <img src={detail.cover} alt="cover" referrerPolicy="no-referrer" className="w-10 h-10 rounded-lg object-cover shadow-sm" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs">
+                          {detailsLoading ? '⏳' : '💿'}
+                        </div>
+                      )}
+                      <div className="flex flex-col min-w-0">
+                        {detail && !isError ? (
+                          <>
+                            <span className="text-sm font-bold text-slate-800 dark:text-white truncate">{detail.name}</span>
+                            <span className="text-[10px] text-slate-500 font-medium truncate">{detail.artist}</span>
+                          </>
+                        ) : isError ? (
+                          <span className="text-xs font-bold text-red-500 truncate">已下架 / 未找到</span>
+                        ) : (
+                          <span className="text-xs text-slate-400 truncate">{detailsLoading ? '解析中…' : '未找到'}</span>
+                        )}
+                        <span className="text-[10px] font-mono text-pink-500 mt-0.5">#{id}</span>
+                      </div>
+                    </div>
+                    <button onClick={() => removeSong(index)} className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center">✕</button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {ids.length > 0 && (
+              <button onClick={clearAll} className="mt-4 text-[11px] text-slate-400 hover:text-red-500 font-medium transition-colors">
+                清空全部导入歌单
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ============ 光影画廊 ============ */}
+        {activeTab === 'gallery' && (
+          <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
+            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">🖼️ 光影画廊</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">博客已融入的两张个人照片（本地资源，无外链依赖）：</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {['/blog-photo-1.png', '/blog-photo-2.jpg'].map((src) => (
+                <div key={src} className="rounded-2xl overflow-hidden border border-white/40 shadow-lg aspect-square bg-slate-100 dark:bg-slate-800">
+                  <img src={src} alt={src} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                </div>
+              ))}
+            </div>
+            <button onClick={() => router.push('/photowall')} className="mt-6 h-12 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-sm shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-all active:scale-95">
+              📷 前往照片墙
+            </button>
+          </div>
+        )}
+
+        {/* ============ 系统核心配置 ============ */}
+        {activeTab === 'settings' && (
+          <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
+            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">⚙️ 系统核心配置</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { k: '站点标题', v: siteConfig.title },
+                { k: '作者', v: siteConfig.authorName },
+                { k: '部署平台', v: 'Cloudflare Pages（git 绑定自动部署）' },
+                { k: '音乐源', v: m?.source === 'r2' ? 'R2 自托管（WebM）' : '未知' },
+                { k: '默认曲目', v: m?.title || '—' },
+                { k: '管理口令', v: '已启用（199527 · 会话内有效）' },
+              ].map((row) => (
+                <div key={row.k} className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 border border-white/30">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{row.k}</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-white mt-1 break-words">{row.v}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-[11px] text-slate-400 leading-relaxed bg-white/40 dark:bg-slate-900/40 rounded-2xl p-4 border border-white/30 mt-4">
+              🔒 管理面板为客户端口令防护（sessionStorage 解锁，刷新会话需重新输入），适用于个人自娱博客的轻量隔离。如需更强保护，应将校验移至服务端。
+            </p>
+          </div>
+        )}
       </motion.div>
     </div>
   );

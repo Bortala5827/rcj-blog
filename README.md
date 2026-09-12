@@ -17,7 +17,7 @@
 | 项 | 原作者 | 我这边 |
 | --- | --- | --- |
 | 部署平台 | Vercel | **Cloudflare Pages**（`@cloudflare/next-on-pages`，git 绑定自动构建） |
-| 音乐挂件 | 网易云外链 | **R2 自托管音频**为主，网易云 ID 仍可通过后台导入 |
+| 音乐挂件 | 网易云外链 | **自托管音频**（同源 `public/soba-ni-iru-ne.webm`），网易云 ID 仍可通过后台导入 |
 | 图床 / 封面 | 外链图床 | 本地 `public/` 资源 + 本地 `cover-default.svg` 默认封面 |
 | 图片依赖 | README 满屏截图（`picture/`） | **全删**，文档纯文字 |
 | 个人定位 | 原作者信息 | `siteConfig.ts` / `about` 改为 RCJ Lab 口径 |
@@ -60,13 +60,14 @@ Cloudflare Pages → 项目 **`rcj-blog`** → Connect to Git（`Bortala5827/rcj
 
 - 后台口令：`199527`（只在当前浏览器会话内有效）——见 `XHBlogs/app/admin/page.tsx`
 - 后台可干的事：歌单管理（贴网易云 ID 导入）、光影画廊、系统配置、全息仪表盘
-- 音乐播放：`siteConfig.music.source === 'r2'`，走 R2 公开域名 `pub-33cbba9a540847778b48cbc906aea2ad.r2.dev`
-- 网易云那两首外链歌：`/api/music/stream?id=X` 只做**瞬时 302** 跳到解析地址（原因见下）
+- 音乐播放：默认曲「陪在你身边」的音频放在 `XHBlogs/public/soba-ni-iru-ne.webm`，**同源**由 blog.955827.xyz 的 Cloudflare CDN 分发
+- 网易云外链歌：`/api/music/stream?id=X` 只做**瞬时 302** 跳到解析地址（原因见下）
 
 ## 踩过的坑（备忘）
 
 - **网易云封了 Cloudflare 边缘 IP**：`music.163.com/song/media/outer/url` 从 CF 请求会被 302 到 `/404`，所以服务端既不能直连也不能流式透传；现在改成路由瞬时 302 到解析 API，音频交给浏览器自己缓冲。
 - **别给流式响应加 `Content-Length`**：长度对不上 Cloudflare 会掐断，返回 502 播放失败。
+- **自托管音频别挂 `r2.dev` 直链**：部分网络（尤其国内）加载不了，页面永远 `00:00` 并提示「音源不可用」；同一时刻服务端却能正常下载该文件（实测 5.0 MB），极易误判成音频本身坏了。**落 `public/` 走同源最稳**——用户能打开站点就一定能加载音频。
 - **AI 猫猫**要线上生效，得在 Pages 的环境变量里放 `GEMINI_API_KEY`。
 - 本地 `next-on-pages` 构建在 Windows 下偶发 `spawn npx ENOENT` / `.next` 清理失败，属本机沙箱问题，Cloudflare 的 Linux 构建不受影响。
 

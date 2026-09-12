@@ -17,7 +17,7 @@ My personal blog / notebook. Built with Next.js, deployed on Cloudflare Pages.
 | Area | Upstream | Here |
 | --- | --- | --- |
 | Hosting | Vercel | **Cloudflare Pages** (`@cloudflare/next-on-pages`, git-linked auto builds) |
-| Music widget | NetEase external URLs | **Self-hosted audio on R2**; NetEase song IDs still importable via the admin panel |
+| Music widget | NetEase external URLs | **Self-hosted audio** (same-origin `public/soba-ni-iru-ne.webm`); NetEase song IDs still importable via the admin panel |
 | Images / covers | Third-party image host | Local `public/` assets + local `cover-default.svg` |
 | Docs | Screenshot-heavy README (`picture/`) | **Removed** — text only |
 | Identity | Author's own info | `siteConfig.ts` / `about` rewritten for RCJ Lab |
@@ -60,13 +60,14 @@ Any push to `main` triggers a rebuild — no manual upload.
 
 - Admin passcode: `199527` (per browser session only) — see `XHBlogs/app/admin/page.tsx`
 - The panel handles: playlist management (paste NetEase IDs), gallery, system config, dashboard
-- Playback: `siteConfig.music.source === 'r2'`, served from the R2 public domain `pub-33cbba9a540847778b48cbc906aea2ad.r2.dev`
+- Playback: the default track ("陪在你身边") lives at `XHBlogs/public/soba-ni-iru-ne.webm` and is served **same-origin** by blog.955827.xyz's Cloudflare CDN
 - NetEase tracks: `/api/music/stream?id=X` just does an **instant 302** to a resolved URL (see below)
 
 ## Notes / gotchas
 
 - **NetEase blocks Cloudflare egress IPs**: `music.163.com/song/media/outer/url` returns a 302 to `/404` from CF, so neither direct streaming nor server-side resolution works. The route now 302s instantly to a resolver and lets the browser buffer the audio itself.
 - **Never set `Content-Length` on a streamed response**: a mismatch makes Cloudflare cut the connection (502, playback fails).
+- **Never point self-hosted audio at an `r2.dev` URL**: on some networks (especially in mainland China) it simply won't load — the player sits at `00:00` with "source unavailable", while the very same file downloads fine server-side (5.0 MB verified). Ships in `public/` and served same-origin instead: if the visitor can open the site, the audio loads.
 - For the AI assistant to work online, set `GEMINI_API_KEY` in the Pages environment variables.
 - Local `next-on-pages` builds on Windows occasionally hit `spawn npx ENOENT` / `.next` cleanup failures — a local sandbox quirk; Cloudflare's Linux build is unaffected.
 

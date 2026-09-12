@@ -2,6 +2,14 @@
 
 export const runtime = 'edge'
 
+// 兼容 edge / node 运行时的超时信号（AbortSignal.timeout 在某些运行时不可用）
+function timeoutSignal(ms: number): AbortSignal {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  ctrl.signal.addEventListener('abort', () => clearTimeout(timer));
+  return ctrl.signal;
+}
+
 const NET_EASE_HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
@@ -34,11 +42,11 @@ export async function GET(request: NextRequest) {
         const [detailRes, lrcRes] = await Promise.all([
           fetch(
             `https://music.163.com/api/song/detail/?id=${songId}&ids=[${songId}]`,
-            { headers: NET_EASE_HEADERS, signal: AbortSignal.timeout(6000) },
+            { headers: NET_EASE_HEADERS, signal: timeoutSignal(6000) },
           ),
           fetch(
             `https://music.163.com/api/song/lyric?id=${songId}&lv=-1&kv=-1&tv=-1`,
-            { headers: NET_EASE_HEADERS, signal: AbortSignal.timeout(6000) },
+            { headers: NET_EASE_HEADERS, signal: timeoutSignal(6000) },
           ).catch(() => null),
         ])
 

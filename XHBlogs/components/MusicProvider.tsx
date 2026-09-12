@@ -55,6 +55,7 @@ interface MusicContextType {
   prevSong: () => void;
   handleSeek: (e: React.ChangeEvent<HTMLInputElement>) => void;
   playSong: (index: number) => void;
+  selectSong: (index: number) => void; // playSong 的别名（兼容 /music 里两种调用）
   setVolume: (value: number) => void;
   toggleMute: () => void;
   togglePlayMode: () => void;
@@ -143,7 +144,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       : [];
 
     // 网易云歌单 = 配置里的固定 ID + 后台导入的 ID（外链直连，无需版权文件落地）
-    const neteaseIds = [...(siteConfig.cloudMusicIds || []), ...importedIds];
+    // 去重：同一个 ID 既在配置里又在后台导入过时，避免 React key 冲突
+    const neteaseIds = [...new Set([...(siteConfig.cloudMusicIds || []), ...importedIds])];
 
     const fetchMusicData = async () => {
       try {
@@ -285,6 +287,17 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // 音源不可用时给出明确提示，避免永远卡在「正在缓冲」
+  const handleError = () => {
+    const code = audioRef.current?.error?.code;
+    setIsPlaying(false);
+    setCurrentLyric(
+      code === 4
+        ? '这首暂时播不了（音源不可用），点下一首试试'
+        : '播放出错，点下一首试试'
+    );
+  };
+
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newProgress = Number(e.target.value);
     setProgress(newProgress);
@@ -315,7 +328,9 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         playlist, currentIndex, currentSong, isPlaying, progress, currentTime, duration, currentLyric, isLoading,
         volume, isMuted, playMode, // 暴露新状态
         togglePlay, nextSong, prevSong, handleSeek,
-        playSong, setVolume, toggleMute, togglePlayMode // 暴露新方法
+        playSong, selectSong: playSong, setVolume, toggleMute, togglePlayMode, // 暴露新方法
+        // 网易云 ID 导入：必须暴露，否则 /music 切到「歌单」页签会 importedIds.length 崩溃
+        importedIds, addMusicId, removeMusicId
     }}>
       {children}
       {currentSong && (
@@ -325,6 +340,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleEnded} // 使用我们重写的结束处理
           onLoadedMetadata={handleTimeUpdate}
+          onError={handleError}
         />
       )}
     </MusicContext.Provider>

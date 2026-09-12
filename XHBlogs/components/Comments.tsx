@@ -12,8 +12,13 @@ export default function Comments() {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
+  // Gitalk 未配置时（clientID/secret/repo/owner 任一为空）直接不渲染，
+  // 否则它会去打 https://api.github.com/repos///issues 并抛出 "Error: Network Error"
+  const cfg = siteConfig.gitalkConfig;
+  const enabled = !!(cfg.clientID && cfg.clientSecret && cfg.repo && cfg.owner);
+
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!enabled || !containerRef.current) return;
 
     // 清空之前的评论区（防止 Next.js 路由切换时重复渲染）
     containerRef.current.innerHTML = '';
@@ -42,7 +47,9 @@ export default function Comments() {
       window.history.replaceState({}, document.title, url.toString());
     }
 
-  }, [pathname]);
+  }, [pathname, enabled]);
+
+  if (!enabled) return null;
 
   return (
     <div className="w-full mt-16 relative">

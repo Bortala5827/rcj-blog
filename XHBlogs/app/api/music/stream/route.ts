@@ -2,13 +2,19 @@ import { NextRequest } from 'next/server'
 
 // 网易云音频解析代理：
 // 背景：直链 music.163.com/song/media/outer/url?id=X.mp3 从 Cloudflare 边缘 IP 请求会被网易
-// 重定向到 /404（IP 封锁），因此不能靠 CF 直接流式透传。
-// 策略：优先尝试直连流式；失败则用外部解析 API 拿到网易 CDN 直链，302 让浏览器直连播放
+// 重定向到 /404（IP 封锁），不能靠 CF 直接流式透传。
+// 策略：优先直连流式；失败则用外部解析 API 取得网易 CDN 直链，302 让浏览器直连播放
 // （用户浏览器在国内可直连 CDN，被封锁的只是 CF 边缘出口 IP）。
 export const runtime = 'edge'
 
 const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36'
+
+function fetchT(url: string, init: RequestInit, ms: number): Promise<Response> {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), ms)
+  return fetch(url, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(timer))
+}
 
 function extractDirectUrl(text: string): string | null {
   try {
@@ -26,21 +32,20 @@ function extractDirectUrl(text: string): string | null {
   return m ? m[0] : null
 }
 
-const API_STRATEGIES: { name: string; url: (id: string) => string }[] = [
+const NET_EASE_HEADERS: Record<string, string> = { 'User-Agent': UA, Referer: 'https://music.163.com/', Accept: '*/*' }
+
+const API_STRATEGIES: { name: string; url: (id: string) => string; headers?: Record<string, string> }[] = [
   { name: 'injahow', url: (id) => `https://api.injahow.cn/meting/?server=netease&type=song&id=${id}` },
   { name: 'imets', url: (id) => `https://api.i-meto.com/meting/api?server=netease&type=song&id=${id}` },
   { name: 'gdstudio', url: (id) => `https://music-api.gdstudio.xyz/api.php?types=url&source=netease&id=${id}&br=320` },
+  { name: 'enhancePlayer', url: (id) => `https://music.163.com/api/song/enhance/player/url?ids=[${id}]&br=320000`, headers: NET_EASE_HEADERS },
 ]
 
 async function streamOuter(id: string, range: string | null): Promise<Response | null> {
   try {
-    const headers: Record<string, string> = {
-      'User-Agent': UA,
-      Referer: 'https://music.163.com/',
-      Accept: '*/*',
-    }
-    if (range) headers['Range'] = range
-    const r = await fetch(`https://music.163.com/song/media/outer/url?id=${id}.mp3`, { headers, redirect: 'follow' })
+    const headers = { ...NET_EASE_HEADERS }
+    if (range) (headers as any)['Range'] = range
+    const r = await fetchT(`https://music.163.com/song/media/outer/url?id=${id}.mp3`, { headers, redirect: 'follow' }, 6000)
     const ct = (r.headers.get('content-type') || '').toLowerCase()
     if (r.ok && !ct.includes('text/html') && r.body) return r
   } catch {
@@ -58,33 +63,38 @@ export async function GET(request: NextRequest) {
   const debug = request.nextUrl.searchParams.get('debug') === '1'
   const range = request.headers.get('range')
 
-  // 诊断口：一次列出所有策略的真实结果
   if (debug) {
+    // 并行探测，每个策略 8s 超时，避免整体挂死
+    const [outerRes, ...apiRes] = await Promise.allSettled([
+      fetchT(`https://music.163.com/song/media/outer/url?id=${id}.mp3`, { headers: NET_EASE_HEADERS, redirect: 'follow' }, 8000),
+      ...API_STRATEGIES.map((s) => fetchT(s.url(id), { headers: s.headers || { 'User-Agent': UA }, redirect: 'follow' }, 8000)),
+    ])
+
     const report: any = { id, outer: null, apis: [] as any[] }
-    try {
-      const r = await fetch(`https://music.163.com/song/media/outer/url?id=${id}.mp3`, {
-        headers: { 'User-Agent': UA, Referer: 'https://music.163.com/' },
-        redirect: 'follow',
-      })
-      report.outer = { status: r.status, ct: r.headers.get('content-type'), finalUrl: r.url }
-    } catch (e) {
-      report.outer = { error: String(e) }
+    if (outerRes.status === 'fulfilled') {
+      report.outer = { status: outerRes.value.status, ct: outerRes.value.headers.get('content-type'), finalUrl: outerRes.value.url }
+    } else {
+      report.outer = { error: String(outerRes.reason) }
     }
-    for (const s of API_STRATEGIES) {
-      try {
-        const r = await fetch(s.url(id), { headers: { 'User-Agent': UA }, redirect: 'follow' })
-        const t = await r.text()
-        report.apis.push({
-          name: s.name,
-          status: r.status,
-          ct: r.headers.get('content-type'),
-          directUrl: extractDirectUrl(t),
-          snippet: t.slice(0, 220),
-        })
-      } catch (e) {
-        report.apis.push({ name: s.name, error: String(e) })
-      }
-    }
+
+    await Promise.all(
+      apiRes.map(async (res, i) => {
+        const name = API_STRATEGIES[i].name
+        if (res.status !== 'fulfilled') {
+          report.apis[i] = { name, error: String(res.reason) }
+          return
+        }
+        let snippet = ''
+        try { snippet = (await res.value.text()).slice(0, 200) } catch { /* ignore */ }
+        report.apis[i] = {
+          name,
+          status: res.value.status,
+          ct: res.value.headers.get('content-type'),
+          directUrl: extractDirectUrl(snippet),
+          snippet,
+        }
+      }),
+    )
     return Response.json(report)
   }
 
@@ -105,7 +115,7 @@ export async function GET(request: NextRequest) {
     // 2) 解析出网易 CDN 直链 -> 302 让浏览器直连（避开 CF 边缘 IP 封锁）
     for (const s of API_STRATEGIES) {
       try {
-        const r = await fetch(s.url(id), { headers: { 'User-Agent': UA }, redirect: 'follow' })
+        const r = await fetchT(s.url(id), { headers: s.headers || { 'User-Agent': UA }, redirect: 'follow' }, 6000)
         const directUrl = extractDirectUrl(await r.text())
         if (directUrl) {
           const secure = directUrl.replace(/^http:\/\//i, 'https://')

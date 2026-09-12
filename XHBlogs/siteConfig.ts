@@ -5,7 +5,7 @@ export const siteConfig = {
   title: "Bortala の 宝藏之地",
   faviconUrl: "https://github.com/Bortala5827.png",
   authorName: "Bortala",
-  bio: "全栈独立开发者，在 Cloudflare Pages、各种半成品与咖啡因之间反复横跳的普通人。近期正埋头于 RCJ 系列产品的打磨与上线。",
+  bio: "在做 RCJ Lab —— 一个把想法做成可用产品的个人工作室，东西基本都跑在 Cloudflare 边缘上。",
 
   navTitle: "Bortala",
 

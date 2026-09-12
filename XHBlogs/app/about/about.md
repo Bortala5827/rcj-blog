@@ -11,30 +11,18 @@ description: ''
 
 你好，我是 **Bortala**（小样儿）。
 
-一名**全栈独立开发者**，主要围绕 `955827.xyz` 这个生态做产品：从前端、Cloudflare 边缘部署，到支付与 AI 网关，能自己扛的就自己扛。
+在做 **RCJ Lab** —— 一个把想法做成可用产品的个人工作室，几乎所有东西都跑在 Cloudflare 边缘上。写代码、做产品，也折腾内容和影像，喜欢把一件事从头做到能上线。
 
-**🛠️ 技术栈与平台**
+**在做的东西**
 
-* **Cloudflare 全家桶：** Pages（Direct Upload 部署）、D1（轻量数据库）、Workers / Pages Functions（服务端代理与 webhook）。
-* **前端：** 偏好 Vanilla 单文件 + Tailwind 的轻量路线，必要时上 Next.js（如本博客）。
-* **部署自动化：** `wrangler pages deploy` + GitHub Actions，多账户 token 隔离管理。
+* **Exam Hub** —— 辅警 / 消防招录题库与结构化面试练习（exam.955827.xyz）
+* **FaceTalk** —— 匿名互选的口语练习（facetalk.955827.xyz）
+* **Dinner for You** —— 情侣点餐小应用（dinner.955827.xyz）
+* **voicecard** —— 语音名片（card.955827.xyz）
+* 以及你正在看的这个博客。
 
-**🚀 RCJ 产品矩阵**
+**怎么做的**
 
-* **rcj-shop：** 跑在 Cloudflare Pages + D1 的极简小商城，三档定价（¥9.9 / ¥39 / ¥69），闲鱼 + PayPal 收款。
-* **rcj-stack / cloudflare-pay-kit：** 从 rcj 支付系统提炼的开源模板，部署在独立 Cloudflare 账户。
-* **rcj-dinner：** 私人情侣点餐 App，双实例白标 + 个人版，移动端 PWA（dinner.955827.xyz）。
-* **rcj-supportly：** Cloudflare Workers + D1 + GitHub Actions CI/CD。
-* **facetalk：** 三语（中/英/日）站点，AI 激活相关能力打磨中。
+Cloudflare 全家桶（Pages / Workers / D1 / R2），前端偏爱轻量路线；自己维护着一条 AI 网关，本博客里的聊天猫「团子」就走它。
 
-**🤖 AI 与自动化**
-
-* 自维护一个 AI 网关（`functions/api/ai-chat.js`），聚合多家国内渠道并自动 failover，本站聊天猫娘「团子」就走这条链路。
-* 正在横向对比国内 AI 厂商免费额度（智谱 20M tokens vs 火山方舟 单模型 500K × 20+ 模型），挑最优的开发辅助方案。
-
-**📹 内容与引流**
-
-* 从 0 到 1 做抖音视频 + 直播带货，把流量导到飞书免费课（course.html）。
-* 用 WorkBuddy / MCP 把工具链本地化，强调过程实时可见。
-
-**欢迎各位朋友联系交流~**
+**欢迎来玩、来聊～**

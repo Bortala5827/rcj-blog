@@ -81,9 +81,12 @@ export default function AdminDashboard() {
       .then((d) => {
         if (!alive) return;
         if (d && d.ok === true && Array.isArray(d.ids)) {
-          const serverIds = d.ids.filter((x: any) => typeof x === 'string');
+          // 这份列表只放网易云 ID；自托管曲（source='local'）单独渲染，不混进 ID 列表
+          const serverIds = d.ids.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x));
           setIds(serverIds);
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(serverIds)); } catch { /* ignore */ }
+          const items: any[] = Array.isArray(d.items) ? d.items : [];
+          setLocalItem(items.find((i: any) => String(i?.source || 'netease') === 'local') || null);
           setCloudState('synced');
         } else {
           setCloudState('local');
@@ -110,6 +113,9 @@ export default function AdminDashboard() {
           name: song?.name,
           artist: song?.artist || song?.author,
           cover: song?.coverRaw || song?.cover,
+          // 自托管曲才需要地址；网易云的播放地址由 /api/music/stream 现算，不入库
+          url: song?.source === 'local' ? song?.url : undefined,
+          source: song?.source,
         }),
       });
       const d = await r.json();

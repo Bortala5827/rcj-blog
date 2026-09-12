@@ -220,7 +220,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
 
     return () => { isMounted = false; };
-  }, [importedIds]);
+  }, [importedIds, cloudLocal]);
 
   useEffect(() => {
     if (playlist.length === 0) return;

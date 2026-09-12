@@ -6,12 +6,10 @@ import { siteConfig } from '../../siteConfig';
 import Navbar from '../../components/Navbar';
 import PageTransition from '../../components/PageTransition';
 import { useRouter } from 'next/navigation';
-import { ADMIN_PASS, adminHeaders } from '../../lib/adminPass';
+import { adminHeaders, getAdminPass, setAdminPass, clearAdminPass } from '../../lib/adminPass';
 
 // 与 MusicProvider 共用同一个 localStorage key（缓存）；云端（D1）为权威来源
 const STORAGE_KEY = 'rcj_imported_netease_ids';
-// 管理面板访问口令（客户端校验，仅作轻量防护；个人自娱博客足够）
-const ADMIN_PASSWORD = ADMIN_PASS;
 const UNLOCK_KEY = 'rcj_admin_unlocked';
 
 export default function AdminDashboard() {
@@ -24,17 +22,29 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     try {
-      if (sessionStorage.getItem(UNLOCK_KEY) === '1') setUnlocked(true);
+      if (sessionStorage.getItem(UNLOCK_KEY) === '1' && getAdminPass()) setUnlocked(true);
     } catch { /* ignore */ }
   }, []);
 
-  const doUnlock = () => {
-    if (pwdInput === ADMIN_PASSWORD) {
-      try { sessionStorage.setItem(UNLOCK_KEY, '1'); } catch { /* ignore */ }
-      setUnlocked(true);
-      setPwdError('');
-    } else {
-      setPwdError('口令错误，请重试');
+  // 口令交给服务端校验（前端不再持有硬编码口令）
+  const doUnlock = async () => {
+    setPwdError('');
+    try {
+      const r = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ pass: pwdInput }),
+      });
+      const d = await r.json().catch(() => null);
+      if (r.ok && d?.ok) {
+        setAdminPass(pwdInput);
+        try { sessionStorage.setItem(UNLOCK_KEY, '1'); } catch { /* ignore */ }
+        setUnlocked(true);
+        return;
+      }
+      setPwdError(d?.error === 'server_not_configured' ? '服务端未配置 ADMIN_PASS，请先在 Cloudflare 配置' : '口令错误，请重试');
+    } catch {
+      setPwdError('校验失败，请检查网络');
     }
   };
 
@@ -270,7 +280,7 @@ export default function AdminDashboard() {
         </div>
 
         <button
-          onClick={() => { try { sessionStorage.removeItem(UNLOCK_KEY); } catch {} setUnlocked(false); }}
+          onClick={() => { try { sessionStorage.removeItem(UNLOCK_KEY); } catch {} clearAdminPass(); setUnlocked(false); }}
           className="px-4 py-3 rounded-2xl bg-white/30 dark:bg-slate-800/30 text-slate-500 hover:text-red-500 font-bold text-sm border border-white/40 dark:border-slate-700/50 transition-colors"
         >
           🚪 锁定退出
@@ -444,7 +454,7 @@ export default function AdminDashboard() {
                 { k: '部署平台', v: 'Cloudflare Pages（git 绑定自动部署）' },
                 { k: '音乐源', v: m?.source === 'r2' ? 'R2 自托管（WebM）' : '未知' },
                 { k: '默认曲目', v: m?.title || '—' },
-                { k: '管理口令', v: '已启用（199527 · 会话内有效）' },
+                { k: '管理口令', v: '已启用（服务端校验 · 仅会话内有效）' },
               ].map((row) => (
                 <div key={row.k} className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 border border-white/30">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{row.k}</p>

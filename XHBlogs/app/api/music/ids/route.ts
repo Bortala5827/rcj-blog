@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
-import { ADMIN_PASS } from '@/lib/adminPass'
 
 export const runtime = 'edge'
 
@@ -36,6 +35,22 @@ function getDB(): any | null {
   }
 }
 
+// 口令来自 Cloudflare Pages 环境变量 ADMIN_PASS（服务端），不再硬编码、不进前端 bundle。
+// 未配置时一律拒绝写入 —— 宁可后台暂时不能加歌，也不能让写接口裸奔。
+function getAdminPass(): string {
+  try {
+    return String((getRequestContext() as any)?.env?.ADMIN_PASS || '')
+  } catch {
+    return ''
+  }
+}
+
+function isAuthorized(request: NextRequest): boolean {
+  const expected = getAdminPass()
+  if (!expected) return false
+  return request.headers.get('x-rcj-pass') === expected
+}
+
 function numId(raw: unknown): string | null {
   const m = String(raw ?? '').match(/\d{4,}/)
   return m ? m[0] : null
@@ -62,7 +77,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get('x-rcj-pass') !== ADMIN_PASS) {
+  if (!isAuthorized(request)) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
   const db = getDB()
@@ -98,7 +113,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  if (request.headers.get('x-rcj-pass') !== ADMIN_PASS) {
+  if (!isAuthorized(request)) {
     return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
   }
   const db = getDB()

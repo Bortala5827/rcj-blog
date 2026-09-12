@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { siteConfig } from '../siteConfig';
-import { adminHeaders } from '../lib/adminPass';
 
 // 【增强版 LRC 歌词解析】
 function parseLrc(lrcText: string) {
@@ -60,11 +60,10 @@ interface MusicContextType {
   setVolume: (value: number) => void;
   toggleMute: () => void;
   togglePlayMode: () => void;
-  // 网易云 ID 导入（后台管理面板的精髓）
+  // 歌单（网易云 ID）：D1 为权威来源，前台只读
   importedIds: string[];
   cloudSynced: boolean; // 是否已成功与云端（D1）对齐
-  addMusicId: (rawId: string, meta?: { name?: string; artist?: string; cover?: string }) => void;
-  removeMusicId: (id: string) => void;
+  refreshFromCloud: () => Promise<void>; // 手动对齐（一般不需要调，路由/可见性会自动触发）
 }
 
 const MusicContext = createContext<MusicContextType | null>(null);
@@ -86,6 +85,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const [playMode, setPlayMode] = useState<PlayMode>('loop');
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const pathname = usePathname(); // 站内路由变化时重新对齐云端歌单，见下方 effect
 
   // ===== 网易云 ID 导入：后台管理面板“导入网易云音乐的 id”的精髓 =====
   // 存储策略：Cloudflare D1 为准（换设备/清缓存都还在），localStorage 只做「即时渲染缓存」
@@ -105,73 +105,44 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(ids)); } catch { /* ignore */ }
   }, []);
 
+  // 从云端（D1）拉取权威歌单；前台只读，写入一律走 /admin（口令 + 服务端校验）
+  const refreshFromCloud = useCallback(async () => {
+    try {
+      const r = await fetch('/api/music/ids', { cache: 'no-store' });
+      const d = await r.json();
+      if (!d || d.ok !== true || !Array.isArray(d.ids)) return; // 没绑 D1：沿用本地缓存
+      const serverIds: string[] = d.ids.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x));
+      setImportedIds(serverIds);
+      writeLocal(serverIds);
+      setCloudSynced(true);
+    } catch { /* 云端不可达：沿用本地缓存 */ }
+  }, [writeLocal]);
+
+  // 1) 挂载：本地缓存先渲染（秒开），随后云端覆盖
   useEffect(() => {
-    let alive = true;
-    // 1) 本地缓存先渲染（秒开，不闪烁）
     const local = readLocal();
     if (local.length) setImportedIds(local);
+    refreshFromCloud();
+  }, [readLocal, refreshFromCloud]);
 
-    // 2) 再拉云端（D1）权威列表
-    fetch('/api/music/ids', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then(async (d) => {
-        if (!alive || !d || d.ok !== true || !Array.isArray(d.ids)) return; // 没绑 D1 就退回本地
-        const serverIds: string[] = d.ids.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x));
-        if (serverIds.length === 0 && local.length > 0) {
-          // 一次性迁移：把老 localStorage 里的 ID 推到云端
-          await Promise.all(
-            local.map((id) =>
-              fetch('/api/music/ids', {
-                method: 'POST',
-                headers: adminHeaders({ 'content-type': 'application/json' }),
-                body: JSON.stringify({ id }),
-              }).catch(() => null),
-            ),
-          );
-          setCloudSynced(true);
-          return;
-        }
-        if (!alive) return;
-        setImportedIds(serverIds);
-        writeLocal(serverIds);
-        setCloudSynced(true);
-      })
-      .catch(() => { /* 云端不可达：沿用本地缓存 */ });
+  // 2) 路由变化时重新对齐 —— 修「后台加完歌、站内导航切到 /music 看不到新歌」的 bug：
+  //    Provider 挂在 layout 上，站内跳转不会重新挂载，只靠挂载时拉一次就会漏掉新数据。
+  useEffect(() => {
+    refreshFromCloud();
+  }, [pathname, refreshFromCloud]);
 
-    return () => { alive = false; };
-  }, [readLocal, writeLocal]);
-
-  const addMusicId = (rawId: string, meta?: { name?: string; artist?: string; cover?: string }) => {
-    const clean = (rawId || '').toString().trim();
-    // 兼容粘贴网易云分享链接，提取其中的数字 ID
-    const matched = clean.match(/\d{4,}/);
-    const id = matched ? matched[0] : clean;
-    if (!/^\d+$/.test(id)) return;
-    setImportedIds((prev) => {
-      if (prev.includes(id)) return prev;
-      const next = [...prev, id];
-      writeLocal(next);
-      return next;
-    });
-    // 同步到云端（D1）；失败不影响本地体验
-    fetch('/api/music/ids', {
-      method: 'POST',
-      headers: adminHeaders({ 'content-type': 'application/json' }),
-      body: JSON.stringify({ id, name: meta?.name, artist: meta?.artist, cover: meta?.cover }),
-    }).catch(() => { /* 离线时留在本地，下次导入页面加载后再同步 */ });
-  };
-
-  const removeMusicId = (id: string) => {
-    setImportedIds((prev) => {
-      const next = prev.filter((x) => x !== id);
-      writeLocal(next);
-      return next;
-    });
-    fetch(`/api/music/ids?id=${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: adminHeaders(),
-    }).catch(() => { /* ignore */ });
-  };
+  // 3) 切回本页/本标签页时重新对齐 —— 覆盖「在后台另一个标签页加完歌，切回音乐页」的场景
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') refreshFromCloud();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+    };
+  }, [refreshFromCloud]);
 
   useEffect(() => {
     let isMounted = true;
@@ -383,8 +354,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         volume, isMuted, playMode, // 暴露新状态
         togglePlay, nextSong, prevSong, handleSeek,
         playSong, selectSong: playSong, setVolume, toggleMute, togglePlayMode, // 暴露新方法
-        // 网易云 ID 导入：必须暴露，否则 /music 切到「歌单」页签会 importedIds.length 崩溃
-        importedIds, cloudSynced, addMusicId, removeMusicId
+        // 歌单（只读）：/music 切到「歌单」页签要用 importedIds
+        importedIds, cloudSynced, refreshFromCloud
     }}>
       {children}
       {currentSong && (

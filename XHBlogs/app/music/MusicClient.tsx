@@ -15,7 +15,7 @@ export default function MusicClient() {
     playSong, selectSong,
     playMode, togglePlayMode,
     volume, setVolume, isMuted, toggleMute,
-    importedIds, addMusicId, removeMusicId
+    importedIds
   } = useMusic();
 
   const lyricContainerRef = useRef<HTMLDivElement>(null);
@@ -23,11 +23,6 @@ export default function MusicClient() {
   const [activeTab, setActiveTab] = useState<'lyrics' | 'playlist'>('lyrics');
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showImport, setShowImport] = useState(false);
-  const [importInput, setImportInput] = useState('');
-  const [queryResult, setQueryResult] = useState<any>(null);
-  const [queryLoading, setQueryLoading] = useState(false);
-  const [queryError, setQueryError] = useState('');
 
   const [parsedLyrics, setParsedLyrics] = useState<any[]>([]);
 
@@ -110,26 +105,6 @@ export default function MusicClient() {
   const handlePlaySong = (index: number) => {
     if (typeof playSong === 'function') playSong(index);
     else if (typeof selectSong === 'function') selectSong(index);
-  };
-
-  // 导入网易云音乐 ID：粘贴 ID 或分享链接 -> 真实查询 -> 加入歌单（外链直连）
-  const queryNetease = async () => {
-    const raw = importInput.trim();
-    const matched = raw.match(/\d{4,}/);
-    const id = matched ? matched[0] : raw;
-    if (!/^\d+$/.test(id)) { setQueryError('请输入网易云歌曲 ID 或分享链接'); setQueryResult(null); return; }
-    setQueryLoading(true); setQueryError(''); setQueryResult(null);
-    try {
-      const res = await fetch(`/api/music?ids=${id}`);
-      const data = await res.json();
-      const song = Array.isArray(data) ? data[0] : data;
-      if (song && song.url && !song.error) setQueryResult(song);
-      else setQueryError('未找到该歌曲，或外链暂不可用');
-    } catch {
-      setQueryError('查询失败，请检查网络');
-    } finally {
-      setQueryLoading(false);
-    }
   };
 
   const filteredPlaylist = useMemo(() => {
@@ -261,49 +236,15 @@ export default function MusicClient() {
                 )}
                 {activeTab === 'playlist' && (
                   <div className="absolute inset-0 px-4 md:px-8 pb-4 md:pb-8 pt-2 md:pt-4 animate-in fade-in duration-300 flex flex-col">
-                    {/* 导入网易云音乐 ID —— 后台管理面板“导入网易云音乐的 id”的精髓 */}
-                    <div className="mb-3 shrink-0">
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => setShowImport(v => !v)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 transition-colors">
-                          <Disc3 size={14} /> 导入网易云{importedIds.length > 0 && <span className="bg-indigo-500 text-white rounded-full px-1.5 text-[10px]">{importedIds.length}</span>}
-                        </button>
-                        {importedIds.length > 0 && (
-                          <span className="text-[10px] text-slate-400 font-medium">已导入 {importedIds.length} 首</span>
-                        )}
-                      </div>
-                      <AnimatePresence>
-                        {showImport && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden mt-2">
-                            <div className="bg-white/40 dark:bg-slate-900/50 rounded-2xl p-3 border border-white/30 space-y-2">
-                              <div className="flex gap-2">
-                                <input value={importInput} onChange={e => setImportInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && queryNetease()} placeholder="粘贴网易云歌曲 ID 或分享链接" className="flex-1 bg-white dark:bg-slate-800 border-none rounded-xl px-3 py-2 text-xs outline-none shadow-sm" />
-                                <button onClick={queryNetease} disabled={queryLoading} className="px-4 py-2 bg-indigo-500 text-white rounded-xl text-xs font-black shadow disabled:opacity-50">{queryLoading ? '查询中' : '查询'}</button>
-                              </div>
-                              {queryError && <p className="text-[11px] text-red-500 font-medium">{queryError}</p>}
-                              {queryResult && (
-                                <div className="flex items-center gap-3 p-2 bg-white/60 dark:bg-slate-800/60 rounded-xl">
-                                  <img src={queryResult.cover || queryResult.pic} alt="cover" className="w-10 h-10 rounded-lg object-cover" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold truncate">{queryResult.name}</p>
-                                    <p className="text-[10px] text-slate-500 truncate">{queryResult.artist || queryResult.author}</p>
-                                  </div>
-                                  <button onClick={() => { addMusicId(queryResult.id); setImportInput(''); setQueryResult(null); }} className="px-3 py-1.5 bg-green-500 text-white rounded-lg text-[10px] font-black shrink-0 hover:bg-green-600">加入歌单</button>
-                                </div>
-                              )}
-                              {importedIds.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5">
-                                  {importedIds.map(id => (
-                                    <span key={id} className="flex items-center gap-1 bg-slate-200/60 dark:bg-slate-700/60 rounded-full pl-2.5 pr-1 py-1 text-[10px] font-mono text-slate-600 dark:text-slate-300">
-                                      #{id}
-                                      <button onClick={() => removeMusicId(id)} className="w-4 h-4 rounded-full bg-slate-400/40 hover:bg-red-500 hover:text-white flex items-center justify-center text-[8px]">✕</button>
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                    {/* 歌单来源：仅 /admin 后台可写（口令 + 服务端校验），前台只读展示，防止被滥用 */}
+                    <div className="mb-3 shrink-0 flex items-center gap-2">
+                      <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                        <Disc3 size={14} /> 云端歌单
+                        {importedIds.length > 0 && <span className="bg-indigo-500 text-white rounded-full px-1.5 text-[10px]">{importedIds.length}</span>}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-medium">
+                        {importedIds.length > 0 ? `已同步 ${importedIds.length} 首 · 后台管理` : '歌单由后台维护'}
+                      </span>
                     </div>
                     <div className="relative w-full max-w-md mx-auto group mb-4 md:mb-8 shrink-0">
                       <div className="absolute inset-0 bg-indigo-500/5 blur-xl group-focus-within:bg-indigo-500/10 transition-all rounded-full" />

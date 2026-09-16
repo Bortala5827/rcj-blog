@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import BackButton from '../../components/BackButton';
 import { friendsData } from '../../data/friends';
-import Comments from '../../components/Comments'; // 🌟 引入你的 Gitalk 组件
+import Comments from '../../components/Comments';
 import { siteConfig } from '../../siteConfig'; // 🌟 引入刚刚更新的全局配置文件
 
 // Framer Motion 动画变体：交错子元素
@@ -109,7 +109,7 @@ export default function FriendsBoard() {
           ✨ 建立神经连接
         </h2>
         <p className="text-xs md:text-base text-slate-600 dark:text-slate-400 font-serif mb-4 md:mb-6">
-          欢迎各位大佬交换友链！请一键复制下方格式，并在底部的 Gitalk 留言板申请：
+          欢迎各位大佬交换友链！请一键复制下方格式，并在底部的留言板申请：
         </p>
 
         {/* 代码展示框 & 一键复制按钮 */}
@@ -137,7 +137,7 @@ export default function FriendsBoard() {
 
         <div className="mt-6 md:mt-8">
           <a
-            href="#gitalk-container"
+            href="#comments"
             className="inline-block px-6 py-2.5 md:px-8 md:py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-full text-sm md:text-base font-bold tracking-widest transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-indigo-500/30"
           >
             前往留言区申请 👇
@@ -145,9 +145,9 @@ export default function FriendsBoard() {
         </div>
       </motion.div>
 
-      {/* Gitalk 评论区 */}
+      {/* 评论区（Waline） */}
       <motion.div
-        id="gitalk-container"
+        id="comments"
         className="mt-12 md:mt-16 scroll-mt-24 px-2 md:px-0"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

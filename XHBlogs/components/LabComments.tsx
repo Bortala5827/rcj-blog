@@ -2,102 +2,83 @@
 
 import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import 'gitalk/dist/gitalk.css';
-import Gitalk from 'gitalk';
+import {
+  init,
+  type WalineInstance,
+  type WalineInitOptions,
+  type WalineLoginStatus,
+  type WalineMeta,
+} from '@waline/client';
+import '@waline/client/style';
 
 import { siteConfig } from '../siteConfig';
 
-// 🌟 专门为炼金实验室定制的 Gitalk 组件，不影响原有的 Comments.tsx
+// 🌟 炼金实验室专用评论组件：可按 pageId（如 workshop-2026-05）单独开一条评论区，
+// 不影响默认按 pathname 区分的 Comments.tsx。
 export default function LabComments({ pageId }: { pageId?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
+  const cfg = siteConfig.walineConfig;
+  const serverURL = cfg?.serverURL || '';
+
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!serverURL || !containerRef.current) return;
 
-    // 清空之前的评论区，防止切换月份时叠加
-    containerRef.current.innerHTML = '';
+    const options: WalineInitOptions = {
+      el: containerRef.current,
+      serverURL,
+      // 优先用传入的 pageId，否则退回当前路径
+      path: pageId || pathname || '/',
+      lang: cfg.lang || 'zh-CN',
+      dark: 'html.dark',
+      login: (cfg.login as WalineLoginStatus) || 'enable',
+      meta: (cfg.meta as WalineMeta[]) || ['nick', 'mail', 'link'],
+      requiredMeta: (cfg.requiredMeta as WalineMeta[]) || ['nick'],
+      reaction: cfg.reaction ?? true,
+      pageview: cfg.pageview ?? true,
+      imageUploader: false,
+      search: false,
+    };
 
-    // 优先使用传入的 pageId (如 workshop-2026-05)
-    const finalId = (pageId || pathname.replace(/\/$/, '') || '/').substring(0, 49);
+    const waline: WalineInstance | null = init(options);
 
-    const gitalk = new Gitalk({
-      clientID: siteConfig.gitalkConfig.clientID,
-      clientSecret: siteConfig.gitalkConfig.clientSecret,
-      repo: siteConfig.gitalkConfig.repo,
-      owner: siteConfig.gitalkConfig.owner,
-      admin: siteConfig.gitalkConfig.admin,
-      proxy: '/api/github',
-      id: finalId, // 这里的 ID 决定了留言板对应 GitHub 的哪个 Issue
-      distractionFreeMode: false,
-    });
+    return () => waline?.destroy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, pageId, serverURL]);
 
-    gitalk.render(containerRef.current);
-
-    // 擦除 URL 中的 OAuth 凭证，防止刷新报错
-    const url = new URL(window.location.href);
-    if (url.searchParams.has('code')) {
-      url.searchParams.delete('code');
-      window.history.replaceState({}, document.title, url.toString());
-    }
-
-  }, [pathname, pageId]);
+  if (!serverURL) return null;
 
   return (
     <div className="w-full mt-16 relative">
       <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-indigo-500/10 dark:bg-indigo-500/20 blur-3xl rounded-full pointer-events-none z-0"></div>
-      <div ref={containerRef} className="relative z-10 custom-gitalk-glass pt-6 border-t border-slate-200/50 dark:border-slate-700/50" />
 
-      {/* 🌟 保留你原来的毛玻璃样式 */}
+      <div
+        ref={containerRef}
+        className="relative z-10 waline-glass pt-6 border-t border-slate-200/50 dark:border-slate-700/50"
+      />
+
       <style jsx global>{`
-        .custom-gitalk-glass .gt-container .gt-header-textarea {
-          background: rgba(255, 255, 255, 0.1) !important;
-          backdrop-filter: blur(12px) !important;
-          border: 1px solid rgba(255, 255, 255, 0.2) !important;
-          border-radius: 16px !important;
-          color: inherit !important;
-          transition: all 0.3s ease;
+        .waline-glass {
+          --waline-theme-color: #6366f1;
+          --waline-active-color: #818cf8;
+          --waline-bg-color: rgba(255, 255, 255, 0.62);
+          --waline-bg-color-light: rgba(255, 255, 255, 0.4);
+          --waline-color: #0f172a;
+          --waline-border-color: rgba(148, 163, 184, 0.35);
         }
-        .custom-gitalk-glass .gt-container .gt-header-textarea:focus {
-          background: rgba(255, 255, 255, 0.2) !important;
-          border-color: #6366f1 !important;
-          box-shadow: 0 0 15px rgba(99, 102, 241, 0.3) !important;
+        html.dark .waline-glass {
+          --waline-bg-color: rgba(30, 41, 59, 0.55);
+          --waline-bg-color-light: rgba(30, 41, 59, 0.35);
+          --waline-color: #e2e8f0;
+          --waline-border-color: rgba(148, 163, 184, 0.22);
         }
-        .custom-gitalk-glass .gt-container .gt-header-preview {
-          background: rgba(255, 255, 255, 0.1) !important;
-          backdrop-filter: blur(12px) !important;
-          border-radius: 16px !important;
-        }
-        .custom-gitalk-glass .gt-container .gt-btn {
-          background: #6366f1 !important;
-          border: none !important;
-          border-radius: 12px !important;
-          box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4) !important;
-          transition: transform 0.2s, box-shadow 0.2s;
-          color: white !important;
-        }
-        .custom-gitalk-glass .gt-container .gt-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6) !important;
-        }
-        .custom-gitalk-glass .gt-container .gt-comment-content {
-          background: rgba(255, 255, 255, 0.05) !important;
-          backdrop-filter: blur(8px) !important;
-          border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        .waline-glass .wl-panel,
+        .waline-glass .wl-card {
           border-radius: 16px !important;
         }
-        .custom-gitalk-glass .gt-container .gt-comment-admin .gt-comment-content {
-          border-color: rgba(99, 102, 241, 0.3) !important;
-        }
-        .custom-gitalk-glass .gt-container .gt-avatar {
-          border-radius: 50% !important;
-          overflow: hidden;
-        }
-        .custom-gitalk-glass .gt-container .gt-comment-body {
-          color: inherit !important;
-        }
-        .custom-gitalk-glass .gt-container a {
-          color: #6366f1 !important;
+        .waline-glass .wl-panel {
+          backdrop-filter: blur(12px);
         }
       `}</style>
     </div>

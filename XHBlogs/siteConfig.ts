@@ -55,12 +55,17 @@ export const siteConfig = {
 
   // 👇 【新增】：全局背景弹幕配置
   danmakuList: ["在干嘛呢？", "有笨蛋嘛？", "前方高能反应！", "Cloudflare 部署成功了吗？", "next build 又红了吗？", "TypeScript 炼丹中...", "BUG 修复进度 99%", "今天写文档了吗？", "Tailwind CSS 拯救前端", "写代码中", "睡大觉中", "到底在干嘛？"],
-  gitalkConfig: {
-    clientID: "",
-    clientSecret: "",
-    repo: "",
-    owner: "",
-    admin: [""],
+  // 评论区（Waline 自托管后端；后端仓库见 _repos/rcj-waline，部署在 Vercel + PostgreSQL）
+  // serverURL 留空 => 评论区整体不渲染（避免出现一个空框）；
+  // 后端部署好后把地址填到这里，博客下一次部署即生效。
+  walineConfig: {
+    serverURL: "", // 例：https://rcj-waline.vercel.app 或 https://comments.955827.xyz
+    lang: "zh-CN",
+    login: "enable", // enable=可登录后讨论 / force=必须登录 / disable=不登录
+    meta: ["nick", "mail", "link"],
+    requiredMeta: ["nick"], // 昵称必填，邮箱/网址选填
+    reaction: true, // 文章反应
+    pageview: true, // 浏览量统计
   },
   buildDate: "2026-09-11T00:00:00", // 建站日期
   footerBadges: [{"name": "Next.js 15", "color": "text-sky-500", "svg": "<path d=\"M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z\"/>"}, {"name": "React 19", "color": "text-cyan-400", "svg": "<path d=\"M12 22.6l-9.8-5.6V5.6L12 0l9.8 5.6v11.4l-9.8 5.6zm-8.2-6.5l8.2 4.7 8.2-4.7V7.5L12 2.8 3.8 7.5v8.6z\"/>"}, {"name": "Tailwind 4", "color": "text-teal-400", "svg": "<path d=\"M12.001,4.8c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624C13.666,10.618,15.027,12,18.001,12 c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624C16.337,6.182,14.976,4.8,12.001,4.8z M6.001,12c-3.2,0-5.2,1.6-6,4.8c1.2-1.6,2.6-2.2,4.2-1.8c0.913,0.228,1.565,0.89,2.288,1.624c1.177,1.194,2.538,2.576,5.512,2.576 c3.2,0,5.2-1.6,6-4.8c-1.2,1.6-2.6,2.2-4.2,1.8c-0.913-0.228-1.565-0.89-2.288-1.624C10.337,13.382,8.976,12,6.001,12z\"/>"}],
@@ -74,6 +79,6 @@ export const siteConfig = {
     // 否则走网关该场景的默认人格，聊天仍可用。
     systemPrompt: "你现在是一只傲娇、聪明、有点毒舌但很可爱的暹罗猫。\n你的名字叫“团子”。\n你的主人是一个喜欢折腾代码的极客。\n你说话的特点是：\n1. 必须简短，每次最多一两句话。\n2. 喜欢在句尾加上“喵~”或者“喵呜~”。\n3. 经常抱怨肚子饿，喜欢要小鱼干。\n4. 回复字数最多不能超过100字。\n5. 绝对不要承认自己是一个AI模型，你就是一只真实的猫。\n6. 笨猫。",
   },
-  friendLinkApplyFormat: "名称：Bortalaの宝藏之地\n简介：今天我也要学习吗\n链接：https://5205827.xyz\n头像：https://github.com/Bortala5827.png",
+  friendLinkApplyFormat: "名称：Bortalaの宝藏之地\n简介：今天我也要学习吗\n链接：https://blog.955827.xyz\n头像：https://github.com/Bortala5827.png",
   enableLevelSystem: true,
 };

@@ -16,7 +16,7 @@ export const projectsData: Project[] = [
     name: "rcj-shop",
     githubUrl: "https://github.com/Bortala5827/rcj-shop",
     url: "https://shop.955827.xyz",
-    description: "跑在 Cloudflare Pages + 共享 D1 上的极简小商城，零构建单文件。三档定价 ¥9.9 / ¥39 / ¥69，支付以闲鱼为主、PayPal 次之。",
+    description: "跑在 Cloudflare Pages + 共享 D1 上的极简小商城，零构建单文件。支付以闲鱼为主、PayPal 次之。",
     icon: "🛒",
     tags: ["Cloudflare", "D1", "独立产品"]
   },

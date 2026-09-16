@@ -76,6 +76,7 @@ export default function Navbar() {
     { name: '音乐', href: '/music' },
     { name: '后台', href: '/admin' },
     { name: '友链', href: '/friends' },
+    { name: '加入频道', href: 'https://pd.qq.com/s/6mjqng89c', external: true },
     { name: '关于', href: '/about' },
   ];
 
@@ -95,9 +96,17 @@ export default function Navbar() {
           <nav className="flex gap-8 text-sm font-bold">
             {/* PC端依然使用全量的 navLinks */}
             {navLinks.map((link) => {
-              const isActive = pathname === link.href || pathname === `${link.href}/`;
+              const isActive = !link.external && (pathname === link.href || pathname === `${link.href}/`);
+              const cls = `relative py-1 transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-200 hover:text-indigo-600'}`;
+              if (link.external) {
+                return (
+                  <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className={cls}>
+                    {link.name}
+                  </a>
+                );
+              }
               return (
-                <Link key={link.href} href={link.href} className={`relative py-1 transition-colors ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-200 hover:text-indigo-600'}`}>
+                <Link key={link.href} href={link.href} className={cls}>
                   {link.name}
                   {isActive && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-indigo-500 rounded-full animate-pulse"></span>}
                 </Link>
@@ -162,9 +171,14 @@ export default function Navbar() {
 
                   {/* 🌟 手机端轮盘渲染：使用过滤后的 mobileNavLinks */}
                   {mobileNavLinks.map((link, index) => {
-                    const isActive = pathname === link.href || pathname === `${link.href}/`;
+                    const isActive = !link.external && (pathname === link.href || pathname === `${link.href}/`);
                     // 🌟 角度计算也会基于过滤后的长度，保证图标自动均匀排布！
                     const angle = index * (360 / mobileNavLinks.length);
+                    const circleCls = `flex items-center justify-center w-full h-full rounded-full transition-all duration-300 ${
+                      isActive
+                        ? 'bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.8)] scale-110'
+                        : 'bg-white/90 dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-md hover:scale-110 border border-white/50 dark:border-slate-600'
+                    }`;
 
                     return (
                       <div
@@ -175,17 +189,25 @@ export default function Navbar() {
                         }}
                       >
                         <motion.div style={{ rotate: inverseRotation }} className="w-full h-full">
-                          <Link
-                            href={link.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={`flex items-center justify-center w-full h-full rounded-full transition-all duration-300 ${
-                              isActive 
-                                ? 'bg-indigo-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.8)] scale-110' 
-                                : 'bg-white/90 dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-md hover:scale-110 border border-white/50 dark:border-slate-600'
-                            }`}
-                          >
-                            <span className="text-[11px] font-black">{link.name}</span>
-                          </Link>
+                          {link.external ? (
+                            <a
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className={circleCls}
+                            >
+                              <span className="text-[11px] font-black">{link.name}</span>
+                            </a>
+                          ) : (
+                            <Link
+                              href={link.href}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className={circleCls}
+                            >
+                              <span className="text-[11px] font-black">{link.name}</span>
+                            </Link>
+                          )}
                         </motion.div>
                       </div>
                     );

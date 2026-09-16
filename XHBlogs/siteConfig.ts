@@ -46,12 +46,7 @@ export const siteConfig = {
     cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链
   },
   social: {
-    github: "Bortala5827",
-    gitee: "",
-    google: "",
-    email: "",
-    qq: "",
-    wechat: "",
+    email: "bortala5827@gmail.com",
   },
   counts: {
     photos: 2, // 照片墙数量：data/albums.ts 中“生活碎片”相册含 2 张

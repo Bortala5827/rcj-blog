@@ -43,9 +43,9 @@ export const projectsData: Project[] = [
     name: "facetalk",
     githubUrl: "https://github.com/Bortala5827/facetalk",
     url: "https://facetalk.955827.xyz",
-    description: "三语（中 / 英 / 日）站点，AI 激活相关能力打磨中。",
+    description: "匿名面试 / 语音互选平台：免登录、60 秒语音试聊，双方都同意才配对；PWA + 轻量 WebView，三语即开即用。",
     icon: "🗣️",
-    tags: ["三语", "i18n", "AI"]
+    tags: ["匿名互选", "语音试聊", "PWA"]
   },
   {
     id: "proj_rcj_lab",

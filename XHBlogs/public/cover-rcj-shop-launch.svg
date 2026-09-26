@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c2d12"/>
+      <stop offset="1" stop-color="#fb923c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="1020" cy="120" r="250" fill="#fed7aa" opacity="0.15"/>
+  <circle cx="140" cy="540" r="210" fill="#ffedd5" opacity="0.10"/>
+  <g transform="rotate(-12 910 380)" opacity="0.9">
+    <path d="M820 300 h150 l60 60 -60 60 h-150 z" fill="none" stroke="#ffedd5" stroke-width="10" stroke-linejoin="round"/>
+    <circle cx="860" cy="360" r="14" fill="#ffedd5"/>
+  </g>
+  <text x="80" y="300" font-family="ui-monospace, Consolas, monospace" font-size="96" font-weight="bold" fill="#fff7ed">rcj-shop</text>
+  <text x="80" y="380" font-family="ui-monospace, Consolas, monospace" font-size="40" fill="#fed7aa" opacity="0.9">pricing hosting · launch log</text>
+</svg>

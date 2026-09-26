@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, PanInfo } from 'framer-motion';
 import { siteConfig } from '../siteConfig';
 
 export default function Navbar() {
@@ -13,10 +13,11 @@ export default function Navbar() {
   const pathname = usePathname();
 
   // --- 🌟 物理引擎：菜单转动逻辑 ---
+  // 注意：链接必须放在「转盘层」之外的独立层上 —— onPan 在触摸时会指针捕获，
+  // 把 tap 的 click 截留在盘面元素上，导致手机端点选项不跳转（2026-09-26 修复）。
   const wheelRef = useRef<HTMLDivElement>(null);
   const rawRotation = useMotionValue(0);
   const smoothRotation = useSpring(rawRotation, { stiffness: 200, damping: 25 });
-  const inverseRotation = useTransform(smoothRotation, (r) => -r);
 
   const handlePan = (event: any, info: PanInfo) => {
     if (!wheelRef.current) return;
@@ -73,6 +74,7 @@ export default function Navbar() {
     { name: '项目', href: '/projects' },
     { name: '归档', href: '/timeline' },
     { name: '照片墙', href: '/photowall' },
+    { name: '留言墙', href: '/board' },
     { name: '音乐', href: '/music' },
     { name: '后台', href: '/admin' },
     { name: '友链', href: '/friends' },
@@ -157,22 +159,32 @@ export default function Navbar() {
                 transition={{ type: 'spring', damping: 20, stiffness: 150 }}
                 className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] z-[70] pointer-events-none"
               >
+                {/* 层 1：转盘本体 —— 只负责视觉与转动手势（onPan 会指针捕获，绝不能包住链接） */}
                 <motion.div
                   ref={wheelRef}
                   style={{ rotate: smoothRotation }}
                   onPan={handlePan}
-                  className="w-full h-full rounded-full border border-white/30 dark:border-slate-500/50 bg-white/40 dark:bg-slate-800/50 backdrop-blur-3xl shadow-[0_0_50px_rgba(0,0,0,0.3)] pointer-events-auto relative cursor-grab active:cursor-grabbing"
+                  className="absolute inset-0 rounded-full border border-white/30 dark:border-slate-500/50 bg-white/40 dark:bg-slate-800/50 backdrop-blur-3xl shadow-[0_0_50px_rgba(0,0,0,0.3)] pointer-events-auto cursor-grab active:cursor-grabbing"
                 >
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700 border-4 border-slate-300 dark:border-slate-500 flex items-center justify-center shadow-inner z-10">
+                  {/* 盘面装饰刻度：随盘转动 */}
+                  {[0, 90, 180, 270].map((deg) => (
+                    <div key={deg} className="absolute top-1/2 left-1/2 w-full" style={{ transform: `rotate(${deg}deg)`, height: 1 }}>
+                      <div className="mx-auto h-px w-10 bg-slate-400/40 dark:bg-slate-500/40" style={{ transform: `translateX(${140 - 20}px)` }} />
+                    </div>
+                  ))}
+                </motion.div>
+
+                {/* 层 2：链接层 —— 叠在盘面上方，不吃 pan 捕获，手机端点击必达 */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="pointer-events-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700 border-4 border-slate-300 dark:border-slate-500 flex items-center justify-center shadow-inner z-10">
                     <button onClick={() => setIsMobileMenuOpen(false)} className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-white font-black shadow-lg hover:bg-red-500 hover:rotate-90 transition-all duration-300 active:scale-95">
                       ✕
                     </button>
                   </div>
 
-                  {/* 🌟 手机端轮盘渲染：使用过滤后的 mobileNavLinks */}
                   {mobileNavLinks.map((link, index) => {
                     const isActive = !link.external && (pathname === link.href || pathname === `${link.href}/`);
-                    // 🌟 角度计算也会基于过滤后的长度，保证图标自动均匀排布！
+                    // 🌟 角度基于链接总数，保证圆盘上自动均匀排布；标签恒正立（不再随盘反转）
                     const angle = index * (360 / mobileNavLinks.length);
                     const circleCls = `flex items-center justify-center w-full h-full rounded-full transition-all duration-300 ${
                       isActive
@@ -183,36 +195,24 @@ export default function Navbar() {
                     return (
                       <div
                         key={link.href}
-                        className="absolute top-1/2 left-1/2 w-14 h-14 -ml-7 -mt-7 flex items-center justify-center"
+                        className="absolute top-1/2 left-1/2 w-14 h-14 -ml-7 -mt-7 flex items-center justify-center pointer-events-auto"
                         style={{
                           transform: `rotate(${angle}deg) translateY(-115px) rotate(${-angle}deg)`
                         }}
                       >
-                        <motion.div style={{ rotate: inverseRotation }} className="w-full h-full">
-                          {link.external ? (
-                            <a
-                              href={link.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={() => setIsMobileMenuOpen(false)}
-                              className={circleCls}
-                            >
-                              <span className="text-[11px] font-black">{link.name}</span>
-                            </a>
-                          ) : (
-                            <Link
-                              href={link.href}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                              className={circleCls}
-                            >
-                              <span className="text-[11px] font-black">{link.name}</span>
-                            </Link>
-                          )}
-                        </motion.div>
+                        {link.external ? (
+                          <a href={link.href} target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)} className={circleCls}>
+                            <span className="text-[11px] font-black">{link.name}</span>
+                          </a>
+                        ) : (
+                          <Link href={link.href} onClick={() => setIsMobileMenuOpen(false)} className={circleCls}>
+                            <span className="text-[11px] font-black">{link.name}</span>
+                          </Link>
+                        )}
                       </div>
                     );
                   })}
-                </motion.div>
+                </div>
               </motion.div>
             </>
           )}

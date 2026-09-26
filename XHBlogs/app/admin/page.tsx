@@ -63,6 +63,52 @@ export default function AdminDashboard() {
   // D1 里的自托管曲（source='local'，即「陪在你身边」）：与网易云 ID 一样是库里的一条记录
   const [localItem, setLocalItem] = useState<any | null>(null);
 
+  // ============ 便签管理状态 ============
+  const [boardNotes, setBoardNotes] = useState<any[]>([]);
+  const [boardLoading, setBoardLoading] = useState(false);
+  const [boardMsg, setBoardMsg] = useState('');
+
+  const loadBoardNotes = useCallback(async () => {
+    setBoardLoading(true);
+    setBoardMsg('');
+    try {
+      const r = await fetch('/api/notes', { cache: 'no-store' });
+      const d = await r.json().catch(() => null);
+      if (d?.ok && Array.isArray(d.notes)) {
+        setBoardNotes(d.notes);
+      } else {
+        setBoardMsg(d?.error === 'no_db' ? '云端未连接（本地无 D1 绑定）' : '读取失败，请检查网络');
+      }
+    } catch {
+      setBoardMsg('读取失败，请检查网络');
+    } finally {
+      setBoardLoading(false);
+    }
+  }, []);
+
+  const deleteBoardNote = useCallback(async (id: string) => {
+    try {
+      const r = await fetch(`/api/notes?id=${encodeURIComponent(id)}`, { method: 'DELETE', headers: adminHeaders() });
+      const d = await r.json().catch(() => null);
+      if (r.ok && d?.ok) {
+        setBoardNotes((prev) => prev.filter((n) => n.id !== id));
+      } else if (d?.error === 'unauthorized') {
+        setBoardMsg('口令校验未通过，请重新解锁后台');
+      } else {
+        setBoardMsg('删除失败，请重试');
+      }
+    } catch {
+      setBoardMsg('删除失败，请检查网络');
+    }
+  }, []);
+
+  // 首次切到便签管理时自动加载
+  useEffect(() => {
+    if (unlocked && activeTab === 'board' && boardNotes.length === 0 && !boardLoading && !boardMsg) {
+      loadBoardNotes();
+    }
+  }, [unlocked, activeTab, boardNotes.length, boardLoading, boardMsg, loadBoardNotes]);
+
   // 读歌单：云端（D1）优先，取不到则退回本地缓存
   useEffect(() => {
     let alive = true;
@@ -242,6 +288,7 @@ export default function AdminDashboard() {
   const menuItems = [
     { id: 'dashboard', name: '全息仪表盘', icon: '🌌' },
     { id: 'music', name: '歌单管理', icon: '🎵' },
+    { id: 'board', name: '便签管理', icon: '🗒️' },
     { id: 'gallery', name: '光影画廊', icon: '🖼️' },
     { id: 'settings', name: '系统核心配置', icon: '⚙️' },
   ];
@@ -467,6 +514,45 @@ export default function AdminDashboard() {
                 清空全部导入歌单
               </button>
             )}
+          </div>
+        )}
+
+        {/* ============ 便签管理 ============ */}
+        {activeTab === 'board' && (
+          <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-black text-slate-800 dark:text-white">🗒️ 便签管理（留言墙）</h2>
+              <button onClick={loadBoardNotes} disabled={boardLoading} className="h-10 px-4 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:bg-indigo-500/20 transition-colors disabled:opacity-50">
+                {boardLoading ? '加载中…' : '刷新列表'}
+              </button>
+            </div>
+            {boardMsg && <p className="text-xs text-amber-600 dark:text-amber-400 mb-4">{boardMsg}</p>}
+            {boardNotes.length === 0 && !boardLoading ? (
+              <p className="text-sm text-slate-400 py-6 text-center">墙上还没有便签</p>
+            ) : (
+              <div className="space-y-3">
+                {boardNotes.map((n) => (
+                  <div key={n.id} className="group flex items-center gap-4 rounded-2xl border border-white/40 dark:border-slate-700/40 bg-white/50 dark:bg-slate-800/40 px-4 py-3">
+                    <span className="w-4 h-4 shrink-0 rounded-full border border-black/10" style={{ background: n.color }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-slate-800 dark:text-slate-200 truncate">
+                        <span className="font-black mr-2">{n.name}</span>
+                        {n.content}
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">{n.id} · {new Date(n.ts).toLocaleString('zh-CN')}</p>
+                    </div>
+                    <button
+                      onClick={() => deleteBoardNote(n.id)}
+                      title="撤下这张便签"
+                      className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="text-[11px] text-slate-400 mt-4">💡 便签存于 Cloudflare D1（与歌单同库），删除即时生效且不可恢复；访客每分钟最多钉 1 张。</p>
           </div>
         )}
 

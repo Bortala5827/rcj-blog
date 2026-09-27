@@ -3,7 +3,7 @@
 // 照片墙 —— 暖纸拍立得风（设计参照 aibrium.cn 的暖色系：暖米渐变背景、
 // 衬线字体、白框拍立得卡片、胶带贴纸、随机微旋转、hover 摆正抬起）。
 // 逻辑与原版一致：相册堆叠卡 → 相册内瀑布流 → lightbox，含搜索。
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Navbar from '../../components/Navbar';
 import PageTransition from '../../components/PageTransition';
 import { albums, Album } from '../../data/albums';
@@ -74,7 +74,22 @@ function Polaroid({ src, caption, onClick, seed, eager }: { src: string; caption
 
 export default function PhotoWallClient() {
   const [currentAlbum, setCurrentAlbum] = useState<Album | null>(null);
-  const [selectedImage, setSelectedImage] = useState<{ url: string; caption?: string; albumName?: string } | null>(null);
+  // 光箱浏览态：携带整组照片列表 + 当前下标，支持上一张/下一张连续浏览
+  const [viewer, setViewer] = useState<{ list: { url: string; caption?: string }[]; index: number } | null>(null);
+  const touchX = useRef(0);
+
+  const openViewer = (list: { url: string; caption?: string }[], index: number) => setViewer({ list, index });
+
+  useEffect(() => {
+    if (!viewer) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setViewer(null);
+      else if (e.key === 'ArrowLeft') setViewer((v) => v && { ...v, index: (v.index - 1 + v.list.length) % v.list.length });
+      else if (e.key === 'ArrowRight') setViewer((v) => v && { ...v, index: (v.index + 1) % v.list.length });
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [viewer]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
@@ -165,7 +180,12 @@ export default function PhotoWallClient() {
                           src={photo.url}
                           caption={photo.caption ? `${photo.caption} · ${photo.albumName}` : photo.albumName}
                           seed={`sp-${index}-${photo.url}`}
-                          onClick={() => setSelectedImage(photo)}
+                          onClick={() =>
+                            openViewer(
+                              matchedPhotos.map((p) => ({ url: p.url, caption: p.caption ? `${p.caption} · ${p.albumName}` : p.albumName })),
+                              index
+                            )
+                          }
                         />
                       ))}
                     </div>
@@ -314,7 +334,7 @@ export default function PhotoWallClient() {
                     caption={photo.caption}
                     seed={`${photo.url}-${index}`}
                     eager={index < 4}
-                    onClick={() => setSelectedImage(photo)}
+                    onClick={() => openViewer(currentAlbum.photos, index)}
                   />
                 ))}
               </div>
@@ -323,22 +343,83 @@ export default function PhotoWallClient() {
         </div>
       </PageTransition>
 
-      {selectedImage && (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#241d17]/95 p-4 backdrop-blur-xl sm:p-10" style={{ cursor: 'zoom-out' }} onClick={() => setSelectedImage(null)}>
-          <button className="absolute right-6 top-6 rounded-full bg-white/10 p-2 text-white/60 transition-colors hover:bg-white/20 hover:text-white">
+      {viewer && (
+        <div
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#241d17]/95 p-4 backdrop-blur-xl sm:p-10"
+          style={{ cursor: 'zoom-out' }}
+          onClick={() => setViewer(null)}
+          onTouchStart={(e) => {
+            touchX.current = e.touches[0].clientX;
+          }}
+          onTouchEnd={(e) => {
+            const dx = e.changedTouches[0].clientX - touchX.current;
+            if (dx > 48) setViewer((v) => v && { ...v, index: (v.index - 1 + v.list.length) % v.list.length });
+            else if (dx < -48) setViewer((v) => v && { ...v, index: (v.index + 1) % v.list.length });
+          }}
+        >
+          <button
+            aria-label="关闭"
+            className="absolute right-6 top-6 rounded-full bg-white/10 p-2 text-white/60 transition-colors hover:bg-white/20 hover:text-white"
+            onClick={(e) => {
+              e.stopPropagation();
+              setViewer(null);
+            }}
+          >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
-          <div className="relative bg-white p-3 pb-4 shadow-2xl" style={{ transform: 'rotate(-1deg)', maxWidth: '90vw', maxHeight: '88vh' }} onClick={(e) => e.stopPropagation()}>
-            <img src={selectedImage.url} alt={selectedImage.caption || '全屏照片'} className="max-h-[72vh] max-w-full object-contain" />
-            {selectedImage.caption && (
+          {viewer.list.length > 1 && (
+            <>
+              <button
+                aria-label="上一张"
+                className="absolute left-2 top-1/2 z-10 rounded-full bg-white/10 p-2.5 text-white/70 transition-all hover:scale-110 hover:bg-white/25 hover:text-white sm:left-6"
+                style={{ transform: 'translateY(-50%)' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setViewer({ ...viewer, index: (viewer.index - 1 + viewer.list.length) % viewer.list.length });
+                }}
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                aria-label="下一张"
+                className="absolute right-2 top-1/2 z-10 rounded-full bg-white/10 p-2.5 text-white/70 transition-all hover:scale-110 hover:bg-white/25 hover:text-white sm:right-6"
+                style={{ transform: 'translateY(-50%)' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setViewer({ ...viewer, index: (viewer.index + 1) % viewer.list.length });
+                }}
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          <div
+            key={viewer.index}
+            className="pw-viewer-pop relative bg-white p-3 pb-4 shadow-2xl"
+            style={{ maxWidth: '90vw', maxHeight: '88vh', transform: 'rotate(-1deg)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src={viewer.list[viewer.index].url} alt={viewer.list[viewer.index].caption || '全屏照片'} className="max-h-[72vh] max-w-full object-contain" />
+            {viewer.list[viewer.index].caption && (
               <p className="mt-3 text-center text-sm" style={{ color: '#6b5d52', fontFamily: SERIF, fontStyle: 'italic' }}>
-                {selectedImage.caption}
+                {viewer.list[viewer.index].caption}
               </p>
             )}
           </div>
+
+          {viewer.list.length > 1 && (
+            <div className="mt-5 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold tracking-widest text-white/70" onClick={(e) => e.stopPropagation()}>
+              {viewer.index + 1} / {viewer.list.length}
+            </div>
+          )}
         </div>
       )}
 
@@ -354,6 +435,19 @@ export default function PhotoWallClient() {
         }
         .animate-pw-in {
           animation: pwFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes pwViewerIn {
+          from {
+            opacity: 0;
+            transform: rotate(-1deg) translateY(14px) scale(0.97);
+          }
+          to {
+            opacity: 1;
+            transform: rotate(-1deg);
+          }
+        }
+        .pw-viewer-pop {
+          animation: pwViewerIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
       `}</style>
     </div>

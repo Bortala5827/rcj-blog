@@ -31,8 +31,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/projects`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5 },
     { url: `${SITE_URL}/timeline`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${SITE_URL}/friends`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
-    { url: `${SITE_URL}/photowall`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.4 },
+    { url: `${SITE_URL}/friends`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.4 },
+    { url: `${SITE_URL}/board`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.4 },
+    { url: `${SITE_URL}/photowall`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.4 },
     { url: `${SITE_URL}/music`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.3 },
   ];
 

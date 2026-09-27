@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import PixelBenben from './PixelBenben';
 
 export default function CyberCat() {
   const [isPetted, setIsPetted] = useState(false);
@@ -178,43 +179,10 @@ export default function CyberCat() {
             </button>
         </div>
 
-        {/* 狗狗图片容器 */}
-        <div
-          className="w-[120px] h-[120px] relative cursor-pointer"
-          onClick={handlePetCat}
-        >
-          <style>{`
-            .cat-sprite {
-              width: 100%;
-              height: 100%;
-              background-image: url('/benben.png');
-              background-size: 300% 300%;
-              background-repeat: no-repeat;
-              image-rendering: pixelated;
-            }
-            .cat-idle {
-              animation: idle-frames 1.2s infinite;
-              background-position-y: 0%;
-            }
-            .cat-petted {
-              animation: pet-frames 0.8s infinite;
-              background-position-y: 50%;
-            }
-            .cat-thinking {
-              animation: idle-frames 0.6s infinite;
-              background-position-y: 0%;
-            }
-            @keyframes idle-frames {
-              0%, 33.32% { background-position-x: 0%; }
-              33.33%, 66.65% { background-position-x: 50%; }
-              66.66%, 100% { background-position-x: 100%; }
-            }
-            @keyframes pet-frames {
-              0%, 49.99% { background-position-x: 0%; }
-              50%, 100% { background-position-x: 50%; }
-            }
-          `}</style>
-          <div className={`cat-sprite drop-shadow-2xl ${isPetted ? 'cat-petted' : isThinking ? 'cat-thinking' : 'cat-idle'}`} />
+        {/* 狗狗本体：canvas 像素渲染（benbenFrames 24×24，暗部色阶营造立体感）
+            状态映射：被摸→happy（吐舌摇尾）、等 AI→think（眼珠上瞟+闭眼）、平时→idle（摇尾） */}
+        <div className="w-[120px] h-[120px] relative cursor-pointer" onClick={handlePetCat}>
+          <PixelBenben state={isPetted ? 'happy' : isThinking ? 'think' : 'idle'} size={120} className="drop-shadow-2xl" />
         </div>
       </div>
 

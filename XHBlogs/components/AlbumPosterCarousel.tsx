@@ -24,6 +24,8 @@ export default function AlbumPosterCarousel({ album }: { album: Album }) {
           key={p.url}
           src={p.url}
           alt={p.caption || album.title}
+          loading={i === 0 ? 'eager' : 'lazy'}
+          decoding="async"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out group-hover:scale-105 ${i === idx ? 'opacity-90' : 'opacity-0'}`}
         />
       ))}

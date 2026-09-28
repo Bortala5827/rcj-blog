@@ -148,7 +148,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
           <MusicProvider>
             <div id="app-mount-root" className="flex-1 flex flex-col transition-opacity duration-1000">
-              <div className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+              <div id="bg-effects-layer" className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden transition-[filter] duration-700">
                 {!siteConfig.useGradient && <BackgroundSlider />}
                 <div className="absolute inset-0 z-[-9] bg-white/30 dark:bg-slate-900/40 backdrop-blur-md transition-colors duration-1000"></div>
 

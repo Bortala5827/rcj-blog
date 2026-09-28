@@ -48,15 +48,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     else root.classList.remove('dark');
   }, [isDark, mounted]);
 
-  // neon 模式全局 filter 注入
+  // neon 模式 filter 只作用于背景层，不动图片/文字/卡片内容
   useEffect(() => {
     if (!mounted) return;
-    const body = document.body;
+    const bgLayer = document.getElementById('bg-effects-layer');
+    if (!bgLayer) return;
     if (theme === 'neon') {
       // 骚气：色相扭 310°（蓝→玫红、绿→霓虹蓝紫）+ 超饱和 + 稍对比 + 稍亮
-      body.style.filter = 'hue-rotate(310deg) saturate(1.7) contrast(1.12) brightness(1.08)';
+      bgLayer.style.filter = 'hue-rotate(310deg) saturate(1.7) contrast(1.12) brightness(1.08)';
     } else {
-      body.style.filter = '';
+      bgLayer.style.filter = '';
     }
   }, [theme, mounted]);
 

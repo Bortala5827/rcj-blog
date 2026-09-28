@@ -44,16 +44,6 @@ function Polaroid({ src, caption, onClick, seed, eager }: { src: string; caption
           e.currentTarget.style.zIndex = '';
         }}
       >
-        {/* 顶部胶带 */}
-        <div
-          className="absolute -top-2.5 left-1/2 z-10 h-5 w-16 -translate-x-1/2 -rotate-2"
-          style={{
-            background: 'rgba(255,244,221,0.85)',
-            boxShadow: 'rgba(0,0,0,0.08) 0 1px 3px',
-            borderLeft: '1px dashed rgba(163,138,128,0.35)',
-            borderRight: '1px dashed rgba(163,138,128,0.35)',
-          }}
-        />
         <div className="overflow-hidden">
           <img
             src={src}
@@ -241,16 +231,6 @@ export default function PhotoWallClient() {
                         >
                           <img src={album.cover} alt={album.title} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                         </div>
-                        <div
-                          className="absolute -top-3 left-1/2 z-30 h-6 w-20 -translate-x-1/2 -rotate-2"
-                          style={{
-                            background: 'rgba(255,244,221,0.9)',
-                            boxShadow: 'rgba(0,0,0,0.1) 0 2px 4px',
-                            borderLeft: '1px dashed rgba(163,138,128,0.35)',
-                            borderRight: '1px dashed rgba(163,138,128,0.35)',
-                            transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                          }}
-                        />
                       </div>
 
                       <div className="w-full px-4 text-center">

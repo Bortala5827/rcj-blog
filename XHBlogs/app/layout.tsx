@@ -155,7 +155,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
                 {/* z-8 渐变流动层 */}
                 <div
-                  className="absolute inset-0 z-[-8] opacity-60 dark:opacity-20 mix-blend-color transition-opacity duration-1000 transform-gpu"
+                  className="bg-gradient-flow absolute inset-0 z-[-8] opacity-60 dark:opacity-20 mix-blend-color transition-opacity duration-1000 transform-gpu"
                   style={{
                     background: 'linear-gradient(-45deg, var(--grad-c1), var(--grad-c2), var(--grad-c3), var(--grad-c4))',
                     backgroundSize: '400% 400%',

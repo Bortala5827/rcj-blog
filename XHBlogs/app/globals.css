@@ -39,16 +39,21 @@
 
   /* —— 霓虹骚粉主题（同时覆盖 dark 和 light 的变量）—— */
   html[data-theme="neon"] {
-    --bg-body: #1a0a2e;              /* 深紫底 */
-    --bg-blur-layer: rgba(45,21,80,0.6); /* 深紫半透 */
+    --bg-body: #0d001a;              /* 紫黑底，比 dark 更深更骚 */
+    --bg-blur-layer: rgba(45,10,80,0.7); /* 深紫半透，加浓 */
     --grad-c1: #ff2d95;              /* 玫红 */
     --grad-c2: #b026ff;              /* 品紫 */
     --grad-c3: #00d4ff;              /* 电光蓝 */
     --grad-c4: #ff2d95;              /* 循环回玫红 */
-    --glow-1: rgba(255,45,149,0.3);  /* 霓虹粉 */
-    --glow-2: rgba(0,212,255,0.3);   /* 电光蓝 */
-    --scrollbar: rgba(255,45,149,0.4);
-    --scrollbar-hover: rgba(255,45,149,0.9);
+    --glow-1: rgba(255,45,149,0.55); /* 霓虹粉，透明度拉到 0.55 */
+    --glow-2: rgba(0,212,255,0.55);  /* 电光蓝，透明度拉到 0.55 */
+    --scrollbar: rgba(255,45,149,0.55);
+    --scrollbar-hover: rgba(255,45,149,1);
+  }
+
+  /* neon 模式下渐变流动层 opacity 拉满，让霓虹冲出来 */
+  html[data-theme="neon"] .bg-gradient-flow {
+    opacity: 0.55 !important;
   }
 
   body {

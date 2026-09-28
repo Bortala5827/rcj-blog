@@ -3,21 +3,64 @@
 /* 1. 声明暗黑模式变体 */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* 2. 基础环境与性能优化 */
+/* 2. 主题色变量（三套：light / dark / neon）
+   neon 不套 CSS filter，每层颜色意图性切换：
+   - 底层半透底 / 渐变流动 / 光晕球 / 滚动条 都有专属霓虹色
+   - 图片/卡片/文字 保持原色不变 */
 @layer base {
+  /* —— 日间 & 夜间（默认值，与原配色一致）—— */
   :root {
     --font-serif: var(--font-serif), "Source Han Serif SC", "Noto Serif SC", "Songti SC", "SimSun", serif;
+    --bg-body: #f8fafc;              /* body 底 */
+    --bg-blur-layer: rgba(255,255,255,0.3);  /* z-9 半透底 */
+    --grad-c1: #a18cd1;              /* 渐变流动 */
+    --grad-c2: #fbc2eb;
+    --grad-c3: #a1c4fd;
+    --grad-c4: #c2e9fb;
+    --glow-1: rgba(255,255,255,0.4); /* 左上光晕 */
+    --glow-2: rgba(99,102,241,0.3);  /* 右下水晕 */
+    --scrollbar: rgba(99,102,241,0.3);
+    --scrollbar-hover: rgba(99,102,241,0.8);
+  }
+
+  /* —— 夜间模式覆盖 —— */
+  .dark {
+    --bg-body: #020617;              /* slate-950 */
+    --bg-blur-layer: rgba(15,23,42,0.4); /* slate-900/40 */
+    --grad-c1: #a18cd1;              /* 渐变色保持 */
+    --grad-c2: #fbc2eb;
+    --grad-c3: #a1c4fd;
+    --grad-c4: #c2e9fb;
+    --glow-1: rgba(49,46,129,0.2);   /* indigo-900/20 */
+    --glow-2: rgba(88,28,135,0.3);   /* purple-900/30 */
+    --scrollbar: rgba(99,102,241,0.4);
+    --scrollbar-hover: rgba(99,102,241,0.9);
+  }
+
+  /* —— 霓虹骚粉主题（同时覆盖 dark 和 light 的变量）—— */
+  html[data-theme="neon"] {
+    --bg-body: #1a0a2e;              /* 深紫底 */
+    --bg-blur-layer: rgba(45,21,80,0.6); /* 深紫半透 */
+    --grad-c1: #ff2d95;              /* 玫红 */
+    --grad-c2: #b026ff;              /* 品紫 */
+    --grad-c3: #00d4ff;              /* 电光蓝 */
+    --grad-c4: #ff2d95;              /* 循环回玫红 */
+    --glow-1: rgba(255,45,149,0.3);  /* 霓虹粉 */
+    --glow-2: rgba(0,212,255,0.3);   /* 电光蓝 */
+    --scrollbar: rgba(255,45,149,0.4);
+    --scrollbar-hover: rgba(255,45,149,0.9);
   }
 
   body {
     font-family: var(--font-serif);
-    @apply transition-colors duration-1000 text-slate-900 bg-slate-50;
+    @apply transition-colors duration-1000 text-slate-900;
+    background-color: var(--bg-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   .dark body {
-    @apply text-slate-100 bg-slate-950;
+    @apply text-slate-100;
   }
 
   h1, h2, h3, h4 {
@@ -81,11 +124,11 @@ input[type=range]::-webkit-slider-thumb {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
+  background: var(--scrollbar);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.8);
+  background: var(--scrollbar-hover);
 }
 
 /* ========================================================
@@ -93,7 +136,7 @@ input[type=range]::-webkit-slider-thumb {
    ======================================================== */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(99, 102, 241, 0.3) transparent;
+  scrollbar-color: var(--scrollbar) transparent;
 }
 
 /* ===== 东方元素：宣纸质感 / 墨线 / 朱砂 / 竖排短句 ===== */

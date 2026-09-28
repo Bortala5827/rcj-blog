@@ -148,22 +148,24 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
           <MusicProvider>
             <div id="app-mount-root" className="flex-1 flex flex-col transition-opacity duration-1000">
-              <div id="bg-effects-layer" className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden transition-[filter] duration-700">
+              <div id="bg-effects-layer" className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
                 {!siteConfig.useGradient && <BackgroundSlider />}
-                <div className="absolute inset-0 z-[-9] bg-white/30 dark:bg-slate-900/40 backdrop-blur-md transition-colors duration-1000"></div>
+                {/* z-9 半透底 + 毛玻璃 */}
+                <div className="absolute inset-0 z-[-9] backdrop-blur-md transition-colors duration-1000" style={{ background: 'var(--bg-blur-layer)' }}></div>
 
+                {/* z-8 渐变流动层 */}
                 <div
                   className="absolute inset-0 z-[-8] opacity-60 dark:opacity-20 mix-blend-color transition-opacity duration-1000 transform-gpu"
                   style={{
-                    background: `linear-gradient(-45deg, ${siteConfig.themeColors.join(', ')})`,
+                    background: 'linear-gradient(-45deg, var(--grad-c1), var(--grad-c2), var(--grad-c3), var(--grad-c4))',
                     backgroundSize: '400% 400%',
-                    animation: 'gradientMove 15s ease infinite' // 🌟 全端保留渐变流动
+                    animation: 'gradientMove 15s ease infinite'
                   }}
                 ></div>
 
-                {/* 👇 🌟 优化：手机端去掉了 mix-blend-overlay，但保留了 blur 模糊光晕，确保视觉不打折 */}
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-white/40 dark:bg-indigo-900/20 blur-[100px] rounded-full z-[-7] md:mix-blend-overlay"></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-400/30 dark:bg-purple-900/30 blur-[100px] rounded-full z-[-7] md:mix-blend-overlay"></div>
+                {/* z-7 两个光晕球 */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] blur-[100px] rounded-full z-[-7] md:mix-blend-overlay transition-colors duration-1000" style={{ background: 'var(--glow-1)' }}></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] blur-[100px] rounded-full z-[-7] md:mix-blend-overlay transition-colors duration-1000" style={{ background: 'var(--glow-2)' }}></div>
 
                 {/* 隐藏手机端高负载粒子特效 */}
                 <div className="hidden md:block absolute inset-0 w-full h-full">

@@ -20,11 +20,20 @@ export const albums: Album[] = [
     date: "2026.08",
     photos: [
       { url: "/blog-photo-1.png", caption: "随手一拍" },
-      { url: "/blog-photo-2.jpg", caption: "某一刻" },
       { url: "/life-1-portrait-suit.jpg", caption: "正装肖像" },
       { url: "/life-2-team.jpg", caption: "团队活动" },
       { url: "/life-3-sketch-portrait.jpg", caption: "素描肖像" },
       { url: "/life-4-fire-sketch.jpg", caption: "主题素描" },
+    ],
+  },
+  {
+    id: "film-moments",
+    title: "影视剧",
+    description: "2026 年 8 月，剧中某一刻",
+    cover: "/blog-photo-2.jpg",
+    date: "2026.08",
+    photos: [
+      { url: "/blog-photo-2.jpg", caption: "某一刻" },
     ],
   },
 ];

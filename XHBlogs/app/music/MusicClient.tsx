@@ -106,7 +106,7 @@ export default function MusicClient() {
     else if (typeof selectSong === 'function') selectSong(index);
   };
 
-  // 歌单总数 = D1 里的网易云条目 + 自托管曲（「陪在你身边」，source='local'）
+  // 歌单总数 = D1 里的网易云条目 + 自托管曲（「留在我身邊 (そばにいるね)」，source='local'）
   const playlistTotal = importedIds.length + (playlist.some((s: any) => s.id === 'r2-local') ? 1 : 0);
 
   const filteredPlaylist = useMemo(() => {

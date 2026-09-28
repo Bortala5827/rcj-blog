@@ -21,7 +21,7 @@ export const runtime = 'edge'
 
 // 歌单条目：既能放网易云 ID，也能放站点自托管的曲目
 //   source='netease'：id 为网易云歌曲 ID，播放走 /api/music/stream
-//   source='local'  ：id 固定为 'r2-local'（自托管曲，如「陪在你身边」），url 为同源/R2 地址
+//   source='local'  ：id 固定为 'r2-local'（自托管曲，如「留在我身邊 (そばにいるね)」），url 为同源/R2 地址
 const LOCAL_ID = 'r2-local'
 
 const TABLE = `CREATE TABLE IF NOT EXISTS music_ids (

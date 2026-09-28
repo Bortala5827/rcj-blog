@@ -92,7 +92,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const IMPORT_STORAGE_KEY = 'rcj_imported_netease_ids';
   const [importedIds, setImportedIds] = useState<string[]>([]);
   const [cloudSynced, setCloudSynced] = useState(false);
-  // 云端（D1）里那条自托管曲（source='local'，如「陪在你身边」）：
+  // 云端（D1）里那条自托管曲（source='local'，如「留在我身邊 (そばにいるね)」）：
   //   null        = 云端没连上（用 siteConfig 兜底）
   //   {present:false} = 云端明确没有它（后台删过）→ 歌单里就不显示
   //   {present:true, meta} = 云端有 → 用库里的标题/歌手/封面/地址
@@ -158,7 +158,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
 
     const m = siteConfig.music;
-    // 自托管曲（「陪在你身边」）的权威来源是 D1：
+    // 自托管曲（「留在我身邊 (そばにいるね)」）的权威来源是 D1：
     //   云端有这条记录 → 用它（标题/歌手/封面/地址都可在库里改）；
     //   云端明确没有（后台删过）→ 歌单里不出现；
     //   云端没连上（未绑 D1 / 离线）→ 退回 siteConfig，本地开发与旧行为不变。

@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   const [queryResult, setQueryResult] = useState<any>(null);
   const [queryError, setQueryError] = useState('');
   const [cloudState, setCloudState] = useState<'idle' | 'synced' | 'local'>('idle');
-  // D1 里的自托管曲（source='local'，即「陪在你身边」）：与网易云 ID 一样是库里的一条记录
+  // D1 里的自托管曲（source='local'，即「留在我身邊 (そばにいるね)」）：与网易云 ID 一样是库里的一条记录
   const [localItem, setLocalItem] = useState<any | null>(null);
 
   // ============ 便签管理状态 ============
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
 
   const m = siteConfig.music;
 
-  // 自托管曲（「陪在你身边」）：权威来源是 D1 里那条 source='local' 的记录；
+  // 自托管曲（「留在我身邊 (そばにいるね)」）：权威来源是 D1 里那条 source='local' 的记录；
   // 云端还没连上（未绑 D1 / 离线）时才退回 siteConfig 兜底。
   const localTrack = localItem
     ? {
@@ -275,7 +275,7 @@ export default function AdminDashboard() {
   const restoreLocalTrack = async () => {
     const meta = {
       id: 'r2-local',
-      name: m?.title || '陪在你身边',
+      name: m?.title || '留在我身邊 (そばにいるね)',
       artist: m?.artist || '——',
       cover: m?.cover || '',
       url: m?.url || '/soba-ni-iru-ne.webm',
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: '🌐', label: '部署平台', value: 'Cloudflare Pages', sub: 'git 绑定自动构建' },
-              { icon: '🎶', label: '主曲目', value: m?.title || '陪在你身边', sub: 'R2 自托管 · WebM' },
+              { icon: '🎶', label: '主曲目', value: m?.title || '留在我身邊 (そばにいるね)', sub: 'R2 自托管 · WebM' },
               { icon: '📥', label: '已导入网易云', value: `${ids.length} 首`, sub: cloudState === 'synced' ? '云端 D1 同步' : cloudState === 'local' ? '仅本地缓存' : '外链直连播放' },
               { icon: '🔗', label: '站点地址', value: 'blog.955827.xyz', sub: 'RCJ 生态 · Bortala' },
             ].map((card) => (
@@ -445,7 +445,7 @@ export default function AdminDashboard() {
             {/* 真实歌单：R2 默认曲 + 已导入网易云 */}
             <p className="text-[10px] font-black text-slate-400 uppercase ml-1 mb-3">当前播放歌单（与 /music 实时同步）</p>
             <div className="max-h-[420px] overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-              {/* 自托管曲（「陪在你身边」）：和网易云歌曲一样是 D1 里的一条记录，可删可恢复 */}
+              {/* 自托管曲（「留在我身邊 (そばにいるね)」）：和网易云歌曲一样是 D1 里的一条记录，可删可恢复 */}
               {localTrack ? (
                 <div className="flex justify-between items-center p-3 bg-white/40 dark:bg-slate-800/40 rounded-2xl border border-indigo-500/20 group">
                   <div className="flex items-center gap-3">
@@ -467,7 +467,7 @@ export default function AdminDashboard() {
               ) : (
                 cloudState === 'synced' && (
                   <button onClick={restoreLocalTrack} className="w-full p-3 rounded-2xl border border-dashed border-indigo-500/40 text-[11px] font-black text-indigo-500 hover:bg-indigo-500/5 transition-colors">
-                    ＋ 把「{m?.title || '陪在你身边'}」加回歌单
+                    ＋ 把「{m?.title || '留在我身邊 (そばにいるね)'}」加回歌单
                   </button>
                 )
               )}

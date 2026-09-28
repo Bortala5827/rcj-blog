@@ -44,7 +44,7 @@ export const siteConfig = {
   music: {
     source: 'local',
     url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || '/soba-ni-iru-ne.webm',
-    title: '陪在你身边', // そばにいるね 的中文呈现，避免直接露出原日文标题
+    title: '留在我身邊 (そばにいるね)', // 繁中 + 日文原名直出，作为 D1 未连上时的兜底显示名
     artist: '——',
     cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链
   },

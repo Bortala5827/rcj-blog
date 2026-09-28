@@ -1,39 +1,50 @@
 "use client";
 
-import { useTheme } from './ThemeProvider';
+import { useTheme, THEMES } from './ThemeProvider';
 
-// 这里的 export default 非常关键！没有 default 就会报你那个错误
+// 主题切换卡：3 主题横排选择，当前选中高亮
 export default function ThemeToggleBlock() {
-  const { isDark, toggleTheme } = useTheme();
+  const { theme, isDark, setTheme } = useTheme();
+  const current = THEMES.find(t => t.id === theme) ?? THEMES[1];
 
   return (
     <div
-      onClick={toggleTheme}
-      // 【核心修复】：移除了定高限制 (h-[180px] md:h-auto)，换成了统一的 h-full w-full
-      className={`h-full w-full rounded-3xl backdrop-blur-md border shadow-xl p-6 flex flex-col justify-center items-center transition-all duration-500 hover:scale-[1.05] cursor-pointer group relative overflow-hidden
+      className={`h-full w-full rounded-3xl backdrop-blur-md border shadow-xl p-5 flex flex-col justify-center items-center transition-all duration-500 hover:scale-[1.02] relative overflow-hidden
         ${isDark ? 'bg-slate-800/40 border-slate-600/50' : 'bg-white/40 border-white/60'}
       `}
     >
-       {/* 日夜交替动画图标 */}
-       <div className="relative w-20 h-20 rounded-full overflow-hidden mb-3 shadow-inner flex-shrink-0">
-          <div className={`absolute inset-0 transition-transform duration-700 ${isDark ? '-translate-y-full' : 'translate-y-0'} bg-gradient-to-tr from-sky-300 to-yellow-200`}></div>
-          <div className={`absolute inset-0 transition-transform duration-700 ${isDark ? 'translate-y-0' : 'translate-y-full'} bg-gradient-to-tr from-indigo-900 to-slate-800`}></div>
+      {/* 3 主题 emoji 选择器 */}
+      <div className="flex gap-3 mb-3">
+        {THEMES.map(t => {
+          const active = t.id === theme;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setTheme(t.id)}
+              title={t.label}
+              className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all duration-300 cursor-pointer
+                ${active
+                  ? 'ring-2 ring-pink-400 scale-110 shadow-lg shadow-pink-500/30'
+                  : 'opacity-70 hover:opacity-100 hover:scale-105'
+                }
+                ${isDark ? 'bg-slate-700/50' : 'bg-white/50'}
+              `}
+            >
+              {t.emoji}
+            </button>
+          );
+        })}
+      </div>
 
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ${isDark ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'} text-3xl drop-shadow-md`}>
-            🌸
-          </div>
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-700 ${isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'} text-3xl drop-shadow-md`}>
-            ✨
-          </div>
-       </div>
-       <div className="text-center z-10 mt-auto">
-           <h3 className={`text-xl font-bold transition-colors duration-500 ${isDark ? 'text-white' : 'text-slate-800'}`}>
-             {isDark ? '夜间模式' : '日间模式'}
-           </h3>
-           <p className={`text-sm font-medium mt-1 transition-colors duration-500 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-             {isDark ? '流萤飞舞的深空' : '落樱漫舞的清晨'}
-           </p>
-       </div>
+      {/* 当前主题标题 + 副标题 */}
+      <div className="text-center z-10">
+        <h3 className={`text-lg font-bold transition-colors duration-500 ${isDark ? 'text-white' : 'text-slate-800'}`}>
+          {current.label}
+        </h3>
+        <p className={`text-xs font-medium mt-0.5 transition-colors duration-500 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+          {current.subtitle}
+        </p>
+      </div>
     </div>
   );
 }

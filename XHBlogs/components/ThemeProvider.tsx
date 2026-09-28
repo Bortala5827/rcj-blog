@@ -1,55 +1,80 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
-const ThemeContext = createContext({ isDark: true, toggleTheme: () => {} });
+export type ThemeId = 'light' | 'dark' | 'neon';
+
+interface ThemeInfo {
+  id: ThemeId;
+  emoji: string;
+  label: string;
+  subtitle: string;
+  filter?: string;
+}
+
+export const THEMES: ThemeInfo[] = [
+  { id: 'light', emoji: '☀️', label: '日间模式', subtitle: '落樱漫舞的清晨' },
+  { id: 'dark',  emoji: '🌙', label: '夜间模式', subtitle: '流萤飞舞的深空' },
+  { id: 'neon',  emoji: '💋', label: '霓虹骚粉', subtitle: '全站歪到非正常色' },
+];
+
+const ThemeContext = createContext<{
+  theme: ThemeId;
+  isDark: boolean;
+  setTheme: (t: ThemeId) => void;
+  cycleTheme: () => void;
+}>({ theme: 'dark', isDark: true, setTheme: () => {}, cycleTheme: () => {} });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // 默认设为 true，这样在读取到配置前，如果是夜间模式就不会闪烁
-  const [isDark, setIsDark] = useState(true);
+  // 默认 dark，避免首屏闪白
+  const [theme, setThemeState] = useState<ThemeId>('dark');
   const [mounted, setMounted] = useState(false);
 
+  // neon 模式仍然基于深色（dark: 前缀照常生效），只是额外套 filter
+  const isDark = theme !== 'light';
+
   useEffect(() => {
-    // 标记组件已挂载，避免 hydration 报错
     setMounted(true);
-
-    // 从 localStorage 读取真实状态
-    const savedTheme = localStorage.getItem('blog-theme');
-    // 如果没有记录，默认给深色模式（流萤飞舞）
-    const isDarkMode = savedTheme !== 'light';
-    setIsDark(isDarkMode);
-
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    const saved = localStorage.getItem('blog-theme') as ThemeId | null;
+    const valid: ThemeId[] = ['light', 'dark', 'neon'];
+    const t = saved && valid.includes(saved) ? saved : 'dark';
+    setThemeState(t);
   }, []);
 
-  // 极其重要：监听 isDark 状态，只要它变了，立刻强制更新 html 标签，防止路由切换丢失
+  // 同步 html.dark class：neon 也算 dark（页面元素用 dark: 变量）
   useEffect(() => {
     if (!mounted) return;
     const root = document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    if (isDark) root.classList.add('dark');
+    else root.classList.remove('dark');
   }, [isDark, mounted]);
 
-  const toggleTheme = () => {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    localStorage.setItem('blog-theme', newDark ? 'dark' : 'light');
-  };
+  // neon 模式全局 filter 注入
+  useEffect(() => {
+    if (!mounted) return;
+    const body = document.body;
+    if (theme === 'neon') {
+      // 骚气：色相扭 310°（蓝→玫红、绿→霓虹蓝紫）+ 超饱和 + 稍对比 + 稍亮
+      body.style.filter = 'hue-rotate(310deg) saturate(1.7) contrast(1.12) brightness(1.08)';
+    } else {
+      body.style.filter = '';
+    }
+  }, [theme, mounted]);
 
-  // 在客户端挂载完成前，为了防止闪屏，先隐藏内容
-  if (!mounted) {
-    return <div className="invisible">{children}</div>;
-  }
+  const setTheme = useCallback((t: ThemeId) => {
+    setThemeState(t);
+    localStorage.setItem('blog-theme', t);
+  }, []);
+
+  const cycleTheme = useCallback(() => {
+    const idx = THEMES.findIndex(t => t.id === theme);
+    const next = THEMES[(idx + 1) % THEMES.length];
+    setTheme(next.id);
+  }, [theme, setTheme]);
+
+  if (!mounted) return <div className="invisible">{children}</div>;
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, isDark, setTheme, cycleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

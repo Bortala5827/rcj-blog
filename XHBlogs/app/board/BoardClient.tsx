@@ -15,12 +15,19 @@ export interface Note {
   ts: number;
 }
 
-const NOTE_COLORS = ['#fff1e6', '#edf8ee', '#fff8ea', '#e5f5ff', '#fff4dd', '#eee9ff', '#f8edff'];
-const TAB_COLORS = ['#b5dcf2', '#efce8f'];
+// 7 色便签：饱和度加深 2 档，色相分明但仍是马卡龙质感（桃/绿/黄/蓝/杏/紫/粉紫）
+const NOTE_COLORS = ['#ffd8bd', '#c5ecc9', '#ffedb3', '#c2e5fc', '#ffe0a8', '#ddd2fb', '#f5d5f2'];
+const TAB_COLORS = ['#9fcbe8', '#e6b96a'];
 const MAX_CONTENT = 300;
 const LOCAL_KEY = 'rcj_board_notes';
 
 const SERIF = 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif';
+
+// 旧版浅色便签 → 新色映射：已存便签渲染时换新色，无需迁移数据
+const LEGACY_COLOR_MAP: Record<string, string> = {
+  '#fff1e6': '#ffd8bd', '#edf8ee': '#c5ecc9', '#fff8ea': '#ffedb3',
+  '#e5f5ff': '#c2e5fc', '#fff4dd': '#ffe0a8', '#eee9ff': '#ddd2fb', '#f8edff': '#f5d5f2',
+};
 
 // 稳定的伪随机：同一张便签永远同一个角度/配色
 function hashStr(s: string): number {
@@ -54,7 +61,7 @@ function NoteCard({ note, index, onDelete }: { note: Note; index: number; onDele
         transform: `rotate(${rotate}deg) translateY(${dy}px)`,
         transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow: 'rgba(12,20,44,0.24) 0 18px 24px, rgba(61,76,108,0.1) 0 3px 6px, rgba(255,255,255,0.72) 0 1px 0 inset',
-        background: note.color,
+        background: LEGACY_COLOR_MAP[note.color] || note.color,
         padding: '32px 20px 16px',
       }}
       onMouseEnter={(e) => {

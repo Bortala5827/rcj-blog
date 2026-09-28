@@ -14,7 +14,7 @@ interface ThemeInfo {
 export const THEMES: ThemeInfo[] = [
   { id: 'light', emoji: '☀️', label: '日间模式', subtitle: '落樱漫舞的清晨' },
   { id: 'dark',  emoji: '🌙', label: '夜间模式', subtitle: '流萤飞舞的深空' },
-  { id: 'neon',  emoji: '💋', label: '霓虹骚粉', subtitle: '全站歪到非正常色' },
+  { id: 'neon',  emoji: '🌃', label: '赛博梦境', subtitle: '霓虹深处的粉紫梦' },
 ];
 
 const ThemeContext = createContext<{

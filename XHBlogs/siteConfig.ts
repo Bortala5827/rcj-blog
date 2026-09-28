@@ -50,9 +50,10 @@ export const siteConfig = {
   },
   social: {
     email: "zhouqiang@5205827.xyz",
-    // 社交三件套：首页 ProfileCard 图标行 + 奔奔提示词里的【联系主人】共用
+    // 社交四件套：首页 ProfileCard 图标行 + 奔奔提示词里的【联系主人】共用
     feishu: "https://www.feishu.cn/invitation/page/add_contact/?token=3a3id6d8-7a66-4fad-b2dc-24b739fe9f5b&unique_id=DSqBkd2B2OFRwNhnAoq0yw==",
     xianyu: "https://m.tb.cn/h.8FOWu65?tk=gw9TTOwqDKp", // 闲鱼短链（淘口令通道）
+    qqChannel: "https://pd.qq.com/s/6mjqng89c", // QQ 频道（原导航栏「加入频道」，2026-09-28 挪到首页社交图标行）
   },
   counts: {
     photos: 2, // 照片墙数量：data/albums.ts 中“生活碎片”相册含 2 张

@@ -69,17 +69,18 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const navLinks = [
+  const navLinks: { name: string; href: string; external?: boolean }[] = [
     { name: '首页', href: '/' },
-    { name: '项目', href: '/projects' },
     { name: '归档', href: '/timeline' },
     { name: '照片墙', href: '/photowall' },
     { name: '留言墙', href: '/board' },
     { name: '音乐', href: '/music' },
-    { name: '后台', href: '/admin' },
     { name: '友链', href: '/friends' },
-    { name: '加入频道', href: 'https://pd.qq.com/s/6mjqng89c', external: true },
     { name: '关于', href: '/about' },
+    // 精简说明（2026-09-28）：
+    // - 「项目」：首页已有大卡片入口（page.tsx /projects Link），导航不再重复
+    // - 「后台」：管理员入口走直链 /admin + 密码门，不暴露在公共导航
+    // - 「加入频道」：挪到首页 ProfileCard 社交图标行（siteConfig.social.qqChannel）
   ];
 
   // 🌟 核心：过滤掉“灵境”，专供手机端使用，保证圆盘自动重新均匀排布

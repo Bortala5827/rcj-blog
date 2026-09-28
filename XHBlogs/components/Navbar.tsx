@@ -71,6 +71,7 @@ export default function Navbar() {
 
   const navLinks: { name: string; href: string; external?: boolean }[] = [
     { name: '首页', href: '/' },
+    { name: '项目', href: '/projects' },
     { name: '归档', href: '/timeline' },
     { name: '照片墙', href: '/photowall' },
     { name: '留言墙', href: '/board' },
@@ -78,9 +79,9 @@ export default function Navbar() {
     { name: '友链', href: '/friends' },
     { name: '关于', href: '/about' },
     // 精简说明（2026-09-28）：
-    // - 「项目」：首页已有大卡片入口（page.tsx /projects Link），导航不再重复
     // - 「后台」：管理员入口走直链 /admin + 密码门，不暴露在公共导航
     // - 「加入频道」：挪到首页 ProfileCard 社交图标行（siteConfig.social.qqChannel）
+    // - 「项目」：2026-09-28 加回，独立导航项
   ];
 
   // 🌟 核心：过滤掉“灵境”，专供手机端使用，保证圆盘自动重新均匀排布

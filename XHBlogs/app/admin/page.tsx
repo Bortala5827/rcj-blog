@@ -569,7 +569,7 @@ export default function AdminDashboard() {
               ))}
             </div>
             <button onClick={() => router.push('/photowall')} className="mt-6 h-12 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-sm shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-all active:scale-95">
-              📷 前往照片墙
+              📷 前往光影画廊
             </button>
           </div>
         )}

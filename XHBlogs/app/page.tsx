@@ -76,7 +76,6 @@ export default function Home() {
   const top5Posts = allPosts.length > 0 ? allPosts.slice(0, 5) : [{ slug: 'none', title: '暂无文章', description: '快去写第一篇吧！', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
 
   const realPhotoCount = albums.reduce((total, album) => total + album.photos.length, 0);
-  const latestAlbum = albums.length > 0 ? albums[0] : { id: '', title: '照片墙', description: '查看摄影', cover: siteConfig.photoWallImage, date: '', photos: [] };
 
   return (
     <ToastProvider>
@@ -116,7 +115,7 @@ export default function Home() {
                 <div className="col-span-1 lg:col-span-8 flex flex-col gap-6">
 
                   {/* 照片墙大海报（相册图片轮播） */}
-                  <AlbumPosterCarousel album={latestAlbum} />
+                  <AlbumPosterCarousel albums={albums} />
 
                   {/* 底层网格：项目入口 + 主题切换器 */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full flex-1">

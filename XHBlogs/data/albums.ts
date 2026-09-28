@@ -16,10 +16,9 @@ export const albums: Album[] = [
     id: "life-slices",
     title: "生活碎片",
     description: "日常里随手截下的光",
-    cover: "/blog-photo-1.png",
+    cover: "/life-1-portrait-suit.jpg",
     date: "2026.08",
     photos: [
-      { url: "/blog-photo-1.png", caption: "随手一拍" },
       { url: "/life-1-portrait-suit.jpg", caption: "正装肖像" },
       { url: "/life-2-team.jpg", caption: "团队活动" },
       { url: "/life-3-sketch-portrait.jpg", caption: "素描肖像" },
@@ -33,6 +32,7 @@ export const albums: Album[] = [
     cover: "/blog-photo-2.jpg",
     date: "2026.08",
     photos: [
+      { url: "/blog-photo-1.png", caption: "随手一拍" },
       { url: "/blog-photo-2.jpg", caption: "某一刻" },
     ],
   },

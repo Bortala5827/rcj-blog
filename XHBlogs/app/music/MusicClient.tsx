@@ -245,7 +245,7 @@ export default function MusicClient() {
                         {playlistTotal > 0 && <span className="bg-indigo-500 text-white rounded-full px-1.5 text-[10px]">{playlistTotal}</span>}
                       </span>
                       <span className="text-[10px] text-slate-400 font-medium">
-                        {playlistTotal > 0 ? `已同步 ${playlistTotal} 首 · 后台管理` : '歌单由后台维护'}
+                        {playlistTotal > 0 ? <>已同步 {playlistTotal} 首 · <a href="/admin" className="hover:text-indigo-500 transition-colors">后台管理</a></> : <>歌单由<a href="/admin" className="hover:text-indigo-500 transition-colors">后台</a>维护</>}
                       </span>
                     </div>
                     <div className="relative w-full max-w-md mx-auto group mb-4 md:mb-8 shrink-0">

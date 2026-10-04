@@ -263,6 +263,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
             parsed = String(d.plain)
               .split(/\r?\n/)
               .map((s: string) => s.trim())
+              // lrclib 的 plainLyrics 可能混入 [ti:]/[ar:] 等 LRC 元数据行，过滤掉（时间戳行是数字开头不受影响）
+              .filter((s: string) => !/^\[[a-zA-Z]+:/.test(s))
               .filter(Boolean)
               .map((t: string) => ({ time: -1, text: t }));
           }

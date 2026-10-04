@@ -53,7 +53,7 @@ export const siteConfig = {
   //   duration = 本地文件实际秒数（ffprobe 实测），供 /api/music/lrc 判断 lrclib 歌词版本是否可同步。
   localTracks: [
     { id: 'local-chengdu', title: '成都', artist: '赵雷', duration: 67, src: '/music/chengdu.m4a', cover: '/music/covers/chengdu.jpg' },
-    { id: 'local-fenshenqingren', title: '分身情人', artist: '——', duration: 42, src: '/music/fenshenqingren.m4a', cover: '/music/covers/fenshenqingren.jpg' },
+    { id: 'local-fenshenqingren', title: '分身情人', artist: '魏晨', duration: 42, src: '/music/fenshenqingren.m4a', cover: '/music/covers/fenshenqingren.jpg' },
     { id: 'local-hongdou', title: '红豆', artist: '王菲', duration: 211, src: '/music/hongdou.m4a', cover: '/music/covers/hongdou.svg' },
     { id: 'local-hongdou-2', title: '红豆', artist: '王菲', duration: 78, src: '/music/hongdou-2.m4a', cover: '/music/covers/hongdou-2.jpg' },
     { id: 'local-renjian', title: '人间', artist: '王菲', duration: 100, src: '/music/renjian.m4a', cover: '/music/covers/renjian.svg' },

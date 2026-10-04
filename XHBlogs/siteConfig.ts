@@ -48,6 +48,21 @@ export const siteConfig = {
     artist: '——',
     cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链
   },
+  // 🌟 自托管私人歌单（2026-10-04）：public/music/ 同源分发，与上方 soba 同一链路。
+  //   闲鱼购入的私有音源，自欣赏用；id 用 local- 前缀与网易云 ID 区分，D1 之外静态写死（前台只读）。
+  localTracks: [
+    { id: 'local-chengdu', title: '成都', artist: '赵雷', src: '/music/chengdu.m4a', cover: '/music/covers/chengdu.jpg' },
+    { id: 'local-fenshenqingren', title: '分身情人', artist: '——', src: '/music/fenshenqingren.m4a', cover: '/music/covers/fenshenqingren.jpg' },
+    { id: 'local-hongdou', title: '红豆', artist: '王菲', src: '/music/hongdou.m4a', cover: '/music/covers/hongdou.svg' },
+    { id: 'local-hongdou-2', title: '红豆', artist: '王菲', src: '/music/hongdou-2.m4a', cover: '/music/covers/hongdou-2.jpg' },
+    { id: 'local-renjian', title: '人间', artist: '王菲', src: '/music/renjian.m4a', cover: '/music/covers/renjian.svg' },
+    { id: 'local-shuishou', title: '水手', artist: '郑智化', src: '/music/shuishou.m4a', cover: '/music/covers/shuishou.svg' },
+    { id: 'local-wozhizaihuni', title: '我只在乎你', artist: '邓丽君', src: '/music/wozhizaihuni.m4a', cover: '/music/covers/wozhizaihuni.svg' },
+    { id: 'local-xiangwozheyangderen', title: '像我這樣的人', artist: '毛不易', src: '/music/xiangwozheyangderen.m4a', cover: '/music/covers/xiangwozheyangderen.svg' },
+    { id: 'local-youhebuke', title: '有何不可', artist: '许嵩', src: '/music/youhebuke.m4a', cover: '/music/covers/youhebuke.jpg' },
+    { id: 'local-zhishaohaiyouni', title: '至少还有你', artist: '林忆莲', src: '/music/zhishaohaiyouni.m4a', cover: '/music/covers/zhishaohaiyouni.svg' },
+    { id: 'local-zhishaohaiyouni-2', title: '至少还有你', artist: '林忆莲', src: '/music/zhishaohaiyouni-2.m4a', cover: '/music/covers/zhishaohaiyouni-2.jpg' },
+  ],
   social: {
     email: "zhouqiang@5205827.xyz",
     // 社交四件套：首页 ProfileCard 图标行 + 奔奔提示词里的【联系主人】共用

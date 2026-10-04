@@ -179,6 +179,17 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         }]
       : [];
 
+    // 静态自托管私人歌单（siteConfig.localTracks，public/music/ 同源文件，2026-10-04）
+    const staticLocalTracks = (siteConfig.localTracks || []).map((t) => ({
+      id: t.id,
+      title: t.title,
+      artist: t.artist || '未知歌手',
+      cover: t.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
+      src: t.src,
+      lrcUrl: null,
+      lyrics: [] as any[],
+    }));
+
     // 网易云歌单 = 配置里的固定 ID + 后台导入的 ID（外链直连，无需版权文件落地）
     // 去重：同一个 ID 既在配置里又在后台导入过时，避免 React key 冲突
     const neteaseIds = [...new Set([...(siteConfig.cloudMusicIds || []), ...importedIds])];
@@ -199,13 +210,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
             lyrics: song.lrc ? parseLrc(song.lrc) : [],
           }));
         if (!isMounted) return;
-        const playlist = [...r2Track, ...merged];
+        const playlist = [...r2Track, ...staticLocalTracks, ...merged];
         if (playlist.length > 0) setPlaylist(playlist);
         else setCurrentLyric("云端链路受阻");
         setIsLoading(false);
       } catch (error) {
         if (!isMounted) return;
-        const playlist = [...r2Track];
+        const playlist = [...r2Track, ...staticLocalTracks];
         if (playlist.length > 0) setPlaylist(playlist);
         else setCurrentLyric("网络初始化失败");
         setIsLoading(false);
@@ -215,7 +226,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     if (neteaseIds.length > 0) {
       fetchMusicData();
     } else {
-      if (r2Track.length > 0) setPlaylist(r2Track);
+      const localOnly = [...r2Track, ...staticLocalTracks];
+      if (localOnly.length > 0) setPlaylist(localOnly);
       setIsLoading(false);
     }
 

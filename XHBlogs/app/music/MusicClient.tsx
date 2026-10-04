@@ -106,8 +106,9 @@ export default function MusicClient() {
     else if (typeof selectSong === 'function') selectSong(index);
   };
 
-  // 歌单总数 = D1 里的网易云条目 + 自托管曲（「留在我身邊 (そばにいるね)」，source='local'）
-  const playlistTotal = importedIds.length + (playlist.some((s: any) => s.id === 'r2-local') ? 1 : 0);
+  // 歌单总数 = D1 里的网易云条目 + 自托管曲（r2-local + siteConfig.localTracks 的 local- 前缀曲目）
+  const localCount = playlist.filter((s: any) => s.id === 'r2-local' || String(s.id).startsWith('local-')).length;
+  const playlistTotal = importedIds.length + localCount;
 
   const filteredPlaylist = useMemo(() => {
     if (!searchQuery.trim()) return playlist;
@@ -263,7 +264,7 @@ export default function MusicClient() {
                             <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} key={song.id} onClick={() => handlePlaySong(originalIndex)} className={`group flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl cursor-pointer transition-all border ${isPlayingThis ? 'bg-white/60 dark:bg-slate-700/80 shadow-md border-indigo-500/30' : 'border-transparent hover:bg-white/30 dark:hover:bg-slate-700/40'}`}>
                               <div className="flex items-center gap-3 md:gap-4 w-[85%]">
                                 <div className="relative w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-lg md:rounded-xl overflow-hidden shadow-sm">
-                                  <img src={song.cover || song.pic} alt="cover" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                                  <img src={song.cover || song.pic} alt="cover" referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                   {isPlayingThis && isPlaying && <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]"><div className="flex gap-[3px] items-end h-2 md:h-3"><span className="w-0.5 bg-white rounded-full animate-[bounce_1s_infinite_0ms]" /><span className="w-0.5 bg-white rounded-full animate-[bounce_1s_infinite_200ms]" /><span className="w-0.5 bg-white rounded-full animate-[bounce_1s_infinite_400ms]" /></div></div>}
                                 </div>
                                 <div className="flex flex-col truncate"><span className={`text-sm md:text-[15px] font-black truncate ${isPlayingThis ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-slate-200'}`}>{song.title || song.name}</span><span className="text-[10px] md:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">{song.artist || song.author}</span></div>

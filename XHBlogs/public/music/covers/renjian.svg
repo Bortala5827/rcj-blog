@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8763a"/><stop offset="1" stop-color="#f0d9a8"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.42" r="0.3">
+      <stop offset="0" stop-color="#fff3d6"/><stop offset="1" stop-color="#fff3d6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#g)"/>
+  <rect width="600" height="600" fill="url(#sun)"/>
+  <circle cx="300" cy="252" r="72" fill="#fff7e0" fill-opacity="0.85"/>
+  <path d="M0 330 Q90 300 180 328 T360 326 T600 320 V600 H0 Z" fill="#a05a2c" fill-opacity="0.55"/>
+  <path d="M0 385 Q120 355 240 380 T600 372 V600 H0 Z" fill="#7c421e" fill-opacity="0.6"/>
+  <path d="M0 445 Q150 420 300 440 T600 435 V600 H0 Z" fill="#5c2f12" fill-opacity="0.65"/>
+  <text x="300" y="510" text-anchor="middle" font-family="'Noto Serif SC','Songti SC','SimSun',serif" font-size="52" letter-spacing="14" fill="#4a2410">人间</text>
+  <text x="300" y="552" text-anchor="middle" font-family="'Noto Serif SC','Songti SC','SimSun',serif" font-size="20" letter-spacing="6" fill="#4a2410" fill-opacity="0.7">王菲</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7a2626"/><stop offset="1" stop-color="#c97b7b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.38" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#g)"/>
+  <rect width="600" height="600" fill="url(#glow)"/>
+  <circle cx="300" cy="255" r="150" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="2"/>
+  <circle cx="300" cy="255" r="6" fill="#ffffff" fill-opacity="0.55"/>
+  <ellipse cx="215" cy="345" rx="10" ry="13" fill="#3d1111" fill-opacity="0.65" transform="rotate(-18 215 345)"/>
+  <ellipse cx="255" cy="368" rx="10" ry="13" fill="#3d1111" fill-opacity="0.5" transform="rotate(14 255 368)"/>
+  <ellipse cx="300" cy="350" rx="10" ry="13" fill="#3d1111" fill-opacity="0.6" transform="rotate(-8 300 350)"/>
+  <ellipse cx="345" cy="372" rx="10" ry="13" fill="#3d1111" fill-opacity="0.45" transform="rotate(22 345 372)"/>
+  <ellipse cx="385" cy="348" rx="10" ry="13" fill="#3d1111" fill-opacity="0.55" transform="rotate(-24 385 348)"/>
+  <text x="300" y="478" text-anchor="middle" font-family="'Noto Serif SC','Songti SC','SimSun',serif" font-size="52" letter-spacing="14" fill="#ffffff">红豆</text>
+  <text x="300" y="522" text-anchor="middle" font-family="'Noto Serif SC','Songti SC','SimSun',serif" font-size="20" letter-spacing="6" fill="#ffffff" fill-opacity="0.6">王菲</text>
+</svg>

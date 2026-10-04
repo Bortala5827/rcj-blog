@@ -180,15 +180,20 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       : [];
 
     // 静态自托管私人歌单（siteConfig.localTracks，public/music/ 同源文件，2026-10-04）
-    const staticLocalTracks = (siteConfig.localTracks || []).map((t) => ({
-      id: t.id,
-      title: t.title,
-      artist: t.artist || '未知歌手',
-      cover: t.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
-      src: t.src,
-      lrcUrl: null,
-      lyrics: [] as any[],
-    }));
+    // 歌词走 /api/music/lrc（lrclib 代理）：文件时长与原版接近 → 同步歌词；剪辑片段 → 纯文本
+    const staticLocalTracks = (siteConfig.localTracks || []).map((t) => {
+      const qs = new URLSearchParams({ title: t.title, artist: t.artist || '' });
+      if (t.duration) qs.set('duration', String(t.duration));
+      return {
+        id: t.id,
+        title: t.title,
+        artist: t.artist || '未知歌手',
+        cover: t.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
+        src: t.src,
+        lrcUrl: `/api/music/lrc?${qs.toString()}`,
+        lyrics: [] as any[],
+      };
+    });
 
     // 网易云歌单 = 配置里的固定 ID + 后台导入的 ID（外链直连，无需版权文件落地）
     // 去重：同一个 ID 既在配置里又在后台导入过时，避免 React key 冲突
@@ -246,20 +251,34 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         setCurrentLyric(currentSong.lyrics[0]?.text || "\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a");
       }
     } else if (currentSong.lrcUrl) {
+      // /api/music/lrc 返回 JSON：{ ok, synced, lrc, plain }
+      // synced=true → 逐行实时高亮；只有 plain → 静默展示全部行（time=-1，不参与实时匹配）
       fetch(currentSong.lrcUrl)
-        .then(res => res.text())
-        .then(text => {
-          if (isMounted) {
-             const parsed = parseLrc(text);
-             setLyrics(parsed);
-             setPlaylist(prev => {
-                const newPlaylist = [...prev];
-                newPlaylist[currentIndex].lyrics = parsed;
-                return newPlaylist;
-             });
+        .then(res => res.json())
+        .then((d: any) => {
+          if (!isMounted) return;
+          let parsed: { time: number; text: string }[] = [];
+          if (d?.ok && d?.synced && d?.lrc) parsed = parseLrc(d.lrc);
+          if (parsed.length === 0 && d?.ok && d?.plain) {
+            parsed = String(d.plain)
+              .split(/\r?\n/)
+              .map((s: string) => s.trim())
+              .filter(Boolean)
+              .map((t: string) => ({ time: -1, text: t }));
+          }
+          if (parsed.length > 0) {
+            setLyrics(parsed);
+            setCurrentLyric(parsed[0]?.text || "♪ 纯享音乐 ♪");
+            setPlaylist(prev => {
+              const newPlaylist = [...prev];
+              if (newPlaylist[currentIndex]) newPlaylist[currentIndex] = { ...newPlaylist[currentIndex], lyrics: parsed };
+              return newPlaylist;
+            });
+          } else {
+            setCurrentLyric("♪ 纯享音乐 ♪");
           }
         })
-        .catch(() => { if (isMounted) setCurrentLyric("\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a"); });
+        .catch(() => { if (isMounted) setCurrentLyric("♪ 纯享音乐 ♪"); });
     } else {
       // 无 LRC 的自托管曲目（如 R2）：直接提示纯享音乐，避免永远停留在「正在缓冲」
       setCurrentLyric("\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a");
@@ -319,7 +338,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       setDuration(duration || 0);
       setProgress((currentTime / (duration || 1)) * 100);
 
-      if (lyrics.length > 0) {
+      // 纯文本歌词（time=-1）没有时间轴，不参与实时匹配，避免 find 恒命中最后一行
+      if (lyrics.length > 0 && lyrics.some(l => l.time >= 0)) {
         const activeLyric = lyrics.slice().reverse().find(l => currentTime >= l.time);
         if (activeLyric && activeLyric.text !== currentLyric) {
           setCurrentLyric(activeLyric.text);

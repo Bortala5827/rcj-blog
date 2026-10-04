@@ -154,6 +154,11 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     };
   }, [refreshFromCloud]);
 
+  // 歌词内存缓存：歌单在每次 focus/visibilitychange 都会重建（refreshFromCloud），
+  // 重建后 playlist 条目是全新对象（lyrics=[]），而歌词 effect 只依赖 [currentIndex, playlist.length]
+  // 不会重跑 → 没有这份缓存时，切一次标签页回来歌词面板就塌掉。key = 歌曲 id。
+  const lyricsCacheRef = useRef<Record<string, { time: number; text: string }[]>>({});
+
   useEffect(() => {
     let isMounted = true;
 
@@ -191,7 +196,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         cover: t.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
         src: t.src,
         lrcUrl: `/api/music/lrc?${qs.toString()}`,
-        lyrics: [] as any[],
+        // 重建时从缓存回填已加载过的歌词，避免面板塌掉（首次仍为 []，由歌词 effect 懒加载）
+        lyrics: (lyricsCacheRef.current[t.id] || []) as any[],
       };
     });
 
@@ -269,6 +275,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
               .map((t: string) => ({ time: -1, text: t }));
           }
           if (parsed.length > 0) {
+            lyricsCacheRef.current[currentSong.id] = parsed;
             setLyrics(parsed);
             setCurrentLyric(parsed[0]?.text || "♪ 纯享音乐 ♪");
             setPlaylist(prev => {

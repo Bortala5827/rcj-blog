@@ -36,16 +36,14 @@ export const siteConfig = {
   // 换成你自己的歌单：在下面填 NetEase 歌曲 ID 数组，例如 ["123456","654321"]
   cloudMusicIds: [], // 网易云外链模式已弃用；改用下方 music（R2 自托管）
   // 🌟 自托管音乐（替代网易云外链，避免第三方依赖与地区限制 / 版权灰区）
-  // 【2026-09-12 改】默认改为**同源文件** public/soba-ni-iru-ne.webm：
-  //   实测 r2.dev 直链在部分网络（尤其国内）加载失败 → 音频永远 00:00 并报「音源不可用」；
-  //   改由 blog.955827.xyz 自身的 CF CDN 分发，用户能打开站点就一定能加载音频。
-  //   R2 原地址保留备选：https://pub-33cbba9a540847778b48cbc906aea2ad.r2.dev/soba-ni-iru-ne.webm
-  //   （日后若给 R2 绑了自定义域名，可用 NEXT_PUBLIC_MUSIC_R2_URL 覆盖回来）
+  // 【2026-10-05 改】升级为 R2 + 自定义域名 cdn.955827.xyz（CF CDN，缓存一年）：
+  //   源文件由 webm 换成闲鱼购入的 mp3 原片转 AAC 256k（302.9s 同一录音，音质更好）；
+  //   webm 旧文件已从仓库移除。NEXT_PUBLIC_MUSIC_R2_URL 环境变量仍可覆盖。
   music: {
     source: 'local',
-    url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || '/soba-ni-iru-ne.webm',
+    url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || 'https://cdn.955827.xyz/music/soba-ni-iru-ne.m4a',
     title: '留在我身邊 (そばにいるね)', // 繁中 + 日文原名直出，作为 D1 未连上时的兜底显示名
-    artist: '——',
+    artist: '青山テルマ feat. SoulJa',
     cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链
   },
   // 🌟 自托管私人歌单（2026-10-05 迁移至 R2）：音频/封面存 R2 桶 blog-media，绑 cdn.955827.xyz（CF CDN，缓存一年）。
@@ -73,7 +71,17 @@ export const siteConfig = {
     { id: 'local-mingyun', lrcPath: '/music/lyrics/mingyun.lrc', title: '命运', artist: '家家', duration: 31, src: 'https://cdn.955827.xyz/music/mingyun.m4a', cover: 'https://cdn.955827.xyz/covers/mingyun.svg' },
     { id: 'local-xingkongmengxiang', lrcPath: '/music/lyrics/xingkongmengxiang.lrc', title: '星空下的梦想', artist: '', duration: 49, src: 'https://cdn.955827.xyz/music/xingkongmengxiang.m4a', cover: 'https://cdn.955827.xyz/covers/xingkongmengxiang.svg' },
     { id: 'local-ruguokeyi', lrcPath: '/music/lyrics/ruguokeyi.lrc', title: '如果可以', artist: '韦礼安', duration: 38, src: 'https://cdn.955827.xyz/music/ruguokeyi.m4a', cover: 'https://cdn.955827.xyz/covers/ruguokeyi.svg' },
-    { id: 'local-hongdou-3', lrcPath: '/music/lyrics/hongdou-3.lrc', title: '红豆', artist: '王菲', duration: 187, src: 'https://cdn.955827.xyz/music/hongdou-3.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou-3.jpg' },
+    { id: 'local-hongdou-3', lrcPath: '', title: '红豆', artist: '王菲', duration: 187, src: 'https://cdn.955827.xyz/music/hongdou-3.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou-3.jpg' },
+    { id: 'local-baisejuta', lrcPath: '', title: '白色巨塔', artist: '', duration: 29, src: 'https://cdn.955827.xyz/music/baisejuta.m4a', cover: 'https://cdn.955827.xyz/covers/baisejuta.jpg' },
+    { id: 'local-boli', lrcPath: '', title: '玻璃', artist: '', duration: 49, src: 'https://cdn.955827.xyz/music/boli.m4a', cover: 'https://cdn.955827.xyz/covers/boli.jpg' },
+    { id: 'local-gongzhudianxia', lrcPath: '', title: '公主殿下', artist: '', duration: 49, src: 'https://cdn.955827.xyz/music/gongzhudianxia.m4a', cover: 'https://cdn.955827.xyz/covers/gongzhudianxia.jpg' },
+    { id: 'local-jiurangzhedayu', lrcPath: '', title: '就让这大雨全部落下', artist: '', duration: 71, src: 'https://cdn.955827.xyz/music/jiurangzhedayu.m4a', cover: 'https://cdn.955827.xyz/covers/jiurangzhedayu.jpg' },
+    { id: 'local-liaosanju', lrcPath: '', title: '俩三句', artist: '', duration: 39, src: 'https://cdn.955827.xyz/music/liaosanju.m4a', cover: 'https://cdn.955827.xyz/covers/liaosanju.jpg' },
+    { id: 'local-qingge-jita', lrcPath: '', title: '情歌', artist: '梁静茹', duration: 36, src: 'https://cdn.955827.xyz/music/qingge-jita.m4a', cover: 'https://cdn.955827.xyz/covers/qingge-jita.jpg' },
+    { id: 'local-ruobanni', lrcPath: '', title: '若把你', artist: '', duration: 49, src: 'https://cdn.955827.xyz/music/ruobanni.m4a', cover: 'https://cdn.955827.xyz/covers/ruobanni.jpg' },
+    { id: 'local-shenqibaima', lrcPath: '', title: '身骑白马', artist: '徐佳莹', duration: 59, src: 'https://cdn.955827.xyz/music/shenqibaima.m4a', cover: 'https://cdn.955827.xyz/covers/shenqibaima.jpg' },
+    { id: 'local-woxiangdasheng', lrcPath: '', title: '我想大声告诉你', artist: '樊凡', duration: 275, src: 'https://cdn.955827.xyz/music/woxiangdasheng.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
+    { id: 'local-yudie', lrcPath: '', title: '雨蝶', artist: '李翊君', duration: 33, src: 'https://cdn.955827.xyz/music/yudie.m4a', cover: 'https://cdn.955827.xyz/covers/yudie.jpg' },
   ],
   social: {
     email: "zhouqiang@5205827.xyz",

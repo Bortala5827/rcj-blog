@@ -71,6 +71,7 @@ export default function MusicClient() {
 
   const activeLyricIndex = useMemo(() => {
     if (!parsedLyrics.length) return -1;
+    if (parsedLyrics[0].time < 0) return -1; // 静态歌词（time=-1，如纯文本/伴奏片段）没有时间轴，不参与实时高亮
     let idx = parsedLyrics.findIndex((l: any) => l.time > currentTime) - 1;
     if (idx === -2) idx = parsedLyrics.length - 1;
     return Math.max(0, idx);
@@ -216,9 +217,10 @@ export default function MusicClient() {
                             {parsedLyrics.length > 0 ? (
                               parsedLyrics.map((line: any, index: number) => {
                                 const isActive = index === activeLyricIndex;
+                                const staticMode = activeLyricIndex === -1; // 静态歌词：整体可读，不模拟实时高亮
                                 return (
                                   <div key={index} ref={isActive ? activeLyricRef : null}
-                                    className={`transition-all duration-700 cursor-pointer px-2 md:px-4 rounded-2xl ${isActive ? 'opacity-100 scale-105 py-2 md:py-3 bg-white/10' : 'opacity-20 hover:opacity-40'}`}
+                                    className={`transition-all duration-700 cursor-pointer px-2 md:px-4 rounded-2xl ${isActive ? 'opacity-100 scale-105 py-2 md:py-3 bg-white/10' : staticMode ? 'opacity-75 hover:opacity-95' : 'opacity-20 hover:opacity-40'}`}
                                     onClick={() => duration > 0 && line.time >= 0 && handleSeek({ target: { value: String((line.time / duration) * 100) } } as any)}
                                   >
                                     <p className={`font-black tracking-tight leading-relaxed transition-all duration-700 ${isActive ? 'text-lg md:text-2xl text-indigo-600 dark:text-indigo-400' : 'text-sm md:text-lg text-slate-700 dark:text-slate-300'}`} style={isActive ? { textShadow: '0 0 20px rgba(99,102,241,0.15)' } : {}}>{line.text}</p>

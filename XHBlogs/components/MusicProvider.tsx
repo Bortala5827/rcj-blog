@@ -185,7 +185,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       : [];
 
     // 静态自托管私人歌单（siteConfig.localTracks，public/music/ 同源文件，2026-10-04）
-    // 歌词走 /api/music/lrc（lrclib 代理）：文件时长与原版接近 → 同步歌词；剪辑片段 → 纯文本
+    // 歌词优先用专属 LRC（whisper 听写打轴，与演唱一一对应）；没有时走 /api/music/lrc（lrclib 代理）
     const staticLocalTracks = (siteConfig.localTracks || []).map((t) => {
       const qs = new URLSearchParams({ title: t.title, artist: t.artist || '' });
       if (t.duration) qs.set('duration', String(t.duration));
@@ -195,7 +195,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         artist: t.artist || '未知歌手',
         cover: t.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
         src: t.src,
-        lrcUrl: `/api/music/lrc?${qs.toString()}`,
+        lrcUrl: t.lrcPath || `/api/music/lrc?${qs.toString()}`,
         // 重建时从缓存回填已加载过的歌词，避免面板塌掉（首次仍为 []，由歌词 effect 懒加载）
         lyrics: (lyricsCacheRef.current[t.id] || []) as any[],
       };
@@ -257,16 +257,26 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         setCurrentLyric(currentSong.lyrics[0]?.text || "\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a");
       }
     } else if (currentSong.lrcUrl) {
-      // /api/music/lrc 返回 JSON：{ ok, synced, lrc, plain }
-      // synced=true → 逐行实时高亮；只有 plain → 静默展示全部行（time=-1，不参与实时匹配）
+      // 双协议：/api/music/lrc 返回 JSON（lrclib 代理）；localTracks 专属 LRC 是静态 .lrc 文本
+      // synced → 逐行实时高亮；纯文本 → 静默展示全部行（time=-1，不参与实时匹配）
       fetch(currentSong.lrcUrl)
-        .then(res => res.json())
-        .then((d: any) => {
+        .then(res => res.text())
+        .then(text => {
           if (!isMounted) return;
           let parsed: { time: number; text: string }[] = [];
-          if (d?.ok && d?.synced && d?.lrc) parsed = parseLrc(d.lrc);
-          if (parsed.length === 0 && d?.ok && d?.plain) {
-            parsed = String(d.plain)
+          let plain: string | null = null;
+          const trimmed = text.trim();
+          if (trimmed.startsWith('{')) {
+            try {
+              const d = JSON.parse(trimmed);
+              if (d?.ok && d?.synced && d?.lrc) parsed = parseLrc(d.lrc);
+              if (parsed.length === 0 && d?.ok && d?.plain) plain = String(d.plain);
+            } catch { /* 非 JSON 则按纯文本兜底 */ }
+          } else if (trimmed) {
+            parsed = parseLrc(text);
+          }
+          if (parsed.length === 0 && plain) {
+            parsed = plain
               .split(/\r?\n/)
               .map((s: string) => s.trim())
               // lrclib 的 plainLyrics 可能混入 [ti:]/[ar:] 等 LRC 元数据行，过滤掉（时间戳行是数字开头不受影响）

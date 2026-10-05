@@ -205,6 +205,11 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     // 去重：同一个 ID 既在配置里又在后台导入过时，避免 React key 冲突
     const neteaseIds = [...new Set([...(siteConfig.cloudMusicIds || []), ...importedIds])];
 
+    // 歌单顺序：siteConfig.localTracks 首曲固定排最前（白色巨塔），r2-local（留在我身邊）紧随其后，
+    // 其余自托管曲目按 siteConfig 顺序、网易云歌单垫底
+    const [firstLocal, ...restLocal] = staticLocalTracks;
+    const orderedPlaylist = [firstLocal, ...r2Track, ...restLocal].filter(Boolean);
+
     const fetchMusicData = async () => {
       try {
         const res = await fetch(`/api/music?ids=${neteaseIds.join(',')}`);
@@ -221,13 +226,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
             lyrics: song.lrc ? parseLrc(song.lrc) : [],
           }));
         if (!isMounted) return;
-        const playlist = [...r2Track, ...staticLocalTracks, ...merged];
+        const playlist = [...orderedPlaylist, ...merged];
         if (playlist.length > 0) setPlaylist(playlist);
         else setCurrentLyric("云端链路受阻");
         setIsLoading(false);
       } catch (error) {
         if (!isMounted) return;
-        const playlist = [...r2Track, ...staticLocalTracks];
+        const playlist = [...orderedPlaylist];
         if (playlist.length > 0) setPlaylist(playlist);
         else setCurrentLyric("网络初始化失败");
         setIsLoading(false);
@@ -237,8 +242,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     if (neteaseIds.length > 0) {
       fetchMusicData();
     } else {
-      const localOnly = [...r2Track, ...staticLocalTracks];
-      if (localOnly.length > 0) setPlaylist(localOnly);
+      if (orderedPlaylist.length > 0) setPlaylist([...orderedPlaylist]);
       setIsLoading(false);
     }
 

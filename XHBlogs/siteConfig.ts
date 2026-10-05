@@ -51,6 +51,7 @@ export const siteConfig = {
   //   duration = 本地文件实际秒数（ffprobe 实测）；lrcPath = whisper 听写打轴的专属歌词（public/music/lyrics/），为空走 /api/music/lrc（lrclib）。
   //   后续加歌：文件传 R2（wrangler r2 object put blog-media/music/xxx.m4a ...），仓库不再存音频二进制。
   localTracks: [
+    { id: 'local-baisejuta', lrcPath: '/music/lyrics/baisejuta.lrc', title: '白色巨塔 (Jupiter)', artist: '平原綾香', duration: 29, src: 'https://cdn.955827.xyz/music/baisejuta.m4a', cover: 'https://cdn.955827.xyz/covers/baisejuta.jpg' },
     { id: 'local-chengdu', title: '成都', artist: '赵雷', duration: 67, lrcPath: '', src: 'https://cdn.955827.xyz/music/chengdu.m4a', cover: 'https://cdn.955827.xyz/covers/chengdu.jpg' },
     { id: 'local-fenshenqingren', lrcPath: '/music/lyrics/fenshenqingren.lrc', title: '分身情人', artist: '魏晨', duration: 42, src: 'https://cdn.955827.xyz/music/fenshenqingren.m4a', cover: 'https://cdn.955827.xyz/covers/fenshenqingren.jpg' },
     { id: 'local-hongdou', lrcPath: '/music/lyrics/hongdou.lrc', title: '红豆', artist: '王菲', duration: 211, src: 'https://cdn.955827.xyz/music/hongdou.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou.svg' },
@@ -72,7 +73,6 @@ export const siteConfig = {
     { id: 'local-xingkongmengxiang', lrcPath: '/music/lyrics/xingkongmengxiang.lrc', title: '星空下的梦想', artist: '', duration: 49, src: 'https://cdn.955827.xyz/music/xingkongmengxiang.m4a', cover: 'https://cdn.955827.xyz/covers/xingkongmengxiang.svg' },
     { id: 'local-ruguokeyi', lrcPath: '/music/lyrics/ruguokeyi.lrc', title: '如果可以', artist: '韦礼安', duration: 38, src: 'https://cdn.955827.xyz/music/ruguokeyi.m4a', cover: 'https://cdn.955827.xyz/covers/ruguokeyi.svg' },
     { id: 'local-hongdou-3', lrcPath: '/music/lyrics/hongdou-3.lrc', title: '红豆', artist: '王菲', duration: 187, src: 'https://cdn.955827.xyz/music/hongdou-3.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou-3.jpg' },
-    { id: 'local-baisejuta', lrcPath: '/music/lyrics/baisejuta.lrc', title: '白色巨塔 (Jupiter)', artist: '平原綾香', duration: 29, src: 'https://cdn.955827.xyz/music/baisejuta.m4a', cover: 'https://cdn.955827.xyz/covers/baisejuta.jpg' },
     { id: 'local-boli', lrcPath: '/music/lyrics/boli.lrc', title: '玻璃', artist: 'Gareth.T', duration: 49, src: 'https://cdn.955827.xyz/music/boli.m4a', cover: 'https://cdn.955827.xyz/covers/boli.jpg' },
     { id: 'local-gongzhudianxia', lrcPath: '/music/lyrics/gongzhudianxia.lrc', title: '公主殿下', artist: '崔洋', duration: 49, src: 'https://cdn.955827.xyz/music/gongzhudianxia.m4a', cover: 'https://cdn.955827.xyz/covers/gongzhudianxia.jpg' },
     { id: 'local-jiurangzhedayu', lrcPath: '/music/lyrics/jiurangzhedayu.lrc', title: '就让这大雨全部落下', artist: '容祖儿', duration: 71, src: 'https://cdn.955827.xyz/music/jiurangzhedayu.m4a', cover: 'https://cdn.955827.xyz/covers/jiurangzhedayu.jpg' },

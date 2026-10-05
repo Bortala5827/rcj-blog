@@ -278,6 +278,15 @@ export function MusicProvider({ children }: { children: ReactNode }) {
             } catch { /* 非 JSON 则按纯文本兜底 */ }
           } else if (trimmed) {
             parsed = parseLrc(text);
+            // 纯文本 .lrc（无 [mm:ss] 时间戳）：整列静态展示（time=-1，不参与实时匹配）
+            if (parsed.length === 0) {
+              parsed = text
+                .split(/\r?\n/)
+                .map((s: string) => s.trim())
+                .filter(Boolean)
+                .filter((s: string) => !/^\[[a-zA-Z]+:/.test(s))
+                .map((t: string) => ({ time: -1, text: t }));
+            }
           }
           if (parsed.length === 0 && plain) {
             parsed = plain

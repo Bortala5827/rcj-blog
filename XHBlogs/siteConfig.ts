@@ -42,6 +42,7 @@ export const siteConfig = {
   music: {
     source: 'local',
     url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || 'https://cdn.955827.xyz/music/soba-ni-iru-ne.m4a',
+    lrcPath: '/music/lyrics/soba-ni-iru-ne.lrc', // lrclib 官方同步歌词（dur 303s 与音频 302.9s 同版本）
     title: '留在我身邊 (そばにいるね)', // 繁中 + 日文原名直出，作为 D1 未连上时的兜底显示名
     artist: '青山テルマ feat. SoulJa',
     cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链

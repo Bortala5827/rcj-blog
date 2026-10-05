@@ -179,7 +179,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
           artist: localMeta?.artist || m?.artist || '未知歌手',
           cover: localMeta?.cover || m?.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
           src: localUrl as string,
-          lrcUrl: null,
+          lrcUrl: m?.lrcPath || null, // siteConfig.music.lrcPath（lrclib 同步歌词）
           lyrics: [] as any[],
         }]
       : [];

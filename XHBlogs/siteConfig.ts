@@ -57,7 +57,6 @@ export const siteConfig = {
     { id: 'local-hongdou', title: '红豆', artist: '王菲', duration: 211, src: '/music/hongdou.m4a', cover: '/music/covers/hongdou.svg' },
     { id: 'local-hongdou-2', title: '红豆', artist: '王菲', duration: 78, src: '/music/hongdou-2.m4a', cover: '/music/covers/hongdou-2.jpg' },
     { id: 'local-renjian', title: '人间', artist: '王菲', duration: 100, src: '/music/renjian.m4a', cover: '/music/covers/renjian.svg' },
-    { id: 'local-shuishou', title: '水手', artist: '郑智化', duration: 71, src: '/music/shuishou.m4a', cover: '/music/covers/shuishou.svg' },
     { id: 'local-wozhizaihuni', title: '我只在乎你', artist: '邓丽君', duration: 78, src: '/music/wozhizaihuni.m4a', cover: '/music/covers/wozhizaihuni.svg' },
     { id: 'local-xiangwozheyangderen', title: '像我這樣的人', artist: '毛不易', duration: 218, src: '/music/xiangwozheyangderen.m4a', cover: '/music/covers/xiangwozheyangderen.svg' },
     { id: 'local-youhebuke', title: '有何不可', artist: '许嵩', duration: 41, src: '/music/youhebuke.m4a', cover: '/music/covers/youhebuke.jpg' },

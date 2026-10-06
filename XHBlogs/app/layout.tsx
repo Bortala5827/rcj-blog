@@ -1,5 +1,5 @@
 import 'katex/dist/katex.min.css';
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
@@ -15,6 +15,7 @@ import DanmakuBackground from '../components/DanmakuBackground';
 import { ToastProvider } from '../components/ToastProvider';
 
 import MobileBackButton from '../components/MobileBackButton';
+import PWARegister from '../components/PWARegister';
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -71,8 +72,19 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: siteConfig.faviconUrl,
-    apple: siteConfig.faviconUrl,
+    apple: '/icons/apple-touch-icon.png',
   },
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: '宝藏之地',
+    statusBarStyle: 'black-translucent',
+  },
+};
+
+// PWA 独立窗口时的系统状态栏/地址栏颜色
+export const viewport: Viewport = {
+  themeColor: '#312e81',
 };
 
 // 站点级结构化数据：Person + WebSite（含站内搜索 Action），帮助搜索引擎理解站点归属
@@ -145,6 +157,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <ToastProvider>
 
           <SplashScreen />
+
+          <PWARegister />
 
           <MusicProvider>
             <div id="app-mount-root" className="flex-1 flex flex-col transition-opacity duration-1000">

@@ -332,6 +332,29 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   }, [volume, isMuted]);
 
+  // 🌟 4a. MediaSession：锁屏/通知栏媒体卡片，手机息屏后仍可切歌、暂停、拖进度（蓝牙耳机按键同源）
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('mediaSession' in navigator) || playlist.length === 0) return;
+    const ms = navigator.mediaSession;
+    const song = playlist[currentIndex];
+    if (!song) return;
+    const artworkSrc = song.cover ? (song.cover.startsWith('http') ? song.cover : `${window.location.origin}${song.cover}`) : null;
+    ms.metadata = new MediaMetadata({
+      title: song.title,
+      artist: song.artist || '',
+      album: 'Bortala の 宝藏之地',
+      artwork: artworkSrc ? [{ src: artworkSrc, sizes: '512x512' }] : [],
+    });
+    ms.playbackState = isPlaying ? 'playing' : 'paused';
+    ms.setActionHandler('play', () => audioRef.current?.play());
+    ms.setActionHandler('pause', () => audioRef.current?.pause());
+    ms.setActionHandler('previoustrack', () => prevSong());
+    ms.setActionHandler('nexttrack', () => nextSong());
+    ms.setActionHandler('seekbackward', (d) => { if (audioRef.current) audioRef.current.currentTime -= d.seekOffset || 10; });
+    ms.setActionHandler('seekforward', (d) => { if (audioRef.current) audioRef.current.currentTime += d.seekOffset || 10; });
+    ms.setActionHandler('seekto', (d) => { if (audioRef.current && d.seekTime != null) audioRef.current.currentTime = d.seekTime; });
+  }, [currentIndex, playlist.length, playMode, isPlaying]);
+
   const togglePlay = () => {
     if (audioRef.current) {
       if (isPlaying) audioRef.current.pause();
@@ -369,6 +392,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       setCurrentTime(currentTime);
       setDuration(duration || 0);
       setProgress((currentTime / (duration || 1)) * 100);
+
+      // 同步锁屏媒体卡片的进度条（duration 为 NaN/0 时跳过，避免 Safari 抛错）
+      if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession && Number.isFinite(duration) && duration > 0) {
+        try {
+          navigator.mediaSession.setPositionState({ duration, playbackRate: audioRef.current.playbackRate || 1, position: Math.min(currentTime, duration) });
+        } catch { /* 部分浏览器在 buffer 未就绪时会拒绝，忽略 */ }
+      }
 
       // 纯文本歌词（time=-1）没有时间轴，不参与实时匹配，避免 find 恒命中最后一行
       if (lyrics.length > 0 && lyrics.some(l => l.time >= 0)) {

@@ -92,11 +92,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const IMPORT_STORAGE_KEY = 'rcj_imported_netease_ids';
   const [importedIds, setImportedIds] = useState<string[]>([]);
   const [cloudSynced, setCloudSynced] = useState(false);
-  // 云端（D1）里那条自托管曲（source='local'，如「留在我身邊 (そばにいるね)」）：
-  //   null        = 云端没连上（用 siteConfig 兜底）
-  //   {present:false} = 云端明确没有它（后台删过）→ 歌单里就不显示
-  //   {present:true, meta} = 云端有 → 用库里的标题/歌手/封面/地址
-  const [cloudLocal, setCloudLocal] = useState<{ present: boolean; meta?: any } | null>(null);
 
   const readLocal = useCallback((): string[] => {
     try {
@@ -116,14 +111,10 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       const r = await fetch('/api/music/ids', { cache: 'no-store' });
       const d = await r.json();
       if (!d || d.ok !== true || !Array.isArray(d.ids)) return; // 没绑 D1：沿用本地缓存
-      const items: any[] = Array.isArray(d.items) ? d.items : [];
       // 网易云条目：歌单主体（换设备/清缓存都在 D1 里）
       const serverIds: string[] = d.ids.filter((x: any) => typeof x === 'string' && /^\d+$/.test(x));
       setImportedIds(serverIds);
       writeLocal(serverIds);
-      // 自托管曲（source='local'）也由 D1 说了算：库里有 → 显示，后台删了 → 不显示
-      const localItem = items.find((i: any) => String(i?.source || 'netease') === 'local');
-      setCloudLocal(localItem ? { present: true, meta: localItem } : { present: false });
       setCloudSynced(true);
     } catch { /* 云端不可达：沿用本地缓存 */ }
   }, [writeLocal]);
@@ -162,28 +153,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
 
-    const m = siteConfig.music;
-    // 自托管曲（「留在我身邊 (そばにいるね)」）的权威来源是 D1：
-    //   云端有这条记录 → 用它（标题/歌手/封面/地址都可在库里改）；
-    //   云端明确没有（后台删过）→ 歌单里不出现；
-    //   云端没连上（未绑 D1 / 离线）→ 退回 siteConfig，本地开发与旧行为不变。
-    const localMeta: any = cloudLocal?.present ? cloudLocal.meta || {} : null;
-    const localUrl = (localMeta?.url || m?.url) as string | undefined;
-    const wantLocal = cloudLocal === null ? true : !!cloudLocal.present;
-    const localReady = wantLocal && !!localUrl && !String(localUrl).includes('__REPLACE');
-
-    const r2Track = localReady
-      ? [{
-          id: 'r2-local',
-          title: localMeta?.name || m?.title || '未知歌曲',
-          artist: localMeta?.artist || m?.artist || '未知歌手',
-          cover: localMeta?.cover || m?.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
-          src: localUrl as string,
-          lrcUrl: m?.lrcPath || null, // siteConfig.music.lrcPath（lrclib 同步歌词）
-          lyrics: [] as any[],
-        }]
-      : [];
-
     // 静态自托管私人歌单（siteConfig.localTracks，public/music/ 同源文件，2026-10-04）
     // 歌词优先用专属 LRC（whisper 听写打轴，与演唱一一对应）；没有时走 /api/music/lrc（lrclib 代理）
     const staticLocalTracks = (siteConfig.localTracks || []).map((t) => {
@@ -205,14 +174,16 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     // 去重：同一个 ID 既在配置里又在后台导入过时，避免 React key 冲突
     const neteaseIds = [...new Set([...(siteConfig.cloudMusicIds || []), ...importedIds])];
 
-    // 歌单顺序：siteConfig.localTracks 首曲固定排最前（白色巨塔），r2-local（留在我身邊）紧随其后，
-    // 其余自托管曲目按 siteConfig 顺序、网易云歌单垫底
+    // 歌单顺序：siteConfig.localTracks 首曲固定排最前（白色巨塔），其余按 siteConfig 顺序、网易云歌单垫底
     const [firstLocal, ...restLocal] = staticLocalTracks;
-    const orderedPlaylist = [firstLocal, ...r2Track, ...restLocal].filter(Boolean);
+    const orderedPlaylist = [firstLocal, ...restLocal].filter(Boolean);
 
     const fetchMusicData = async () => {
       try {
-        const res = await fetch(`/api/music?ids=${neteaseIds.join(',')}`);
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 15000);
+        const res = await fetch(`/api/music?ids=${neteaseIds.join(',')}`, { signal: ctrl.signal });
+        clearTimeout(timer);
         const rawResults = await res.json();
         const merged = rawResults
           .filter((song: any) => song && song.url && !song.error)
@@ -247,7 +218,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
 
     return () => { isMounted = false; };
-  }, [importedIds, cloudLocal]);
+  }, [importedIds]);
 
   useEffect(() => {
     if (playlist.length === 0) return;
@@ -263,8 +234,10 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     } else if (currentSong.lrcUrl) {
       // 双协议：/api/music/lrc 返回 JSON（lrclib 代理）；localTracks 专属 LRC 是静态 .lrc 文本
       // synced → 逐行实时高亮；纯文本 → 静默展示全部行（time=-1，不参与实时匹配）
-      fetch(currentSong.lrcUrl)
-        .then(res => res.text())
+      const lrcCtrl = new AbortController();
+      const lrcTimer = setTimeout(() => lrcCtrl.abort(), 8000);
+      fetch(currentSong.lrcUrl, { signal: lrcCtrl.signal })
+        .then(res => { clearTimeout(lrcTimer); return res.text(); })
         .then(text => {
           if (!isMounted) return;
           let parsed: { time: number; text: string }[] = [];
@@ -310,7 +283,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
             setCurrentLyric("♪ 纯享音乐 ♪");
           }
         })
-        .catch(() => { if (isMounted) setCurrentLyric("♪ 纯享音乐 ♪"); });
+        .catch(() => { clearTimeout(lrcTimer); if (isMounted) setCurrentLyric("♪ 纯享音乐 ♪"); });
     } else {
       // 无 LRC 的自托管曲目（如 R2）：直接提示纯享音乐，避免永远停留在「正在缓冲」
       setCurrentLyric("\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a");

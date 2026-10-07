@@ -107,8 +107,8 @@ export default function MusicClient() {
     else if (typeof selectSong === 'function') selectSong(index);
   };
 
-  // 歌单总数 = D1 里的网易云条目 + 自托管曲（r2-local + siteConfig.localTracks 的 local- 前缀曲目）
-  const localCount = playlist.filter((s: any) => s.id === 'r2-local' || String(s.id).startsWith('local-')).length;
+  // 歌单总数 = D1 里的网易云条目 + 自托管曲（siteConfig.localTracks 的 local- 前缀曲目）
+  const localCount = playlist.filter((s: any) => String(s.id).startsWith('local-')).length;
   const playlistTotal = importedIds.length + localCount;
 
   const filteredPlaylist = useMemo(() => {

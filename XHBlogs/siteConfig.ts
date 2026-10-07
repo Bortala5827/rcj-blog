@@ -34,19 +34,7 @@ export const siteConfig = {
   photoWallImage: "/blog-photo-1.png",
   // 网易云歌单 ID：留空 -> 音乐挂件会提示“请配置 cloudMusicIds”。
   // 换成你自己的歌单：在下面填 NetEase 歌曲 ID 数组，例如 ["123456","654321"]
-  cloudMusicIds: [], // 网易云外链模式已弃用；改用下方 music（R2 自托管）
-  // 🌟 自托管音乐（替代网易云外链，避免第三方依赖与地区限制 / 版权灰区）
-  // 【2026-10-05 改】升级为 R2 + 自定义域名 cdn.955827.xyz（CF CDN，缓存一年）：
-  //   源文件由 webm 换成闲鱼购入的 mp3 原片转 AAC 256k（302.9s 同一录音，音质更好）；
-  //   webm 旧文件已从仓库移除。NEXT_PUBLIC_MUSIC_R2_URL 环境变量仍可覆盖。
-  music: {
-    source: 'local',
-    url: process.env.NEXT_PUBLIC_MUSIC_R2_URL || 'https://cdn.955827.xyz/music/soba-ni-iru-ne.m4a',
-    lrcPath: '/music/lyrics/soba-ni-iru-ne.lrc', // lrclib 官方同步歌词（dur 303s 与音频 302.9s 同版本）
-    title: '留在我身邊 (そばにいるね)', // 繁中 + 日文原名直出，作为 D1 未连上时的兜底显示名
-    artist: '青山テルマ feat. SoulJa',
-    cover: '/blog-photo-2.jpg', // 音乐页旋转唱片用本地个人照片，不引外链
-  },
+  cloudMusicIds: [], // 网易云外链模式已弃用；改用下方 localTracks（R2 自托管）
   // 🌟 自托管私人歌单（2026-10-05 迁移至 R2）：音频/封面存 R2 桶 blog-media，绑 cdn.955827.xyz（CF CDN，缓存一年）。
   //   闲鱼购入的私有音源，自欣赏用；id 用 local- 前缀与网易云 ID 区分。
   //   duration = 本地文件实际秒数（ffprobe 实测）；lrcPath = whisper 听写打轴的专属歌词（public/music/lyrics/），为空走 /api/music/lrc（lrclib）。
@@ -57,11 +45,11 @@ export const siteConfig = {
     { id: 'local-fenshenqingren', lrcPath: '/music/lyrics/fenshenqingren.lrc', title: '分身情人', artist: '魏晨', duration: 42, src: 'https://cdn.955827.xyz/music/fenshenqingren.m4a', cover: 'https://cdn.955827.xyz/covers/fenshenqingren.jpg' },
     { id: 'local-hongdou', lrcPath: '/music/lyrics/hongdou.lrc', title: '红豆', artist: '王菲', duration: 211, src: 'https://cdn.955827.xyz/music/hongdou.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou.svg' },
     { id: 'local-hongdou-2', lrcPath: '/music/lyrics/hongdou-2.lrc', title: '红豆', artist: '王菲', duration: 78, src: 'https://cdn.955827.xyz/music/hongdou-2.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou-2.jpg' },
-    { id: 'local-renjian', lrcPath: '/music/lyrics/renjian.lrc', title: '人间', artist: '王菲', duration: 100, src: 'https://cdn.955827.xyz/music/renjian.m4a', cover: 'https://cdn.955827.xyz/covers/renjian.svg' },
+    { id: 'local-renjian', lrcPath: '/music/lyrics/renjian.lrc', title: '人间', artist: '王菲', duration: 87, src: 'https://cdn.955827.xyz/music/renjian.m4a', cover: 'https://cdn.955827.xyz/covers/renjian.svg' },
     { id: 'local-wozhizaihuni', lrcPath: '/music/lyrics/wozhizaihuni.lrc', title: '我只在乎你', artist: '邓丽君', duration: 78, src: 'https://cdn.955827.xyz/music/wozhizaihuni.m4a', cover: 'https://cdn.955827.xyz/covers/wozhizaihuni.svg' },
-    { id: 'local-xiangwozheyangderen', lrcPath: '/music/lyrics/xiangwozheyangderen.lrc', title: '像我這樣的人', artist: '毛不易', duration: 218, src: 'https://cdn.955827.xyz/music/xiangwozheyangderen.m4a', cover: 'https://cdn.955827.xyz/covers/xiangwozheyangderen.svg' },
+    { id: 'local-xiangwozheyangderen', lrcPath: '/music/lyrics/xiangwozheyangderen.lrc', title: '像我這樣的人', artist: '毛不易', duration: 202, src: 'https://cdn.955827.xyz/music/xiangwozheyangderen.m4a', cover: 'https://cdn.955827.xyz/covers/xiangwozheyangderen.svg' },
     { id: 'local-youhebuke', lrcPath: '/music/lyrics/youhebuke.lrc', title: '有何不可', artist: '许嵩', duration: 41, src: 'https://cdn.955827.xyz/music/youhebuke.m4a', cover: 'https://cdn.955827.xyz/covers/youhebuke.jpg' },
-    { id: 'local-zhishaohaiyouni', lrcPath: '/music/lyrics/zhishaohaiyouni.lrc', title: '至少还有你', artist: '林忆莲', duration: 252, src: 'https://cdn.955827.xyz/music/zhishaohaiyouni.m4a', cover: 'https://cdn.955827.xyz/covers/zhishaohaiyouni.svg' },
+    { id: 'local-zhishaohaiyouni', lrcPath: '/music/lyrics/zhishaohaiyouni.lrc', title: '至少还有你', artist: '林忆莲', duration: 246, src: 'https://cdn.955827.xyz/music/zhishaohaiyouni.m4a', cover: 'https://cdn.955827.xyz/covers/zhishaohaiyouni.svg' },
     { id: 'local-zhishaohaiyouni-2', lrcPath: '/music/lyrics/zhishaohaiyouni-2.lrc', title: '至少还有你', artist: '林忆莲', duration: 65, src: 'https://cdn.955827.xyz/music/zhishaohaiyouni-2.m4a', cover: 'https://cdn.955827.xyz/covers/zhishaohaiyouni-2.jpg' },
     { id: 'local-fenshenqingren-2', lrcPath: '/music/lyrics/fenshenqingren-2.lrc', title: '分身情人', artist: '魏晨', duration: 88, src: 'https://cdn.955827.xyz/music/fenshenqingren-2.m4a', cover: 'https://cdn.955827.xyz/covers/fenshenqingren-2.svg' },
     { id: 'local-qingfeideyi', lrcPath: '/music/lyrics/qingfeideyi.lrc', title: '情非得已', artist: '庾澄庆', duration: 56, src: 'https://cdn.955827.xyz/music/qingfeideyi.m4a', cover: 'https://cdn.955827.xyz/covers/qingfeideyi.svg' },
@@ -69,7 +57,7 @@ export const siteConfig = {
     { id: 'local-guanjianci', lrcPath: '/music/lyrics/guanjianci.lrc', title: '关键词', artist: '林俊杰', duration: 33, src: 'https://cdn.955827.xyz/music/guanjianci.m4a', cover: 'https://cdn.955827.xyz/covers/guanjianci.svg' },
     { id: 'local-nvhai', lrcPath: '/music/lyrics/nvhai.lrc', title: '女孩', artist: '韋禮安', duration: 33, src: 'https://cdn.955827.xyz/music/nvhai.m4a', cover: 'https://cdn.955827.xyz/covers/nvhai.svg' },
     { id: 'local-nuannuan', lrcPath: '/music/lyrics/nuannuan.lrc', title: '暖暖', artist: '梁静茹', duration: 45, src: 'https://cdn.955827.xyz/music/nuannuan.m4a', cover: 'https://cdn.955827.xyz/covers/nuannuan.svg' },
-    { id: 'local-xiangjianhenwan', lrcPath: '/music/lyrics/xiangjianhenwan.lrc', title: '相见恨晚', artist: '彭佳慧', duration: 252, src: 'https://cdn.955827.xyz/music/xiangjianhenwan.m4a', cover: 'https://cdn.955827.xyz/covers/xiangjianhenwan.svg' },
+    { id: 'local-xiangjianhenwan', lrcPath: '/music/lyrics/xiangjianhenwan.lrc', title: '相见恨晚', artist: '彭佳慧', duration: 206, src: 'https://cdn.955827.xyz/music/xiangjianhenwan.m4a', cover: 'https://cdn.955827.xyz/covers/xiangjianhenwan.svg' },
     { id: 'local-mingyun', lrcPath: '/music/lyrics/mingyun.lrc', title: '命运', artist: '家家', duration: 31, src: 'https://cdn.955827.xyz/music/mingyun.m4a', cover: 'https://cdn.955827.xyz/covers/mingyun.svg' },
     { id: 'local-xingkongmengxiang', lrcPath: '/music/lyrics/xingkongmengxiang.lrc', title: '星空下的梦想', artist: '', duration: 49, src: 'https://cdn.955827.xyz/music/xingkongmengxiang.m4a', cover: 'https://cdn.955827.xyz/covers/xingkongmengxiang.svg' },
     { id: 'local-ruguokeyi', lrcPath: '/music/lyrics/ruguokeyi.lrc', title: '如果可以', artist: '韦礼安', duration: 38, src: 'https://cdn.955827.xyz/music/ruguokeyi.m4a', cover: 'https://cdn.955827.xyz/covers/ruguokeyi.svg' },
@@ -81,8 +69,9 @@ export const siteConfig = {
     { id: 'local-qingge-jita', lrcPath: '/music/lyrics/qingge-jita.lrc', title: '情歌', artist: '梁静茹', duration: 36, src: 'https://cdn.955827.xyz/music/qingge-jita.m4a', cover: 'https://cdn.955827.xyz/covers/qingge-jita.jpg' },
     { id: 'local-ruobanni', lrcPath: '/music/lyrics/ruobanni.lrc', title: '若把你', artist: 'Kirsty刘瑾睿', duration: 49, src: 'https://cdn.955827.xyz/music/ruobanni.m4a', cover: 'https://cdn.955827.xyz/covers/ruobanni.jpg' },
     { id: 'local-shenqibaima', lrcPath: '/music/lyrics/shenqibaima.lrc', title: '身骑白马', artist: '徐佳莹', duration: 59, src: 'https://cdn.955827.xyz/music/shenqibaima.m4a', cover: 'https://cdn.955827.xyz/covers/shenqibaima.jpg' },
-    { id: 'local-woxiangdasheng', lrcPath: '/music/lyrics/woxiangdasheng.lrc', title: '我想大声告诉你', artist: '樊凡', duration: 275, src: 'https://cdn.955827.xyz/music/woxiangdasheng.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
+    { id: 'local-woxiangdasheng', lrcPath: '/music/lyrics/woxiangdasheng.lrc', title: '我想大声告诉你', artist: '樊凡', duration: 263, src: 'https://cdn.955827.xyz/music/woxiangdasheng.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
     { id: 'local-yudie', lrcPath: '/music/lyrics/yudie.lrc', title: '雨蝶', artist: '李翊君', duration: 33, src: 'https://cdn.955827.xyz/music/yudie.m4a', cover: 'https://cdn.955827.xyz/covers/yudie.jpg' },
+    { id: 'local-qifengle', lrcPath: '/music/lyrics/qifengle.lrc', title: '起风了', artist: '买辣椒也用券', duration: 260, src: 'https://cdn.955827.xyz/music/qifengle.m4a', cover: 'https://cdn.955827.xyz/covers/qifengle.jpg' },
   ],
   social: {
     email: "zhouqiang@5205827.xyz",

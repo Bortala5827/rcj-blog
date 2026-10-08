@@ -1,10 +1,10 @@
 import 'katex/dist/katex.min.css';
 import type { Metadata, Viewport } from "next";
-import dynamic from 'next/dynamic';
 import { Geist, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import { MusicProvider } from "../components/MusicProvider";
+import HeavyDecor from "../components/HeavyDecor";
 import { siteConfig } from "../siteConfig";
 import SplashScreen from "../components/SplashScreen";
 import { ToastProvider } from '../components/ToastProvider';
@@ -18,15 +18,6 @@ const notoSerif = Noto_Serif_SC({
   variable: "--font-serif",
   display: 'swap',
 });
-
-// 重型装饰组件：dynamic import，避免首屏 bundle 膨胀
-const BackgroundEffects = dynamic(() => import('../components/BackgroundEffects'), { ssr: false });
-const BackgroundSlider = dynamic(() => import('../components/BackgroundSlider'), { ssr: false });
-const DanmakuBackground = dynamic(() => import('../components/DanmakuBackground'), { ssr: false });
-const ClickEffect = dynamic(() => import('../components/ClickEffect'), { ssr: false });
-const CyberCat = dynamic(() => import('../components/CyberCat'), { ssr: false });
-const FloatingPlayer = dynamic(() => import('../components/FloatingPlayer'), { ssr: false });
-const PWARegister = dynamic(() => import('../components/PWARegister'), { ssr: false });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://blog.955827.xyz'),
@@ -159,40 +150,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
           <SplashScreen />
 
-          <PWARegister />
-
           <MusicProvider>
+            {/* 重型装饰组件都在 HeavyDecor 里（Client Component，里面 dynamic import ssr:false） */}
+            <HeavyDecor />
+
             <div id="app-mount-root" className="flex-1 flex flex-col transition-opacity duration-1000">
-              <div id="bg-effects-layer" className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
-                {!siteConfig.useGradient && <BackgroundSlider />}
-                {/* z-9 半透底 + 毛玻璃 */}
-                <div className="absolute inset-0 z-[-9] backdrop-blur-md transition-colors duration-1000" style={{ background: 'var(--bg-blur-layer)' }}></div>
-
-                {/* z-8 渐变流动层 */}
-                <div
-                  className="bg-gradient-flow absolute inset-0 z-[-8] opacity-60 dark:opacity-20 mix-blend-color transition-opacity duration-1000 transform-gpu"
-                  style={{
-                    background: 'linear-gradient(-45deg, var(--grad-c1), var(--grad-c2), var(--grad-c3), var(--grad-c4))',
-                    backgroundSize: '400% 400%',
-                    animation: 'gradientMove 15s ease infinite'
-                  }}
-                ></div>
-
-                {/* z-7 两个光晕球 */}
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] blur-[100px] rounded-full z-[-7] md:mix-blend-overlay transition-colors duration-1000" style={{ background: 'var(--glow-1)' }}></div>
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] blur-[100px] rounded-full z-[-7] md:mix-blend-overlay transition-colors duration-1000" style={{ background: 'var(--glow-2)' }}></div>
-
-                {/* 隐藏手机端高负载粒子特效 */}
-                <div className="hidden md:block absolute inset-0 w-full h-full">
-                  <BackgroundEffects />
-                </div>
-              </div>
-
-              {/* 隐藏手机端弹幕 */}
-              <div className="hidden md:block">
-                <DanmakuBackground />
-              </div>
-
               <div className="relative z-10 flex-1 flex flex-col">
                 {children}
               </div>
@@ -200,15 +162,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <div className="md:hidden block">
                 <MobileBackButton />
               </div>
-
-              {/* 隐藏手机端点击粒子 */}
-              <div className="hidden md:block">
-                <ClickEffect />
-              </div>
             </div>
-
-            {/* 全局底栏（全局显示，替代原右上角浮窗） */}
-            <FloatingPlayer />
 
             <style suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `
               @keyframes gradientMove { 
@@ -218,10 +172,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               }
             `}} />
           </MusicProvider>
-
-          <div className="hidden md:block">
-            <CyberCat />
-          </div>
 
           </ToastProvider>
         </ThemeProvider>

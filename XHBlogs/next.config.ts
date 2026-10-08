@@ -18,10 +18,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // 性能优化
-  poweredByHeader: false,
-
-  // CF Pages 下 next/image 没用，跳过优化
+  // 下面这些可以保留
   images: {
     unoptimized: true,
   },

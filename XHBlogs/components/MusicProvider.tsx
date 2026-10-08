@@ -85,8 +85,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const [playMode, setPlayMode] = useState<PlayMode>('loop');
 
   const audioRef = useRef<HTMLAudioElement>(null);
-  // 播放历史栈：prevSong 优先回历史（无论 playMode），random 下不"随机回"
-  const historyRef = useRef<number[]>([]);
   const pathname = usePathname(); // 站内路由变化时重新对齐云端歌单，见下方 effect
 
   // ===== 网易云 ID 导入：后台管理面板“导入网易云音乐的 id”的精髓 =====
@@ -338,47 +336,27 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 🌟 5. 重写 nextSong：random 去重 + 记录历史
-  const pickRandomIndex = (len: number, excludeIdx: number) => {
-    if (len <= 1) return 0;
-    let idx = Math.floor(Math.random() * (len - 1));
-    if (idx >= excludeIdx) idx++;
-    return idx;
-  };
-
+  // 🌟 5. 重写 nextSong，加入对随机模式的处理
   const nextSong = () => {
-    historyRef.current.push(currentIndex);
-    if (historyRef.current.length > 50) historyRef.current.shift();
     if (playMode === 'random') {
-      setCurrentIndex(pickRandomIndex(playlist.length, currentIndex));
+      setCurrentIndex(Math.floor(Math.random() * playlist.length));
     } else {
       setCurrentIndex((prev) => (prev + 1) % playlist.length);
     }
   };
 
   const prevSong = () => {
-    // 优先从历史栈回（无论什么 playMode），random 下不"随机回"
-    if (historyRef.current.length > 0) {
-      const last = historyRef.current.pop()!;
-      setCurrentIndex(last);
-      return;
-    }
-    // 历史空：fallback
     if (playMode === 'random') {
-      setCurrentIndex(pickRandomIndex(playlist.length, currentIndex));
+      setCurrentIndex(Math.floor(Math.random() * playlist.length));
     } else {
       setCurrentIndex((prev) => (prev - 1 + playlist.length) % playlist.length);
     }
   };
 
-  // 🌟 6. 暴露直接播放指定歌曲的方法（点歌单列表选歌也记录历史）
+  // 🌟 6. 暴露直接播放指定歌曲的方法
   const playSong = (index: number) => {
-    if (index !== currentIndex) {
-      historyRef.current.push(currentIndex);
-      if (historyRef.current.length > 50) historyRef.current.shift();
-    }
     setCurrentIndex(index);
-    if (!isPlaying) setIsPlaying(true);
+    if (!isPlaying) setIsPlaying(true); // 保证切歌后自动播放
   };
 
   const handleTimeUpdate = () => {
@@ -409,7 +387,6 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const handleEnded = () => {
     if (playMode === 'single' && audioRef.current) {
        audioRef.current.currentTime = 0;
-       setIsPlaying(true);
        audioRef.current.play();
     } else {
        nextSong();

@@ -1,16 +1,24 @@
 import 'katex/dist/katex.min.css';
 import type { Metadata, Viewport } from "next";
-import { Geist, Noto_Serif_SC } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
+import BackgroundEffects from "../components/BackgroundEffects";
 import { MusicProvider } from "../components/MusicProvider";
-import HeavyDecor from "../components/HeavyDecor";
+import FloatingPlayer from "../components/FloatingPlayer";
 import { siteConfig } from "../siteConfig";
+import ClickEffect from "../components/ClickEffect";
+import BackgroundSlider from "../components/BackgroundSlider";
 import SplashScreen from "../components/SplashScreen";
+import CyberCat from '../components/CyberCat';
+import DanmakuBackground from '../components/DanmakuBackground';
 import { ToastProvider } from '../components/ToastProvider';
+
 import MobileBackButton from '../components/MobileBackButton';
+import PWARegister from '../components/PWARegister';
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 const notoSerif = Noto_Serif_SC({
   subsets: ["latin"],
@@ -112,7 +120,7 @@ const siteJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`${geistSans.variable} ${notoSerif.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <style
           suppressHydrationWarning
@@ -140,7 +148,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       {/* 注意：这里不能用 w-screen（=100vw，包含垂直滚动条宽度）：
           页面出现滚动条时 body 会比可视区宽出滚动条那一截，
           导致 max-w-* + mx-auto 的内容整体右移、右侧被裁。用 w-full(100%) 才是可视宽度。 */}
-      <body className="w-full overflow-x-hidden min-h-full flex flex-col relative transition-colors duration-1000 bg-slate-50 dark:bg-slate-950 font-serif pb-14 md:pb-16">
+      <body className="w-full overflow-x-hidden min-h-full flex flex-col relative transition-colors duration-1000 bg-slate-50 dark:bg-slate-950 font-serif">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
@@ -150,17 +158,55 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
           <SplashScreen />
 
-          <MusicProvider>
-            {/* 重型装饰组件都在 HeavyDecor 里（Client Component，里面 dynamic import ssr:false） */}
-            <HeavyDecor />
+          <PWARegister />
 
+          <MusicProvider>
             <div id="app-mount-root" className="flex-1 flex flex-col transition-opacity duration-1000">
+              <div id="bg-effects-layer" className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+                {!siteConfig.useGradient && <BackgroundSlider />}
+                {/* z-9 半透底 + 毛玻璃 */}
+                <div className="absolute inset-0 z-[-9] backdrop-blur-md transition-colors duration-1000" style={{ background: 'var(--bg-blur-layer)' }}></div>
+
+                {/* z-8 渐变流动层 */}
+                <div
+                  className="bg-gradient-flow absolute inset-0 z-[-8] opacity-60 dark:opacity-20 mix-blend-color transition-opacity duration-1000 transform-gpu"
+                  style={{
+                    background: 'linear-gradient(-45deg, var(--grad-c1), var(--grad-c2), var(--grad-c3), var(--grad-c4))',
+                    backgroundSize: '400% 400%',
+                    animation: 'gradientMove 15s ease infinite'
+                  }}
+                ></div>
+
+                {/* z-7 两个光晕球 */}
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] blur-[100px] rounded-full z-[-7] md:mix-blend-overlay transition-colors duration-1000" style={{ background: 'var(--glow-1)' }}></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] blur-[100px] rounded-full z-[-7] md:mix-blend-overlay transition-colors duration-1000" style={{ background: 'var(--glow-2)' }}></div>
+
+                {/* 隐藏手机端高负载粒子特效 */}
+                <div className="hidden md:block absolute inset-0 w-full h-full">
+                  <BackgroundEffects />
+                </div>
+              </div>
+
+              {/* 隐藏手机端弹幕 */}
+              <div className="hidden md:block">
+                <DanmakuBackground />
+              </div>
+
               <div className="relative z-10 flex-1 flex flex-col">
                 {children}
               </div>
 
+              <div className="hidden md:block">
+                <FloatingPlayer />
+              </div>
+
               <div className="md:hidden block">
                 <MobileBackButton />
+              </div>
+
+              {/* 隐藏手机端点击粒子 */}
+              <div className="hidden md:block">
+                <ClickEffect />
               </div>
             </div>
 
@@ -172,6 +218,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               }
             `}} />
           </MusicProvider>
+
+          <div className="hidden md:block">
+            <CyberCat />
+          </div>
 
           </ToastProvider>
         </ThemeProvider>

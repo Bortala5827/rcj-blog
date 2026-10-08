@@ -204,11 +204,25 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/posts/${resolvedParams.slug}` },
   };
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: '首页', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: '文章', item: `${SITE_URL}/posts` },
+      { '@type': 'ListItem', position: 3, name: postData.title, item: `${SITE_URL}/posts/${resolvedParams.slug}` },
+    ],
+  };
+
   return (
     <div className="min-h-screen relative pb-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <Navbar />
       <PageTransition>

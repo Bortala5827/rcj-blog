@@ -18,7 +18,14 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // 下面这些可以保留
+  // 性能优化
+  poweredByHeader: false,
+  compress: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion'], // 按需导入，避免整包进 bundle
+  },
+
+  // CF Pages 下 next/image 没用，跳过优化
   images: {
     unoptimized: true,
   },

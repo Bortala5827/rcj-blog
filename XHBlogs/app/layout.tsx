@@ -1,24 +1,16 @@
 import 'katex/dist/katex.min.css';
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google";
+import dynamic from 'next/dynamic';
+import { Geist, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
-import BackgroundEffects from "../components/BackgroundEffects";
 import { MusicProvider } from "../components/MusicProvider";
-import FloatingPlayer from "../components/FloatingPlayer";
 import { siteConfig } from "../siteConfig";
-import ClickEffect from "../components/ClickEffect";
-import BackgroundSlider from "../components/BackgroundSlider";
 import SplashScreen from "../components/SplashScreen";
-import CyberCat from '../components/CyberCat';
-import DanmakuBackground from '../components/DanmakuBackground';
 import { ToastProvider } from '../components/ToastProvider';
-
 import MobileBackButton from '../components/MobileBackButton';
-import PWARegister from '../components/PWARegister';
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 const notoSerif = Noto_Serif_SC({
   subsets: ["latin"],
@@ -26,6 +18,15 @@ const notoSerif = Noto_Serif_SC({
   variable: "--font-serif",
   display: 'swap',
 });
+
+// 重型装饰组件：dynamic import，避免首屏 bundle 膨胀
+const BackgroundEffects = dynamic(() => import('../components/BackgroundEffects'), { ssr: false });
+const BackgroundSlider = dynamic(() => import('../components/BackgroundSlider'), { ssr: false });
+const DanmakuBackground = dynamic(() => import('../components/DanmakuBackground'), { ssr: false });
+const ClickEffect = dynamic(() => import('../components/ClickEffect'), { ssr: false });
+const CyberCat = dynamic(() => import('../components/CyberCat'), { ssr: false });
+const FloatingPlayer = dynamic(() => import('../components/FloatingPlayer'), { ssr: false });
+const PWARegister = dynamic(() => import('../components/PWARegister'), { ssr: false });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://blog.955827.xyz'),
@@ -120,7 +121,7 @@ const siteJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="zh-CN" className={`${geistSans.variable} ${notoSerif.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <style
           suppressHydrationWarning

@@ -168,3 +168,51 @@ body::after {
   background: linear-gradient(90deg, transparent, rgba(232,228,217,0.22) 18%, rgba(232,228,217,0.22) 82%, transparent);
 }
 .prose blockquote { border-left: 3px solid var(--cinnabar); padding-left: 1rem; font-style: normal; }
+
+/* ========================================================
+   7. 音乐页 & 全局底栏样式（Phase 3 大改版）
+   ======================================================== */
+
+/* Firefox range thumb（补充已有的 webkit 样式） */
+input[type=range]::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: none;
+  cursor: pointer;
+}
+
+/* 旋转唱片动画（音乐页 + mini-bar 封面） */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.rotating-disc { animation: spin 20s linear infinite; }
+.rotating-disc-mini { animation: spin 8s linear infinite; }
+
+/* Drawer 侧边栏动画 */
+@keyframes drawerSlideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes drawerSlideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(-100%); opacity: 0; }
+}
+.drawer-in { animation: drawerSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1); }
+.drawer-out { animation: drawerSlideOut 0.22s cubic-bezier(0.4, 0, 1, 1); }
+
+/* 底栏 safe-area 支持（iPhone 刘海屏） */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* 歌词面板 - 蒙层（顶部底部渐变遮罩） */
+.lyric-mask {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%);
+}
+
+/* 禁止滚动条但保持可滚动 */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

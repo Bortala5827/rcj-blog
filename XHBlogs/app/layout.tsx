@@ -149,7 +149,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       {/* 注意：这里不能用 w-screen（=100vw，包含垂直滚动条宽度）：
           页面出现滚动条时 body 会比可视区宽出滚动条那一截，
           导致 max-w-* + mx-auto 的内容整体右移、右侧被裁。用 w-full(100%) 才是可视宽度。 */}
-      <body className="w-full overflow-x-hidden min-h-full flex flex-col relative transition-colors duration-1000 bg-slate-50 dark:bg-slate-950 font-serif">
+      <body className="w-full overflow-x-hidden min-h-full flex flex-col relative transition-colors duration-1000 bg-slate-50 dark:bg-slate-950 font-serif pb-14 md:pb-16">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
@@ -197,10 +197,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 {children}
               </div>
 
-              <div className="hidden md:block">
-                <FloatingPlayer />
-              </div>
-
               <div className="md:hidden block">
                 <MobileBackButton />
               </div>
@@ -210,6 +206,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                 <ClickEffect />
               </div>
             </div>
+
+            {/* 全局底栏（全局显示，替代原右上角浮窗） */}
+            <FloatingPlayer />
 
             <style suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `
               @keyframes gradientMove { 

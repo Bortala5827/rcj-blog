@@ -216,3 +216,15 @@ input[type=range]::-moz-range-thumb {
 /* 禁止滚动条但保持可滚动 */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 自定义细滚动条（音乐页专用，显隐但极细） */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.5);
+}
+.custom-scrollbar { scrollbar-width: thin; scrollbar-color: rgba(100,116,139,0.25) transparent; }

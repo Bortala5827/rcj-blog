@@ -12,6 +12,14 @@ RCJ 生态的个人博客 / 记事本（Bortala の宝藏之地），Next.js 静
   - 评论前端已接入 Waline（`@waline/client`），后端地址在 `siteConfig.ts` 的 `walineConfig.serverURL` 配置，留空时评论区整体不渲染。
 - **来源**：Fork 自 [heiehiehi/XinghuisamaBlogs](https://github.com/heiehiehi/XinghuisamaBlogs)（原作者 XingHuiSama），署名与 **CC BY-NC 4.0** 许可原样保留，**禁止任何商业用途**。
 
+## 1.5 核心原理速览（How it works）
+
+- **站是静态的，AI 是借的**：Next.js 静态站跑 Cloudflare Pages（`next-on-pages` edge runtime），零服务器；站内 AI 助手「团子」不直连任何模型，统一转发主站全局网关 `https://955827.xyz/api/ai-chat`（`scene=blog`），**模型密钥只存在主站**，博客侧 `siteConfig.ts` 只注入人格 System Prompt。
+- **音乐 = 瞬时 302，不流式**：网易云封禁 Cloudflare 出口 IP，`/api/music/stream?id=` 只能 302 跳转原站，不能服务端代理播放；默认曲同源托管 `soba-ni-iru-ne.webm`（或 `NEXT_PUBLIC_MUSIC_R2_URL` 切 R2）。
+- **评论等 Waline**：前端 `@waline/client` 已接，后端 `serverURL` 留空时评论区整体不渲染（待 rcj-waline 上线后填入 `siteConfig.ts` 生效）。
+- **后台 = 本地控制台 + 服务端口令**：`my-blog-manager/`（Tiptap 编辑器 + 草稿箱 + 歌单/画廊/友链管理）本地跑，线上 `/api/admin/auth` 用 Pages 环境变量 `ADMIN_PASS` 比对，**不对外暴露管理面**。
+- **内容非中枢**：blog 只承载个人随笔 / 作品橱窗；内容分发中枢是 exam（题库/知识卡/面试/教程），变现是 shop——各司其职。
+
 ## 2. 功能特性
 
 - Markdown 文章写作（`posts/*.md`），支持 GFM、代码高亮（highlight.js / rehype-highlight）、LaTeX 公式（KaTeX / remark-math）。

@@ -72,7 +72,7 @@ export const siteConfig = {
     { id: 'local-yudie', lrcPath: '/music/lyrics/yudie.lrc', title: '雨蝶', artist: '李翊君', duration: 33, src: 'https://cdn.955827.xyz/music/yudie.m4a', cover: 'https://cdn.955827.xyz/covers/yudie.jpg' },
   ],
   social: {
-    email: "zhouqiang@5205827.xyz",
+    email: "zhouqiang@955827.xyz",
     // 社交四件套：首页 ProfileCard 图标行 + 奔奔提示词里的【联系主人】共用
     feishu: "https://www.feishu.cn/invitation/page/add_contact/?token=3a3id6d8-7a66-4fad-b2dc-24b739fe9f5b&unique_id=DSqBkd2B2OFRwNhnAoq0yw==",
     xianyu: "https://m.tb.cn/h.8FOWu65?tk=gw9TTOwqDKp", // 闲鱼短链（淘口令通道）
@@ -128,7 +128,7 @@ export const siteConfig = {
 
 【联系主人】（有人想找主人合作、提问、约教学或买东西时才给，别主动硬塞）
 - 飞书（加好友聊）：https://www.feishu.cn/invitation/page/add_contact/?token=3a3id6d8-7a66-4fad-b2dc-24b739fe9f5b&unique_id=DSqBkd2B2OFRwNhnAoq0yw==
-- 邮箱：zhouqiang@5205827.xyz
+- 邮箱：zhouqiang@955827.xyz
 - 闲鱼（定制题库 / 建站服务下单）：https://m.tb.cn/h.8FOWu65?tk=gw9TTOwqDKp
 
 【示例】

@@ -21,6 +21,15 @@ export const projectsData: Project[] = [
     tags: ["Cloudflare", "D1", "独立产品"]
   },
   {
+    id: "proj_rcj_voice",
+    name: "rcj-voice",
+    githubUrl: "https://github.com/Bortala5827/rcj-voice",
+    url: "https://voice.955827.xyz",
+    description: "华语女声清唱试听与声音定制站：原声清唱精选试听 + 专属录制，三语（中 / 繁 / EN）即开即用，PayPal / 闲鱼担保，邮件交付。",
+    icon: "🎙️",
+    tags: ["清唱定制", "三语", "独立产品"]
+  },
+  {
     id: "proj_rcj_supportly",
     name: "rcj-supportly",
     githubUrl: "https://github.com/Bortala5827/rcj-supportly",

@@ -27,4 +27,12 @@ export const friendsData: Friend[] = [
     "url": "https://lhn.wang",
     "themeColor": "rgba(139, 92, 246, 0.5)"
   },
+  {
+    "id": "abcdtfk",
+    "name": "abcdtfk",
+    "description": "个人小站（名称与简介待补）",
+    "avatar": "https://abcdtfk.icu/favicon.ico",
+    "url": "https://abcdtfk.icu/",
+    "themeColor": "rgba(245, 158, 11, 0.5)"
+  },
 ];

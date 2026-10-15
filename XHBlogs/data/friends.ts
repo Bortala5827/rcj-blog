@@ -19,4 +19,12 @@ export const friendsData: Friend[] = [
     "url": "https://www.aibrium.cn/",
     "themeColor": "rgba(20, 184, 166, 0.5)"
   },
+  {
+    "id": "lhn",
+    "name": "道言",
+    "description": "熊猫烧香作者李俊的个人小站，软件分享 · 原创工具 · 生活倒影。",
+    "avatar": "https://lhn.wang/favicon.ico",
+    "url": "https://lhn.wang",
+    "themeColor": "rgba(139, 92, 246, 0.5)"
+  },
 ];

@@ -23,7 +23,7 @@ export const friendsData: Friend[] = [
     "id": "lhn",
     "name": "道言",
     "description": "熊猫烧香作者李俊的个人小站，软件分享 · 原创工具 · 生活倒影。",
-    "avatar": "https://lhn.wang/favicon.ico",
+    "avatar": "https://img.lhn.wang/userAvatar/11767914832257710.jpg",
     "url": "https://lhn.wang",
     "themeColor": "rgba(139, 92, 246, 0.5)"
   },

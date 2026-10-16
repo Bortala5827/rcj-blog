@@ -3,6 +3,14 @@ export interface Friend { id: string; name: string; url: string; description: st
 
 export const friendsData: Friend[] = [
   {
+    "id": "xinghuisama",
+    "name": "XingHuiSama（模板原作）",
+    "description": "本博客基于其 XinghuisamaBlogs 二次开发，CC BY-NC 4.0 开源协议。",
+    "avatar": "https://github.com/heiehiehi.png",
+    "url": "https://github.com/heiehiehi/XinghuisamaBlogs",
+    "themeColor": "rgba(148, 163, 184, 0.25)"
+  },
+  {
     "id": "aibrium",
     "name": "Frud's Blog",
     "description": "AI / 强化学习研究笔记，分享 DPO、GRPO、RLHF 等算法梳理与论文阅读。",

@@ -14,8 +14,7 @@ export const friendsData: Friend[] = [
     "id": "aibrium",
     "name": "Frud's Blog",
     "description": "AI / 强化学习研究笔记，分享 DPO、GRPO、RLHF 等算法梳理与论文阅读。",
-    "avatar": "https://www.aibrium.cn/favicon.ico",
-    "fallbackAvatar": "/friends/aibrium-avatar.svg",
+    "avatar": "https://a68b43cc.cloudflare-imgbed-9pz.pages.dev/file/1784265000059_ChatGPT_Image_2026%E5%B9%B47%E6%9C%8817%E6%97%A5_13_09_32.png",
     "url": "https://www.aibrium.cn/",
     "themeColor": "rgba(20, 184, 166, 0.5)"
   },

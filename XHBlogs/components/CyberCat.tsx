@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import PixelBenben from './PixelBenben';
 
 export default function CyberCat() {
+  const pathname = usePathname();
+  const isMusic = pathname === '/music';
   const [isPetted, setIsPetted] = useState(false);
   const [speech, setSpeech] = useState<string | null>(null);
   const [showInput, setShowInput] = useState(false);
@@ -127,7 +130,9 @@ export default function CyberCat() {
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.1}
       whileDrag={{ scale: 1.1, cursor: "grabbing" }}
-      className="fixed bottom-20 right-20 z-[9999] flex flex-col items-center group cursor-grab active:cursor-grabbing"
+      animate={{ scale: isMusic ? 0.6 : 1 }}
+      transition={{ duration: 0.3 }}
+      className={`fixed z-[9999] flex flex-col items-center group cursor-grab active:cursor-grabbing ${isMusic ? 'bottom-5 right-5' : 'bottom-20 right-20'}`}
     >
       {/* 💬 聊天气泡 */}
       <div className="relative w-full flex justify-center mb-6">

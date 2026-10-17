@@ -19,6 +19,7 @@ export default function MusicClient() {
 
   const lyricContainerRef = useRef<HTMLDivElement>(null);
   const activeLyricRef = useRef<HTMLDivElement>(null);
+  const activeRowRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<'lyrics' | 'playlist'>('lyrics');
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -85,6 +86,13 @@ export default function MusicClient() {
       container.scrollTo({ top: scrollTarget, behavior: 'smooth' });
     }
   }, [activeLyricIndex, activeTab]);
+
+  // 优化④：歌单里切歌时，把当前播放行自动滚动到可视区（仅在歌单 tab）
+  useEffect(() => {
+    if (activeTab === 'playlist' && activeRowRef.current) {
+      activeRowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [currentSong?.id, activeTab]);
 
   const formatTime = (time: number) => {
     if (!time || isNaN(time)) return "0:00";
@@ -162,7 +170,12 @@ export default function MusicClient() {
                    <motion.div className={`absolute inset-0 w-full h-full rounded-full border-[4px] md:border-[6px] border-white/80 dark:border-slate-600/80 shadow-2xl overflow-hidden transition-transform duration-700 z-10 rotating-disc ${isPlaying ? 'scale-100' : 'scale-95'}`}
                      style={{ animationPlayState: isPlaying ? 'running' : 'paused' }}>
                      <img src={songCover} alt="cover" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                     <div className="absolute inset-0 m-auto w-10 h-10 md:w-12 md:h-12 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-full z-30 shadow-inner border border-slate-300 dark:border-slate-700"></div>
+                     {/* 优化①：精致黑胶中心 = 标签环 + 中心小孔（不再是大色块） */}
+                     <div className="absolute inset-0 m-auto w-10 h-10 md:w-12 md:h-12 rounded-full z-30 flex items-center justify-center"
+                       style={{ background: 'linear-gradient(145deg,#2a3358,#1a2142)', border: '2px solid rgba(255,255,255,.25)', boxShadow: '0 2px 8px rgba(0,0,0,.4)' }}>
+                       <div className="absolute w-6 h-6 rounded-full" style={{ border: '1px solid rgba(255,255,255,.12)' }} />
+                       <div className="w-2 h-2 rounded-full" style={{ background: '#0c1020', boxShadow: 'inset 0 1px 2px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.15)' }} />
+                     </div>
                      <div className="absolute inset-0 z-20 rounded-full pointer-events-none opacity-20" style={{ background: 'conic-gradient(from 0deg, transparent, rgba(255,255,255,0.4), transparent, rgba(255,255,255,0.4), transparent)' }}></div>
                    </motion.div>
                 </div>
@@ -177,16 +190,16 @@ export default function MusicClient() {
                   <input type="range" min="0" max="100" value={progress || 0} onChange={handleSeek} className="w-full h-1 md:h-1.5 rounded-full appearance-none cursor-pointer" style={{ background: `linear-gradient(to right, #4f46e5 ${progress}%, rgba(0, 0, 0, 0.15) 0)` }} />
                   <div className="flex justify-between text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 tabular-nums"><span>{formatTime(currentTime)}</span><span>{formatTime(duration)}</span></div>
                 </div>
-                <div className="w-full flex items-center justify-between px-1 md:px-2 lg:px-4">
-                  <button onClick={togglePlayMode} className="p-2 transition-transform hover:scale-110">{getPlayModeIcon()}</button>
-                  <div className="flex items-center gap-3 md:gap-4 lg:gap-6">
+                <div className="w-full flex items-center px-1 md:px-2 lg:px-4">
+                  <button onClick={togglePlayMode} className="w-10 flex justify-center p-2 transition-transform hover:scale-110">{getPlayModeIcon()}</button>
+                  <div className="flex-1 flex items-center justify-center gap-3 md:gap-4 lg:gap-6">
                     <button onClick={prevSong} className="p-2 text-slate-700 dark:text-slate-300 hover:text-indigo-500 transition-transform hover:scale-110"><SkipBack size={24} className="md:w-7 md:h-7" fill="currentColor" /></button>
                     <button onClick={togglePlay} className="w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20 flex items-center justify-center bg-indigo-500 text-white rounded-full hover:scale-105 shadow-xl shadow-indigo-500/40">
                       {isPlaying ? <Pause size={28} className="md:w-8 md:h-8" fill="currentColor" /> : <Play size={28} className="md:w-8 md:h-8 ml-1" fill="currentColor" />}
                     </button>
                     <button onClick={nextSong} className="p-2 text-slate-700 dark:text-slate-300 hover:text-indigo-500 transition-transform hover:scale-110"><SkipForward size={24} className="md:w-7 md:h-7" fill="currentColor" /></button>
                   </div>
-                  <div className="flex items-center" onMouseLeave={() => setShowVolumeSlider(false)}>
+                  <div className="hidden md:flex items-center" onMouseLeave={() => setShowVolumeSlider(false)}>
                     <AnimatePresence>
                       {showVolumeSlider && (
                         <motion.div initial={{ width: 0, opacity: 0 }} animate={{ width: 80, opacity: 1 }} exit={{ width: 0, opacity: 0 }} className="hidden md:flex overflow-hidden items-center mr-2 bg-white/30 dark:bg-black/20 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/20">
@@ -210,17 +223,17 @@ export default function MusicClient() {
               <div className="flex-1 relative mt-2 flex flex-col overflow-hidden">
                 {activeTab === 'lyrics' && (
                   <div className="absolute inset-0 flex flex-col h-full animate-in fade-in duration-300">
-                    <div className="absolute top-0 left-0 right-0 h-32 md:h-40 bg-gradient-to-b from-white/40 dark:from-slate-800/60 to-transparent z-10 pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 right-0 h-32 md:h-40 bg-gradient-to-t from-white/40 dark:from-slate-800/60 to-transparent z-10 pointer-events-none" />
+                    {activeLyricIndex !== -1 && <div className="absolute top-0 left-0 right-0 h-32 md:h-40 bg-gradient-to-b from-white/40 dark:from-slate-800/60 to-transparent z-10 pointer-events-none" />}
+                    {activeLyricIndex !== -1 && <div className="absolute bottom-0 left-0 right-0 h-32 md:h-40 bg-gradient-to-t from-white/40 dark:from-slate-800/60 to-transparent z-10 pointer-events-none" />}
                     <div ref={lyricContainerRef} className="h-full overflow-y-auto no-scrollbar scroll-smooth relative px-4 md:px-6 lyric-mask-container">
-                        <div className="py-[30vh] md:py-[35vh] flex flex-col gap-4 md:gap-6 text-center lg:px-10">
+                        <div className={`flex flex-col gap-4 md:gap-6 text-center lg:px-10 transition-all duration-500 ${activeLyricIndex === -1 ? 'py-10 md:py-14' : 'py-[30vh] md:py-[35vh]'}`}>
                             {parsedLyrics.length > 0 ? (
                               parsedLyrics.map((line: any, index: number) => {
                                 const isActive = index === activeLyricIndex;
                                 const staticMode = activeLyricIndex === -1; // 静态歌词：整体可读，不模拟实时高亮
                                 return (
                                   <div key={index} ref={isActive ? activeLyricRef : null}
-                                    className={`transition-all duration-700 cursor-pointer px-2 md:px-4 rounded-2xl ${isActive ? 'opacity-100 scale-105 py-2 md:py-3 bg-white/10' : staticMode ? 'opacity-75 hover:opacity-95' : 'opacity-20 hover:opacity-40'}`}
+                                    className={`transition-all duration-700 cursor-pointer px-2 md:px-4 rounded-2xl ${isActive ? 'opacity-100 scale-105 py-2 md:py-3 bg-white/10' : staticMode ? 'opacity-85 hover:opacity-100' : 'opacity-20 hover:opacity-40'}`}
                                     onClick={() => duration > 0 && line.time >= 0 && handleSeek({ target: { value: String((line.time / duration) * 100) } } as any)}
                                   >
                                     <p className={`font-black tracking-tight leading-relaxed transition-all duration-700 ${isActive ? 'text-lg md:text-2xl text-indigo-600 dark:text-indigo-400' : 'text-sm md:text-lg text-slate-700 dark:text-slate-300'}`} style={isActive ? { textShadow: '0 0 20px rgba(99,102,241,0.15)' } : {}}>{line.text}</p>
@@ -263,7 +276,7 @@ export default function MusicClient() {
                           const originalIndex = playlist.findIndex((s: any) => s.id === song.id);
                           const isPlayingThis = (song.id === currentSong.id);
                           return (
-                            <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} key={song.id} onClick={() => handlePlaySong(originalIndex)} className={`group flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl cursor-pointer transition-all border ${isPlayingThis ? 'bg-white/60 dark:bg-slate-700/80 shadow-md border-indigo-500/30' : 'border-transparent hover:bg-white/30 dark:hover:bg-slate-700/40'}`}>
+                            <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} key={song.id} ref={isPlayingThis ? activeRowRef : undefined} onClick={() => handlePlaySong(originalIndex)} className={`group flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl cursor-pointer transition-all border ${isPlayingThis ? 'bg-white/60 dark:bg-slate-700/80 shadow-md border-indigo-500/30' : 'border-transparent hover:bg-white/30 dark:hover:bg-slate-700/40'}`}>
                               <div className="flex items-center gap-3 md:gap-4 w-[85%]">
                                 <div className="relative w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-lg md:rounded-xl overflow-hidden shadow-sm">
                                   <img src={song.cover || song.pic} alt="cover" referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover" />
@@ -271,6 +284,7 @@ export default function MusicClient() {
                                 </div>
                                 <div className="flex flex-col truncate"><span className={`text-sm md:text-[15px] font-black truncate ${isPlayingThis ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-slate-200'}`}>{song.title || song.name}</span><span className="text-[10px] md:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">{song.artist || song.author}</span></div>
                               </div>
+                              <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 tabular-nums shrink-0 pl-2">{song.duration ? formatTime(song.duration) : ''}</span>
                             </motion.div>
                           );
                         })}

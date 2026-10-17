@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../../components/Navbar';
 import PageTransition from '../../components/PageTransition';
 import { useMusic } from '../../components/MusicProvider';
+import { siteConfig } from '../../siteConfig';
 import { Play, Pause, SkipBack, SkipForward, Repeat, Shuffle, RefreshCcw, ListMusic, Mic2, Disc3, Volume2, VolumeX, Search, X } from 'lucide-react';
 
 export default function MusicClient() {
@@ -100,6 +101,13 @@ export default function MusicClient() {
     const secs = Math.floor(time % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // 优化⑦：MusicProvider 的 playlist 未带 duration，这里从 siteConfig.localTracks 建时长映射用于列表展示
+  const durationMap = useMemo(() => {
+    const m: Record<string, number> = {};
+    (siteConfig.localTracks || []).forEach((t: any) => { if (t.id && t.duration) m[t.id] = t.duration; });
+    return m;
+  }, []);
 
   const getPlayModeIcon = () => {
     switch (playMode) {
@@ -275,6 +283,7 @@ export default function MusicClient() {
                         {filteredPlaylist.map((song: any) => {
                           const originalIndex = playlist.findIndex((s: any) => s.id === song.id);
                           const isPlayingThis = (song.id === currentSong.id);
+                          const songDur = song.duration || durationMap[song.id] || (isPlayingThis ? duration : 0);
                           return (
                             <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} key={song.id} ref={isPlayingThis ? activeRowRef : undefined} onClick={() => handlePlaySong(originalIndex)} className={`group flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl cursor-pointer transition-all border ${isPlayingThis ? 'bg-white/60 dark:bg-slate-700/80 shadow-md border-indigo-500/30' : 'border-transparent hover:bg-white/30 dark:hover:bg-slate-700/40'}`}>
                               <div className="flex items-center gap-3 md:gap-4 w-[85%]">
@@ -284,7 +293,7 @@ export default function MusicClient() {
                                 </div>
                                 <div className="flex flex-col truncate"><span className={`text-sm md:text-[15px] font-black truncate ${isPlayingThis ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-slate-200'}`}>{song.title || song.name}</span><span className="text-[10px] md:text-[11px] font-medium text-slate-500 dark:text-slate-400 truncate mt-0.5">{song.artist || song.author}</span></div>
                               </div>
-                              <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 tabular-nums shrink-0 pl-2">{song.duration ? formatTime(song.duration) : ''}</span>
+                              <span className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 tabular-nums shrink-0 pl-2">{songDur ? formatTime(songDur) : ''}</span>
                             </motion.div>
                           );
                         })}

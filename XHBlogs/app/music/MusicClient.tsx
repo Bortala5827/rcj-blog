@@ -87,10 +87,10 @@ export default function MusicClient() {
     }
   }, [activeLyricIndex, activeTab]);
 
-  // 优化④：歌单里切歌时，把当前播放行自动滚动到可视区（仅在歌单 tab）
+  // 优化④：歌单里切歌时，把当前播放行自动滚动到可视区中央（避开右下角像素猫）
   useEffect(() => {
     if (activeTab === 'playlist' && activeRowRef.current) {
-      activeRowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      activeRowRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   }, [currentSong?.id, activeTab]);
 
@@ -270,7 +270,7 @@ export default function MusicClient() {
                       <input type="text" placeholder="搜索音轨..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-10 md:pr-12 bg-white/30 dark:bg-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-full text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/40 shadow-inner transition-all" />
                       {searchQuery && (<button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-black/10 rounded-full transition-colors"><X size={14} className="text-slate-500" /></button>)}
                     </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 flex flex-col gap-2 md:gap-2.5">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-14 md:pb-16 flex flex-col gap-2 md:gap-2.5">
                       <AnimatePresence mode='popLayout'>
                         {filteredPlaylist.map((song: any) => {
                           const originalIndex = playlist.findIndex((s: any) => s.id === song.id);

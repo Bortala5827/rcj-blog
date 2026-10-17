@@ -130,7 +130,7 @@ export default function CyberCat() {
       dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
       dragElastic={0.1}
       whileDrag={{ scale: 1.1, cursor: "grabbing" }}
-      animate={{ scale: isMusic ? 0.6 : 1 }}
+      animate={{ scale: isMusic ? 0.55 : 1 }}
       transition={{ duration: 0.3 }}
       className={`fixed z-[9999] flex flex-col items-center group cursor-grab active:cursor-grabbing ${isMusic ? 'bottom-5 right-5' : 'bottom-20 right-20'}`}
     >
@@ -156,7 +156,7 @@ export default function CyberCat() {
       <div className="relative">
 
         {/* 🌟 核心修改区：去掉了 opacity-0 和 group-hover，让按钮常驻显示 */}
-        <div className="absolute -left-12 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20">
+        <div className={`absolute -left-12 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 transition-opacity duration-300 ${isMusic ? 'opacity-0 group-hover:opacity-100 focus-within:opacity-100' : 'opacity-100'}`}>
 
             {/* 💬 聊天按钮 */}
             <button

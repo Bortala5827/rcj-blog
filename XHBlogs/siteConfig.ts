@@ -70,6 +70,18 @@ export const siteConfig = {
     { id: 'local-shenqibaima', lrcPath: '/music/lyrics/shenqibaima.lrc', title: '身骑白马', artist: '徐佳莹', duration: 59, src: 'https://cdn.955827.xyz/music/shenqibaima.m4a', cover: 'https://cdn.955827.xyz/covers/shenqibaima.jpg' },
     { id: 'local-woxiangdasheng', lrcPath: '/music/lyrics/woxiangdasheng.lrc', title: '我想大声告诉你', artist: '樊凡', duration: 263, src: 'https://cdn.955827.xyz/music/woxiangdasheng.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
     { id: 'local-yudie', lrcPath: '/music/lyrics/yudie.lrc', title: '雨蝶', artist: '李翊君', duration: 33, src: 'https://cdn.955827.xyz/music/yudie.m4a', cover: 'https://cdn.955827.xyz/covers/yudie.jpg' },
+    // ---- 2026-10-17/18 第二批（yt-dlp 1017）：11 首新清唱，音频/封面存 R2（cd.955827.xyz），LRC 同 whisper 听写打轴 ----
+    { id: 'local-yizhianjing', lrcPath: '/music/lyrics/yizhianjing.lrc', title: '一直很安静', artist: '阿桑', duration: 141, src: 'https://cdn.955827.xyz/music/yizhianjing.m4a', cover: 'https://cdn.955827.xyz/covers/yizhianjing.svg' },
+    { id: 'local-huihuxidetong', lrcPath: '/music/lyrics/huihuxidetong.lrc', title: '会呼吸的痛', artist: '梁静茹', duration: 214, src: 'https://cdn.955827.xyz/music/huihuxidetong.m4a', cover: 'https://cdn.955827.xyz/covers/huihuxidetong.svg' },
+    { id: 'local-gongzhudianxia-2', lrcPath: '/music/lyrics/gongzhudianxia-2.lrc', title: '公主殿下（清唱版）', artist: '崔洋', duration: 69, src: 'https://cdn.955827.xyz/music/gongzhudianxia-2.m4a', cover: 'https://cdn.955827.xyz/covers/gongzhudianxia-2.svg' },
+    { id: 'local-yongqi', lrcPath: '/music/lyrics/yongqi.lrc', title: '勇气', artist: '梁静茹', duration: 188, src: 'https://cdn.955827.xyz/music/yongqi.m4a', cover: 'https://cdn.955827.xyz/covers/yongqi.svg' },
+    { id: 'local-nimingdehaoyou', lrcPath: '/music/lyrics/nimingdehaoyou.lrc', title: '匿名的好友', artist: '杨丞琳', duration: 195, src: 'https://cdn.955827.xyz/music/nimingdehaoyou.m4a', cover: 'https://cdn.955827.xyz/covers/nimingdehaoyou.svg' },
+    { id: 'local-yinweiaiqing', lrcPath: '/music/lyrics/yinweiaiqing.lrc', title: '因为爱情', artist: '王菲 / 陈奕迅', duration: 159, src: 'https://cdn.955827.xyz/music/yinweiaiqing.m4a', cover: 'https://cdn.955827.xyz/covers/yinweiaiqing.svg' },
+    { id: 'local-dachengxiaoai', lrcPath: '/music/lyrics/dachengxiaoai.lrc', title: '大城小爱', artist: '王力宏', duration: 160, src: 'https://cdn.955827.xyz/music/dachengxiaoai.m4a', cover: 'https://cdn.955827.xyz/covers/dachengxiaoai.svg' },
+    { id: 'local-tianheihai', lrcPath: '/music/lyrics/tianheihai.lrc', title: '天黑黑', artist: '孙燕姿', duration: 193, src: 'https://cdn.955827.xyz/music/tianheihai.m4a', cover: 'https://cdn.955827.xyz/covers/tianheihai.svg' },
+    { id: 'local-ruyuan', lrcPath: '/music/lyrics/ruyuan.lrc', title: '如愿', artist: '王菲', duration: 182, src: 'https://cdn.955827.xyz/music/ruyuan.m4a', cover: 'https://cdn.955827.xyz/covers/ruyuan.svg' },
+    { id: 'local-qingfeideyi-2', lrcPath: '/music/lyrics/qingfeideyi-2.lrc', title: '情非得已（二）', artist: '庾澄庆', duration: 192, src: 'https://cdn.955827.xyz/music/qingfeideyi-2.m4a', cover: 'https://cdn.955827.xyz/covers/qingfeideyi-2.svg' },
+    { id: 'local-yudie-2', lrcPath: '/music/lyrics/yudie-2.lrc', title: '雨蝶（二）', artist: '李翊君', duration: 151, src: 'https://cdn.955827.xyz/music/yudie-2.m4a', cover: 'https://cdn.955827.xyz/covers/yudie-2.svg' },
   ],
   social: {
     email: "zhouqiang@955827.xyz",

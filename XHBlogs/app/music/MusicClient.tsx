@@ -20,7 +20,7 @@ export default function MusicClient() {
 
   const lyricContainerRef = useRef<HTMLDivElement>(null);
   const activeLyricRef = useRef<HTMLDivElement>(null);
-  const activeRowRef = useRef<HTMLDivElement>(null);
+  const playlistListRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<'lyrics' | 'playlist'>('lyrics');
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -88,11 +88,20 @@ export default function MusicClient() {
     }
   }, [activeLyricIndex, activeTab]);
 
-  // 优化④：歌单里切歌时，把当前播放行自动滚动到可视区中央（避开右下角像素猫）
+  // 优化④：歌单里切歌时，把当前播放行自动滚动到歌单容器可视区中央。
+  // 【修复 2026-10-20】此前用 activeRowRef + scrollIntoView：
+  //   ① ref 在 framer-motion 布局动画期间会滞后指向旧行（上一首/第一首），把列表拉回顶部；
+  //   ② scrollIntoView 会连带滚动整页，手机端切到歌单/切歌时页面跟着跳。
+  // 改为：effect 内按 data-song-id 直接查当前行，且只用 container.scrollTo 滚动歌单容器本身。
   useEffect(() => {
-    if (activeTab === 'playlist' && activeRowRef.current) {
-      activeRowRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    }
+    if (activeTab !== 'playlist' || !currentSong) return;
+    const list = playlistListRef.current;
+    if (!list) return;
+    const row = list.querySelector<HTMLElement>(`[data-song-id="${CSS.escape(String(currentSong.id))}"]`);
+    if (!row) return;
+    const rowTopInList = row.getBoundingClientRect().top - list.getBoundingClientRect().top + list.scrollTop;
+    const target = rowTopInList - list.clientHeight / 2 + row.getBoundingClientRect().height / 2;
+    list.scrollTo({ top: Math.max(0, target), behavior: 'smooth' });
   }, [currentSong?.id, activeTab]);
 
   const formatTime = (time: number) => {
@@ -278,14 +287,14 @@ export default function MusicClient() {
                       <input type="text" placeholder="搜索音轨..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-10 md:pr-12 bg-white/30 dark:bg-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-full text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/40 shadow-inner transition-all" />
                       {searchQuery && (<button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-black/10 rounded-full transition-colors"><X size={14} className="text-slate-500" /></button>)}
                     </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-14 md:pb-16 flex flex-col gap-2 md:gap-2.5">
+                    <div ref={playlistListRef} className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-14 md:pb-16 flex flex-col gap-2 md:gap-2.5">
                       <AnimatePresence mode='popLayout'>
                         {filteredPlaylist.map((song: any) => {
                           const originalIndex = playlist.findIndex((s: any) => s.id === song.id);
                           const isPlayingThis = (song.id === currentSong.id);
                           const songDur = song.duration || durationMap[song.id] || (isPlayingThis ? duration : 0);
                           return (
-                            <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} key={song.id} ref={isPlayingThis ? activeRowRef : undefined} onClick={() => handlePlaySong(originalIndex)} className={`group flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl cursor-pointer transition-all border ${isPlayingThis ? 'bg-white/60 dark:bg-slate-700/80 shadow-md border-indigo-500/30' : 'border-transparent hover:bg-white/30 dark:hover:bg-slate-700/40'}`}>
+                            <motion.div layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }} key={song.id} data-song-id={song.id} onClick={() => handlePlaySong(originalIndex)} className={`group flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl cursor-pointer transition-all border ${isPlayingThis ? 'bg-white/60 dark:bg-slate-700/80 shadow-md border-indigo-500/30' : 'border-transparent hover:bg-white/30 dark:hover:bg-slate-700/40'}`}>
                               <div className="flex items-center gap-3 md:gap-4 w-[85%]">
                                 <div className="relative w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-lg md:rounded-xl overflow-hidden shadow-sm">
                                   <img src={song.cover || song.pic} alt="cover" referrerPolicy="no-referrer" loading="lazy" decoding="async" className="w-full h-full object-cover" />

@@ -41,6 +41,7 @@ export const siteConfig = {
   //   后续加歌：文件传 R2（wrangler r2 object put blog-media/music/xxx.m4a ...），仓库不再存音频二进制。
   localTracks: [
     { id: 'local-baisejuta', lrcPath: '/music/lyrics/baisejuta.lrc', title: '白色巨塔 (Jupiter)', artist: '平原綾香', duration: 29, src: 'https://cdn.955827.xyz/music/baisejuta.m4a', cover: 'https://cdn.955827.xyz/covers/baisejuta.jpg' },
+    { id: 'local-fenshenqingren', lrcPath: '/music/lyrics/fenshenqingren.lrc', title: '分身情人', artist: '魏晨', duration: 42, src: 'https://cdn.955827.xyz/music/fenshenqingren.m4a', cover: 'https://cdn.955827.xyz/covers/fenshenqingren.jpg' },
     { id: 'local-qifengle', lrcPath: '/music/lyrics/qifengle.lrc', title: '起风了', artist: '买辣椒也用券', duration: 260, src: 'https://cdn.955827.xyz/music/qifengle.m4a', cover: 'https://cdn.955827.xyz/covers/qifengle.jpg' },
     { id: 'local-hongdou', lrcPath: '/music/lyrics/hongdou.lrc', title: '红豆', artist: '王菲', duration: 211, src: 'https://cdn.955827.xyz/music/hongdou.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou.svg' },
     { id: 'local-renjian', lrcPath: '/music/lyrics/renjian.lrc', title: '人间', artist: '王菲', duration: 87, src: 'https://cdn.955827.xyz/music/renjian.m4a', cover: 'https://cdn.955827.xyz/covers/renjian.svg' },

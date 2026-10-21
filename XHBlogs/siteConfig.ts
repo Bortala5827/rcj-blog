@@ -68,7 +68,7 @@ export const siteConfig = {
     { id: 'local-qingge-jita', lrcPath: '/music/lyrics/qingge-jita.lrc', title: '情歌', artist: '梁静茹', duration: 36, src: 'https://cdn.955827.xyz/music/qingge-jita.m4a', cover: 'https://cdn.955827.xyz/covers/qingge-jita.jpg' },
     { id: 'local-ruobanni', lrcPath: '/music/lyrics/ruobanni.lrc', title: '若把你', artist: 'Kirsty刘瑾睿', duration: 49, src: 'https://cdn.955827.xyz/music/ruobanni.m4a', cover: 'https://cdn.955827.xyz/covers/ruobanni.jpg' },
     { id: 'local-shenqibaima', lrcPath: '/music/lyrics/shenqibaima.lrc', title: '身骑白马', artist: '徐佳莹', duration: 59, src: 'https://cdn.955827.xyz/music/shenqibaima.m4a', cover: 'https://cdn.955827.xyz/covers/shenqibaima.jpg' },
-    { id: 'local-woxiangdasheng', lrcPath: '/music/lyrics/woxiangdasheng.lrc', title: '我想大声告诉你', artist: '樊凡', duration: 263, src: 'https://cdn.955827.xyz/music/woxiangdasheng.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
+    { id: 'local-woxiangdasheng', lrcPath: '/music/lyrics/woxiangdasheng.lrc', title: '我想大声告诉你', artist: '樊凡', duration: 234, src: 'https://cdn.955827.xyz/music/woxiangdasheng-v2.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
     { id: 'local-yudie', lrcPath: '/music/lyrics/yudie.lrc', title: '雨蝶', artist: '李翊君', duration: 33, src: 'https://cdn.955827.xyz/music/yudie.m4a', cover: 'https://cdn.955827.xyz/covers/yudie.jpg' },
     // ---- 2026-10-17/18 第二批（yt-dlp 1017）：11 首新清唱，音频/封面存 R2（cd.955827.xyz），LRC 同 whisper 听写打轴；封面 2026-10-18 v2 黑胶版（?v=2 绕过 CDN 缓存） ----
     { id: 'local-yizhianjing', lrcPath: '/music/lyrics/yizhianjing.lrc', title: '一直很安静', artist: '阿桑', duration: 141, src: 'https://cdn.955827.xyz/music/yizhianjing.m4a', cover: 'https://cdn.955827.xyz/covers/yizhianjing.jpg' },

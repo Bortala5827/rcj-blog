@@ -41,10 +41,8 @@ export const siteConfig = {
   //   后续加歌：文件传 R2（wrangler r2 object put blog-media/music/xxx.m4a ...），仓库不再存音频二进制。
   localTracks: [
     { id: 'local-baisejuta', lrcPath: '/music/lyrics/baisejuta.lrc', title: '白色巨塔 (Jupiter)', artist: '平原綾香', duration: 29, src: 'https://cdn.955827.xyz/music/baisejuta.m4a', cover: 'https://cdn.955827.xyz/covers/baisejuta.jpg' },
-    { id: 'local-fenshenqingren', lrcPath: '/music/lyrics/fenshenqingren.lrc', title: '分身情人', artist: '魏晨', duration: 42, src: 'https://cdn.955827.xyz/music/fenshenqingren.m4a', cover: 'https://cdn.955827.xyz/covers/fenshenqingren.jpg' },
     { id: 'local-qifengle', lrcPath: '/music/lyrics/qifengle.lrc', title: '起风了', artist: '买辣椒也用券', duration: 260, src: 'https://cdn.955827.xyz/music/qifengle.m4a', cover: 'https://cdn.955827.xyz/covers/qifengle.jpg' },
     { id: 'local-hongdou', lrcPath: '/music/lyrics/hongdou.lrc', title: '红豆', artist: '王菲', duration: 211, src: 'https://cdn.955827.xyz/music/hongdou.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou.svg' },
-    { id: 'local-hongdou-2', lrcPath: '/music/lyrics/hongdou-2.lrc', title: '红豆', artist: '王菲', duration: 75, src: 'https://cdn.955827.xyz/music/hongdou-2.m4a', cover: 'https://cdn.955827.xyz/covers/hongdou-2.jpg' },
     { id: 'local-renjian', lrcPath: '/music/lyrics/renjian.lrc', title: '人间', artist: '王菲', duration: 87, src: 'https://cdn.955827.xyz/music/renjian.m4a', cover: 'https://cdn.955827.xyz/covers/renjian.svg' },
     { id: 'local-wozhizaihuni', lrcPath: '/music/lyrics/wozhizaihuni.lrc', title: '我只在乎你', artist: '邓丽君', duration: 72, src: 'https://cdn.955827.xyz/music/wozhizaihuni.m4a', cover: 'https://cdn.955827.xyz/covers/wozhizaihuni.svg' },
     { id: 'local-xiangwozheyangderen', lrcPath: '/music/lyrics/xiangwozheyangderen.lrc', title: '像我這樣的人', artist: '毛不易', duration: 202, src: 'https://cdn.955827.xyz/music/xiangwozheyangderen.m4a', cover: 'https://cdn.955827.xyz/covers/xiangwozheyangderen.svg' },
@@ -66,10 +64,8 @@ export const siteConfig = {
     { id: 'local-jiurangzhedayu', lrcPath: '/music/lyrics/jiurangzhedayu.lrc', title: '就让这大雨全部落下', artist: '容祖儿', duration: 71, src: 'https://cdn.955827.xyz/music/jiurangzhedayu.m4a', cover: 'https://cdn.955827.xyz/covers/jiurangzhedayu.jpg' },
     { id: 'local-liaosanju', lrcPath: '/music/lyrics/liaosanju.lrc', title: '俩三句', artist: '', duration: 39, src: 'https://cdn.955827.xyz/music/liaosanju.m4a', cover: 'https://cdn.955827.xyz/covers/liaosanju.jpg' },
     { id: 'local-qingge-jita', lrcPath: '/music/lyrics/qingge-jita.lrc', title: '情歌', artist: '梁静茹', duration: 36, src: 'https://cdn.955827.xyz/music/qingge-jita.m4a', cover: 'https://cdn.955827.xyz/covers/qingge-jita.jpg' },
-    { id: 'local-ruobanni', lrcPath: '/music/lyrics/ruobanni.lrc', title: '若把你', artist: 'Kirsty刘瑾睿', duration: 49, src: 'https://cdn.955827.xyz/music/ruobanni.m4a', cover: 'https://cdn.955827.xyz/covers/ruobanni.jpg' },
     { id: 'local-shenqibaima', lrcPath: '/music/lyrics/shenqibaima.lrc', title: '身骑白马', artist: '徐佳莹', duration: 59, src: 'https://cdn.955827.xyz/music/shenqibaima.m4a', cover: 'https://cdn.955827.xyz/covers/shenqibaima.jpg' },
     { id: 'local-woxiangdasheng', lrcPath: '/music/lyrics/woxiangdasheng.lrc', title: '我想大声告诉你', artist: '樊凡', duration: 234, src: 'https://cdn.955827.xyz/music/woxiangdasheng-v2.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
-    { id: 'local-yudie', lrcPath: '/music/lyrics/yudie.lrc', title: '雨蝶', artist: '李翊君', duration: 33, src: 'https://cdn.955827.xyz/music/yudie.m4a', cover: 'https://cdn.955827.xyz/covers/yudie.jpg' },
     // ---- 2026-10-17/18 第二批（yt-dlp 1017）：11 首新清唱，音频/封面存 R2（cd.955827.xyz），LRC 同 whisper 听写打轴；封面 2026-10-18 v2 黑胶版（?v=2 绕过 CDN 缓存） ----
     { id: 'local-yizhianjing', lrcPath: '/music/lyrics/yizhianjing.lrc', title: '一直很安静', artist: '阿桑', duration: 141, src: 'https://cdn.955827.xyz/music/yizhianjing.m4a', cover: 'https://cdn.955827.xyz/covers/yizhianjing.jpg' },
     { id: 'local-huihuxidetong', lrcPath: '/music/lyrics/huihuxidetong.lrc', title: '会呼吸的痛', artist: '梁静茹', duration: 214, src: 'https://cdn.955827.xyz/music/huihuxidetong.m4a', cover: 'https://cdn.955827.xyz/covers/huihuxidetong.jpg' },

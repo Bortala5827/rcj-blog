@@ -79,6 +79,7 @@ export const siteConfig = {
     { id: 'local-ruyuan', lrcPath: '/music/lyrics/ruyuan.lrc', title: '如愿', artist: '王菲', duration: 182, src: 'https://cdn.955827.xyz/music/ruyuan.m4a', cover: 'https://cdn.955827.xyz/covers/ruyuan.jpg' },
     { id: 'local-qingfeideyi-2', lrcPath: '/music/lyrics/qingfeideyi-2.lrc', title: '情非得已（二）', artist: '庾澄庆', duration: 192, src: 'https://cdn.955827.xyz/music/qingfeideyi-2.m4a', cover: 'https://cdn.955827.xyz/covers/qingfeideyi-2.jpg' },
     { id: 'local-yudie-2', lrcPath: '/music/lyrics/yudie-2.lrc', title: '雨蝶（二）', artist: '李翊君', duration: 151, src: 'https://cdn.955827.xyz/music/yudie-2.m4a', cover: 'https://cdn.955827.xyz/covers/yudie-2.jpg' },
+    { id: 'local-woxiangdasheng-2', lrcPath: '/music/lyrics/woxiangdasheng-2.lrc', title: '我想大声告诉你（二）', artist: '樊凡', duration: 239, src: 'https://cdn.955827.xyz/music/woxiangdasheng-2.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
   ],
   social: {
     email: "zhouqiang@955827.xyz",

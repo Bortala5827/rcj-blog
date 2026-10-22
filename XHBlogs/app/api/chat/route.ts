@@ -120,8 +120,9 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify({ reply }), {
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  } catch {
+    // 不把内部异常细节（上游主机/网络错误）回显给调用方
+    return new Response(JSON.stringify({ error: '服务暂时不可用，请稍后再试' }), { status: 500 });
   }
 }
 

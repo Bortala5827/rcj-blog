@@ -35,7 +35,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing ids parameter' }, { status: 400 })
   }
 
-  const songIds = ids.split(',').map((id) => id.trim()).filter(Boolean)
+  // 只接受纯数字 ID，挡掉在查询串里拼接额外参数/字符的尝试（固定回源 music.163.net，纵深防御）
+  const songIds = ids.split(',').map((id) => id.trim()).filter((id) => /^\d+$/.test(id));
+  if (!songIds.length) {
+    return NextResponse.json({ error: 'Missing valid ids parameter' }, { status: 400 });
+  }
 
   const results: SongResult[] = await Promise.all(
     songIds.map(async (songId): Promise<SongResult> => {

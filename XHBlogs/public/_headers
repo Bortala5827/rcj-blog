@@ -1,0 +1,9 @@
+# Cloudflare Pages 安全响应头（全站）
+# 说明：不设 CSP（Next.js 内联样式/水合脚本较多，严格 CSP 易误伤）；
+# 仅补框架未自带的 HSTS / 点击劫持防护。nosniff、referrer-policy 由平台/框架自带，此处显式兜底。
+/*
+  Strict-Transport-Security: max-age=15552000
+  X-Frame-Options: DENY
+  Content-Security-Policy: frame-ancestors 'none'
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff

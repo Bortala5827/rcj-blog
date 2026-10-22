@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { siteConfig } from '../../siteConfig';
 
 export const dynamic = 'force-static';
 
@@ -10,7 +11,8 @@ const SITE_TITLE = 'Bortala の 宝藏之地';
 const SITE_DESC =
   '在做 RCJ Lab —— 一个把想法做成可用产品的个人工作室，东西基本都跑在 Cloudflare 边缘上。';
 const AUTHOR = 'Bortala';
-const EMAIL = 'bortala5827@gmail.com';
+// 邮箱跟随 siteConfig.social.email（已迁移主域），不再硬编码旧 Gmail
+const EMAIL = siteConfig.social?.email || '';
 
 function escapeXml(s: string): string {
   return s

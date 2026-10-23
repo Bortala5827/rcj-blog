@@ -105,7 +105,7 @@ function NoteCard({ note, index, onDelete }: { note: Note; index: number; onDele
           {onDelete && (
             <button
               onClick={() => onDelete(note.id)}
-              title="撤下这张便签"
+              title="Remove this note"
               className="rounded px-1 opacity-0 transition-opacity hover:text-red-500 group-hover:opacity-100"
             >
               ×
@@ -186,23 +186,23 @@ export default function BoardClient() {
       if (r.ok && d?.ok && d.note) {
         setNotes((prev) => [d.note, ...prev]);
         setContent('');
-        showToast('钉上啦，感谢你的足迹 ♡');
+        showToast('Pinned! Thanks for stopping by ♡');
       } else if (d?.error === 'rate_limited') {
-        showToast('发得太快啦，喝口水一分钟后再来');
+        showToast('Too fast — take a sip and come back in a minute');
       } else if (d?.error === 'no_db') {
         // 云端未连接 → 本地模式兜底
-        const localNote: Note = { id: `local-${Date.now()}`, name: payload.name || '匿名', content: payload.content, color: payload.color, ts: Date.now() };
+        const localNote: Note = { id: `local-${Date.now()}`, name: payload.name || 'Anonymous', content: payload.content, color: payload.color, ts: Date.now() };
         const next = [localNote, ...loadLocal()];
         localStorage.setItem(LOCAL_KEY, JSON.stringify(next.slice(0, 200)));
         setNotes(next.slice(0, 200));
         setCloudOk(false);
         setContent('');
-        showToast('云端暂未连接，便签先保存在本机');
+        showToast('Cloud not connected — note saved on this device');
       } else {
-        showToast('没钉上，再试一次？');
+        showToast("Couldn't pin it — try again?");
       }
     } catch {
-      showToast('网络打了个盹，再试一次？');
+      showToast('Network hiccup — try again?');
     } finally {
       setSubmitting(false);
     }
@@ -224,10 +224,10 @@ export default function BoardClient() {
           {/* 标题 */}
           <div className="mb-12 text-center">
             <h1 className="text-3xl font-black tracking-tight md:text-4xl" style={{ color: '#2b241f' }}>
-              留言墙
+              Wall
             </h1>
             <p className="mt-2 text-sm tracking-wide" style={{ color: '#a38a80' }}>
-              留下你的足迹，每一张便签都是一份温暖
+              Leave your trace — every note is a little warmth
             </p>
           </div>
 
@@ -244,7 +244,7 @@ export default function BoardClient() {
             <div className="flex items-center gap-3">
               <input
                 type="text"
-                placeholder="你的名字（可留空）"
+                placeholder="Your name (optional)"
                 maxLength={16}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -256,7 +256,7 @@ export default function BoardClient() {
                   <button
                     key={c}
                     onClick={() => setColor(c)}
-                    aria-label={`选择便签颜色 ${c}`}
+                    aria-label={`Pick color ${c}`}
                     className="h-6 w-6 rounded-full transition-transform hover:scale-110"
                     style={{ background: c, boxShadow: color === c ? '0 0 0 2px #879bdd' : 'inset 0 0 0 1px rgba(0,0,0,0.06)' }}
                   />
@@ -264,7 +264,7 @@ export default function BoardClient() {
               </div>
             </div>
             <textarea
-              placeholder="写下你想说的话…"
+              placeholder="Write something…"
               maxLength={MAX_CONTENT}
               rows={3}
               value={content}
@@ -282,25 +282,25 @@ export default function BoardClient() {
                 className="rounded-xl px-6 py-2.5 text-[15px] font-bold text-white transition-all hover:brightness-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45"
                 style={{ background: '#879bdd', borderRadius: 12 }}
               >
-                {submitting ? '钉上中…' : '钉上便签'}
+                {submitting ? 'Pinning…' : 'Pin a note'}
               </button>
             </div>
           </div>
 
           {cloudOk === false && (
             <p className="mx-auto mb-10 max-w-xl rounded-lg px-4 py-2 text-center text-xs" style={{ color: '#a38a80', background: 'rgba(255,255,255,0.4)' }}>
-              云端暂未连接，新便签会先保存在这台设备上
+              Cloud not connected — new notes are saved on this device first
             </p>
           )}
 
           {/* 便签墙 */}
           {loading ? (
             <div className="py-20 text-center text-sm" style={{ color: '#a38a80' }}>
-              便签墙整理中…
+              Organizing the wall…
             </div>
           ) : notes.length === 0 ? (
             <div className="py-20 text-center text-sm" style={{ color: '#a38a80' }}>
-              还没有便签，钉上第一张吧
+              No notes yet — pin the first one
             </div>
           ) : (
             <div className="flex flex-wrap justify-center gap-x-7 gap-y-12 pb-10 pt-4">

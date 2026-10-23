@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'bad_json' }, { status: 400 })
   }
 
-  const name = String(body?.name ?? '').trim().slice(0, MAX_NAME) || '匿名'
+  const name = String(body?.name ?? '').trim().slice(0, MAX_NAME) || 'Anonymous'
   const content = String(body?.content ?? '').trim()
   const color = NOTE_COLORS.includes(String(body?.color)) ? String(body?.color) : NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)]
 

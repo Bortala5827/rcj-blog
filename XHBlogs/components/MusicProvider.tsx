@@ -76,7 +76,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [lyrics, setLyrics] = useState<{ time: number; text: string }[]>([]);
-  const [currentLyric, setCurrentLyric] = useState("正在连接高可用神经云端...");
+  const [currentLyric, setCurrentLyric] = useState("Connecting to the high-availability neural cloud…");
   const [isLoading, setIsLoading] = useState(true);
 
   // 🌟 2. 新增音量和播放模式状态
@@ -161,7 +161,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
       return {
         id: t.id,
         title: t.title,
-        artist: t.artist || '未知歌手',
+        artist: t.artist || 'Unknown artist',
         cover: t.cover || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
         src: t.src,
         lrcUrl: t.lrcPath || `/api/music/lrc?${qs.toString()}`,
@@ -189,8 +189,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
           .filter((song: any) => song && song.url && !song.error)
           .map((song: any) => ({
             id: song.id || Math.random().toString(),
-            title: song.name || '未知歌曲',
-            artist: song.artist || song.author || '未知歌手',
+            title: song.name || 'Unknown song',
+            artist: song.artist || song.author || 'Unknown artist',
             cover: song.cover || song.pic || 'https://bu.dusays.com/2026/03/24/69c24230a5ff8.jpg',
             src: song.url,
             lrcUrl: null,
@@ -199,13 +199,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         if (!isMounted) return;
         const playlist = [...orderedPlaylist, ...merged];
         if (playlist.length > 0) setPlaylist(playlist);
-        else setCurrentLyric("云端链路受阻");
+        else setCurrentLyric("Cloud link blocked");
         setIsLoading(false);
       } catch (error) {
         if (!isMounted) return;
         const playlist = [...orderedPlaylist];
         if (playlist.length > 0) setPlaylist(playlist);
-        else setCurrentLyric("网络初始化失败");
+        else setCurrentLyric("Network init failed");
         setIsLoading(false);
       }
     };
@@ -225,7 +225,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     let isMounted = true;
     const currentSong = playlist[currentIndex];
     setLyrics([]);
-    setCurrentLyric("♪ 正在缓冲 ♪");
+    setCurrentLyric("♪ Buffering ♪");
     if (currentSong.lyrics && currentSong.lyrics.length > 0) {
       if (isMounted) {
         setLyrics(currentSong.lyrics);
@@ -273,17 +273,17 @@ export function MusicProvider({ children }: { children: ReactNode }) {
           if (parsed.length > 0) {
             lyricsCacheRef.current[currentSong.id] = parsed;
             setLyrics(parsed);
-            setCurrentLyric(parsed[0]?.text || "♪ 纯享音乐 ♪");
+            setCurrentLyric(parsed[0]?.text || "♪ Pure music ♪");
             setPlaylist(prev => {
               const newPlaylist = [...prev];
               if (newPlaylist[currentIndex]) newPlaylist[currentIndex] = { ...newPlaylist[currentIndex], lyrics: parsed };
               return newPlaylist;
             });
           } else {
-            setCurrentLyric("♪ 纯享音乐 ♪");
+            setCurrentLyric("♪ Pure music ♪");
           }
         })
-        .catch(() => { clearTimeout(lrcTimer); if (isMounted) setCurrentLyric("♪ 纯享音乐 ♪"); });
+        .catch(() => { clearTimeout(lrcTimer); if (isMounted) setCurrentLyric("♪ Pure music ♪"); });
     } else {
       // 无 LRC 的自托管曲目（如 R2）：直接提示纯享音乐，避免永远停留在「正在缓冲」
       setCurrentLyric("\u266a \u7eaf\u4eab\u97f3\u4e50 \u266a");
@@ -315,7 +315,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     ms.metadata = new MediaMetadata({
       title: song.title,
       artist: song.artist || '',
-      album: 'Bortala の 宝藏之地',
+      album: 'Bortala · Treasure Land',
       artwork: artworkSrc ? [{ src: artworkSrc, sizes: '512x512' }] : [],
     });
     ms.playbackState = isPlaying ? 'playing' : 'paused';
@@ -399,8 +399,8 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     setIsPlaying(false);
     setCurrentLyric(
       code === 4
-        ? '这首暂时播不了（音源不可用），点下一首试试'
-        : '播放出错，点下一首试试'
+        ? "This track can't play (source unavailable) — try the next one"
+        : 'Playback error — try the next one'
     );
   };
 

@@ -10,7 +10,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 type ActivityRecord = {
   id: string;
-  type: '文章';
+  type: 'Post';
   title: string;
   date: string;
   url: string;
@@ -116,7 +116,7 @@ export default function AboutClient({
 
   const getTypeColor = (type: string) => {
     switch(type) {
-      case '文章': return 'text-indigo-600 dark:text-indigo-400';
+      case 'Post': return 'text-indigo-600 dark:text-indigo-400';
       default: return 'text-slate-500 dark:text-slate-400';
     }
   };
@@ -137,7 +137,7 @@ export default function AboutClient({
         {/* 🌟 核心修复区：手机端排版优雅适配 */}
         <div className="mt-4 md:mt-6 mb-6 md:mb-8 relative flex flex-col md:flex-row md:items-end justify-between gap-5 md:gap-4">
           <div className="text-center md:text-left">
-            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-1 md:mb-3 transition-colors duration-700">关于我</h1>
+            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-1 md:mb-3 transition-colors duration-700">About Me</h1>
             <p className="text-sm md:text-lg text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase transition-colors duration-700">Hello World, I'm {siteConfig.authorName}</p>
           </div>
 
@@ -146,13 +146,13 @@ export default function AboutClient({
               onClick={() => handleTabChange('intro')}
               className={`flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-black transition-all duration-300 ${activeTab === 'intro' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500 hover:text-indigo-500'}`}
             >
-              自我介绍
+              Intro
             </button>
             <button
               onClick={() => handleTabChange('activity')}
               className={`flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-black transition-all duration-300 ${activeTab === 'activity' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500 hover:text-indigo-500'}`}
             >
-              研究动态
+              Research
             </button>
           </div>
         </div>
@@ -268,7 +268,7 @@ export default function AboutClient({
                               return (
                                 <div
                                   key={j}
-                                  title={`${dateKey}: ${count} 次更新`}
+                                  title={`${dateKey}: ${count} updates`}
                                   className={`w-[11px] h-[11px] md:w-[13px] md:h-[13px] rounded-[3px] transition-colors duration-300 hover:ring-2 hover:ring-indigo-500/50 ${getColorClass(count)}`}
                                 ></div>
                               );
@@ -312,7 +312,7 @@ export default function AboutClient({
                             <div className="flex items-center gap-2">
                               <span className="font-black text-slate-800 dark:text-slate-200 text-sm">{siteConfig.authorName}</span>
                               <span className={`text-xs font-bold ${getTypeColor(act.type)}`}>
-                                {`更新了 ${act.type}`}
+                                {`Updated ${act.type}`}
                               </span>
                             </div>
 
@@ -346,7 +346,7 @@ export default function AboutClient({
                 })}
 
                 {activities.length === 0 && (
-                  <div className="text-slate-500 text-sm font-bold">源石数据库中暂无活动记录...</div>
+                  <div className="text-slate-500 text-sm font-bold">No activity in the origin-stone database…</div>
                 )}
               </div>
 

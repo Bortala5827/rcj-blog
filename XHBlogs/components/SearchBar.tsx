@@ -75,7 +75,7 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
         <input
           type="text"
           className="w-full pl-14 pr-6 py-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-800 dark:text-slate-200 transition-all placeholder-slate-500 dark:placeholder-slate-400 font-medium text-lg relative z-0"
-          placeholder="搜寻标题、描述或标签..."
+          placeholder="Search titles, descriptions or tags..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -163,7 +163,7 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
                   </svg>
                 </div>
                 <p className="text-slate-500 dark:text-slate-400 font-medium">
-                  数据海中未发现关于 "<span className="text-indigo-500 font-bold">{searchQuery}</span>" 的踪迹
+                  No trace of "<span className="text-indigo-500 font-bold">{searchQuery}</span>" found in the data sea
                 </p>
               </div>
             )}

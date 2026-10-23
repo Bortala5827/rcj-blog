@@ -21,7 +21,7 @@ export default function SiteDashboard() {
       const diff = now.getTime() - START_DATE;
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      setUptimeStr(`${days}天 ${hours}小时`);
+      setUptimeStr(`${days}d ${hours}h`);
     };
 
     updateTime(); // 初始执行一次
@@ -47,7 +47,7 @@ export default function SiteDashboard() {
         {/* 运行时间 */}
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-          <span>系统已稳定运行：<span className="text-indigo-600 dark:text-indigo-400 font-black">{uptimeStr}</span></span>
+          <span>Uptime: <span className="text-indigo-600 dark:text-indigo-400 font-black">{uptimeStr}</span></span>
         </div>
 
         {/* 技术栈徽章 (🌟 动态映射 siteConfig 里的数组) */}

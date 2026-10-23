@@ -22,7 +22,7 @@ export default function ProfileCard({ postCount, projectCount, photoCount }: { p
   const email = siteConfig.social?.email || '';
   const socials: SocialIcon[] = [
     {
-      name: '飞书',
+      name: 'Feishu',
       href: siteConfig.social?.feishu || '',
       viewBox: '0 0 16 16',
       paths: [
@@ -33,7 +33,7 @@ export default function ProfileCard({ postCount, projectCount, photoCount }: { p
       ],
     },
     {
-      name: '闲鱼',
+      name: 'Xianyu',
       href: siteConfig.social?.xianyu || '',
       viewBox: '0 0 24 24',
       paths: [{
@@ -42,7 +42,7 @@ export default function ProfileCard({ postCount, projectCount, photoCount }: { p
       }],
     },
     {
-      name: 'QQ频道',
+      name: 'QQ Channel',
       href: siteConfig.social?.qqChannel || '',
       viewBox: '0 0 24 24',
       paths: [
@@ -51,7 +51,7 @@ export default function ProfileCard({ postCount, projectCount, photoCount }: { p
       ],
     },
     {
-      name: '邮箱',
+      name: 'Email',
       copy: email,
       viewBox: '0 0 24 24',
       paths: [
@@ -84,11 +84,11 @@ export default function ProfileCard({ postCount, projectCount, photoCount }: { p
 
       <div className="flex flex-col md:flex-row items-center md:items-end justify-between mt-6 md:mt-8 gap-5 md:gap-6 relative z-10">
         <div className="flex gap-2 sm:gap-6 w-full md:w-auto justify-between sm:justify-around md:justify-start px-2 sm:px-0">
-          <StatItem count={postCount} label="文章" color="text-indigo-600 dark:text-indigo-400" />
+          <StatItem count={postCount} label="Posts" color="text-indigo-600 dark:text-indigo-400" />
           <div className="w-px h-8 md:h-10 bg-slate-300/50 dark:bg-slate-700 hidden md:block"></div>
-          <StatItem count={projectCount} label="项目" color="text-purple-600 dark:text-purple-400" />
+          <StatItem count={projectCount} label="Projects" color="text-purple-600 dark:text-purple-400" />
           <div className="w-px h-8 md:h-10 bg-slate-300/50 dark:bg-slate-700 hidden md:block"></div>
-          <StatItem count={photoCount} label="照片" color="text-pink-600 dark:text-pink-400" />
+          <StatItem count={photoCount} label="Photos" color="text-pink-600 dark:text-pink-400" />
         </div>
 
         {/* 社交图标行（参照 aibrium.cn 首页样式：圆角半透明小按钮 + hover 变色） */}
@@ -111,9 +111,9 @@ export default function ProfileCard({ postCount, projectCount, photoCount }: { p
                   key={s.name}
                   type="button"
                   aria-label={s.name}
-                  title={`点击复制${s.name}`}
+                  title={`Click to copy ${s.name}`}
                   onClick={() => {
-                    navigator.clipboard.writeText(s.copy!).then(() => showToast(`${s.name}已复制`));
+                    navigator.clipboard.writeText(s.copy!).then(() => showToast(`${s.name} copied`));
                   }}
                   className={cls}
                 >

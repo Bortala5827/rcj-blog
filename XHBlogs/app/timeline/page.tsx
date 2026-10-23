@@ -9,7 +9,7 @@ import TimelineClient from '../../components/TimelineClient';
 import { ToastProvider } from '../../components/ToastProvider';
 
 export const metadata = {
-  title: "归档与探索 | " + siteConfig.title,
+  title: "Archive | " + siteConfig.title,
 };
 
 export default function Timeline() {
@@ -28,7 +28,7 @@ export default function Timeline() {
         const fileContents = fs.readFileSync(fullPath, 'utf8');
         const { data } = matter(fileContents);
 
-        const postTags = data.tags && Array.isArray(data.tags) ? data.tags : ['未分类'];
+        const postTags = data.tags && Array.isArray(data.tags) ? data.tags : ['Uncategorized'];
 
         postTags.forEach(tag => {
           tagCounts[tag] = (tagCounts[tag] || 0) + 1;
@@ -36,7 +36,7 @@ export default function Timeline() {
 
         posts.push({
           slug,
-          title: data.title || '无标题',
+          title: data.title || 'Untitled',
           date: data.date || '1970-01-01',
           description: data.description || '',
           tags: postTags,
@@ -50,7 +50,7 @@ export default function Timeline() {
       });
     }
   } catch(e) {
-    console.error("读取文章列表失败", e);
+    console.error("Failed to read post list", e);
   }
 
   const tagsArray = Object.keys(tagCounts)

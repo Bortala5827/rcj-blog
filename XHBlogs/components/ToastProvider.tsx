@@ -47,6 +47,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 // 2. 导出魔法钩子，让 ProfileCard 可以调用
 export const useToast = () => {
   const context = useContext(ToastContext);
-  if (!context) throw new Error("useToast 必须在 ToastProvider 内部使用");
+  if (!context) throw new Error("useToast must be used inside a ToastProvider");
   return context;
 };

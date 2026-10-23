@@ -33,7 +33,7 @@ export default function ProjectsBoard() {
             Projects Matrix
           </h1>
           <p className="text-slate-600 dark:text-slate-400 font-serif">
-            开源项目、科研代码与实验室折腾记录。
+            Open-source projects, research code & lab experiments.
           </p>
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function ProjectsBoard() {
         <div className="relative w-full max-w-lg">
           <input
             type="text"
-            placeholder="搜索项目名称、描述或技术栈..."
+            placeholder="Search project name, description or stack…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-full px-6 py-3 pl-12 text-slate-800 dark:text-white shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-slate-500 font-serif"
@@ -77,7 +77,7 @@ export default function ProjectsBoard() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="absolute inset-0 z-10"
-                  aria-label={`访问 ${project.name}`}
+                  aria-label={`Visit ${project.name}`}
                 />
 
                 {/* 内容（位于拉伸链接之下，链接透明故可见；group-hover 仍生效） */}
@@ -109,7 +109,7 @@ export default function ProjectsBoard() {
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${project.name} 的 GitHub 仓库`}
+                  aria-label={`${project.name} GitHub repo`}
                   className="absolute top-6 right-6 md:top-8 md:right-8 z-20 w-8 h-8 flex items-center justify-center text-slate-400 group-hover:text-slate-800 dark:group-hover:text-white transition-colors"
                 >
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
@@ -127,7 +127,7 @@ export default function ProjectsBoard() {
             animate={{ opacity: 1 }}
             className="col-span-full text-center py-20 text-slate-500 font-serif w-full"
           >
-            云端尚未建立代号为 [{searchQuery}] 的档案...
+            No archive codenamed [{searchQuery}] found in the cloud…
           </motion.div>
         )}
       </motion.div>

@@ -1,4 +1,4 @@
 export const runtime = 'edge';
 export async function GET() {
-  return new Response("汪！我能通！", { status: 200 });
+  return new Response("Woof! I can reach you!", { status: 200 });
 }

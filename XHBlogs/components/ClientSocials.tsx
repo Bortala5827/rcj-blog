@@ -9,7 +9,7 @@ export default function ClientSocials() {
 
   const copyEmail = () => {
     const email = siteConfig.social?.email || '';
-    navigator.clipboard.writeText(email).then(() => showToast('邮箱已复制'));
+    navigator.clipboard.writeText(email).then(() => showToast('Email copied'));
   };
 
   return (
@@ -17,7 +17,7 @@ export default function ClientSocials() {
       <button
         type="button"
         onClick={copyEmail}
-        title="点击复制邮箱"
+        title="Click to copy email"
         className="text-xs md:text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 px-3 py-2 rounded-xl bg-white/50 dark:bg-slate-700/50 border border-white/40 dark:border-white/10 shadow-sm"
       >
         {siteConfig.social?.email}

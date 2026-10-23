@@ -2,8 +2,8 @@ import { siteConfig } from "../../siteConfig";
 import BoardClient from "./BoardClient";
 
 export const metadata = {
-  title: "留言墙 | " + siteConfig.title,
-  description: "留下你的足迹，每一张便签都是一份温暖",
+  title: "Wall | " + siteConfig.title,
+  description: "Leave your trace — every note is a little warmth",
 };
 
 export default function BoardPage() {

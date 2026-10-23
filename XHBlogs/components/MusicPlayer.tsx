@@ -41,7 +41,7 @@ export default function CloudPlayer({ songIds }: { songIds: string[] }) {
   const [duration, setDuration] = useState(0);
   const [lyrics, setLyrics] = useState<{ time: number; text: string }[]>([]);
 
-  const [currentLyric, setCurrentLyric] = useState("正在连接高可用神经云端...");
+  const [currentLyric, setCurrentLyric] = useState("Connecting to the high-availability neural cloud…");
   const [displayedLyric, setDisplayedLyric] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -53,7 +53,7 @@ export default function CloudPlayer({ songIds }: { songIds: string[] }) {
       try {
         const fetchPromises = songIds.map(id =>
           fetch(`https://api.injahow.cn/meting/?server=netease&type=song&id=${id}`)
-            .then(res => { if (!res.ok) throw new Error("API 异常"); return res.json(); })
+            .then(res => { if (!res.ok) throw new Error("API error"); return res.json(); })
             .catch(err => null)
         );
         const results = await Promise.all(fetchPromises);
@@ -63,8 +63,8 @@ export default function CloudPlayer({ songIds }: { songIds: string[] }) {
             const song = res[0];
             return {
               id: song.id,
-              title: song.name || '未知歌曲',
-              artist: song.artist || '未知歌手',
+              title: song.name || 'Unknown song',
+              artist: song.artist || 'Unknown artist',
               cover: song.cover || 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=300',
               src: song.url,
               lrcUrl: song.lrc
@@ -76,20 +76,20 @@ export default function CloudPlayer({ songIds }: { songIds: string[] }) {
           if (mergedPlaylist.length > 0) {
             setPlaylist(mergedPlaylist);
           } else {
-            setCurrentLyric("音乐流被拦截，可能是版权限制");
+            setCurrentLyric("Music stream blocked — likely copyright");
           }
           setIsLoading(false);
         }
       } catch (error) {
         if (isMounted) {
-          setCurrentLyric("云端连接失败，请检查网络");
+          setCurrentLyric("Cloud connection failed — check your network");
           setIsLoading(false);
         }
       }
     };
 
     if (songIds && songIds.length > 0) fetchMusicData();
-    else { setIsLoading(false); setCurrentLyric("请配置 cloudMusicIds"); }
+    else { setIsLoading(false); setCurrentLyric("Please configure cloudMusicIds"); }
     return () => { isMounted = false; };
   }, [songIds]);
 
@@ -97,21 +97,21 @@ export default function CloudPlayer({ songIds }: { songIds: string[] }) {
     if (playlist.length === 0) return;
     let isMounted = true;
     const currentSong = playlist[currentIndex];
-    setCurrentLyric("正在解析歌词...");
+    setCurrentLyric("Parsing lyrics…");
     setLyrics([]);
 
     if (currentSong.lrcUrl) {
       fetch(currentSong.lrcUrl)
-        .then(res => { if (!res.ok) throw new Error("失败"); return res.text(); })
+        .then(res => { if (!res.ok) throw new Error("Failed"); return res.text(); })
         .then(text => {
           if (isMounted) {
             setLyrics(parseLrc(text));
-            setCurrentLyric("♪ 歌词加载完毕 ♪");
+            setCurrentLyric("♪ Lyrics loaded ♪");
           }
         })
-        .catch(() => { if (isMounted) setCurrentLyric("♪ 纯享音乐 ♪"); });
+        .catch(() => { if (isMounted) setCurrentLyric("♪ Pure music ♪"); });
     } else {
-      setCurrentLyric("♪ 纯音乐，请欣赏 ♪");
+      setCurrentLyric("♪ Instrumental — enjoy ♪");
     }
 
     if (isPlaying && audioRef.current) {
@@ -183,7 +183,7 @@ export default function CloudPlayer({ songIds }: { songIds: string[] }) {
   if (playlist.length === 0) {
     return (
       <div className="md:col-span-5 rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl p-6 flex flex-col items-center justify-center h-[220px] transition-colors duration-700">
-        <span className="text-slate-600 dark:text-slate-300 font-bold mb-2">云端音乐加载失败</span>
+        <span className="text-slate-600 dark:text-slate-300 font-bold mb-2">Cloud music failed to load</span>
       </div>
     );
   }

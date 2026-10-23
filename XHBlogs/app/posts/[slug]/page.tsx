@@ -51,7 +51,7 @@ function getPostMeta(slug: string) {
       : `${SITE_URL}${data.cover}`
     : `${SITE_URL}/cover-default.svg`;
   return {
-    title: data.title || '文章',
+    title: data.title || 'Post',
     description: (data.description || data.excerpt || data.title || '').toString(),
     date: data.date,
     tags: Array.isArray(data.tags) ? data.tags : [],
@@ -79,7 +79,7 @@ export async function generateMetadata({
       type: 'article',
       locale: 'zh_CN',
       url,
-      siteName: 'Bortala の 宝藏之地',
+      siteName: 'Bortala · Treasure Land',
       title: meta.title,
       description: meta.description,
       publishedTime: meta.date,
@@ -179,7 +179,7 @@ function getRecentPosts(currentSlug: string) {
     const s = f.replace(/\.md$/, '');
     const c = fs.readFileSync(path.join(postsDirectory, f), 'utf8');
     const { data } = matter(c);
-    return { slug: s, title: data.title || '无标题', date: data.date };
+    return { slug: s, title: data.title || 'Untitled', date: data.date };
   }).filter(p => p.slug !== currentSlug).slice(0, 3);
 }
 
@@ -216,7 +216,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
 
           <article className="flex-1 bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 dark:border-white/10 overflow-hidden transition-colors duration-700">
             <div className="w-full aspect-video bg-slate-200 dark:bg-slate-700 relative group">
-              <img src={postData.cover} alt="封面" className="w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105" />
+              <img src={postData.cover} alt="Cover" className="w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105" />
             </div>
 
             <div className="p-5 md:p-12 relative">
@@ -232,7 +232,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
                 <div className="flex flex-wrap items-center gap-2 md:gap-3">
                   <div className="flex items-center gap-1.5 md:gap-2 text-indigo-700 dark:text-indigo-400 font-bold bg-white/30 dark:bg-slate-900/50 px-3 md:px-4 py-1.5 md:py-2 rounded-full w-max text-xs md:text-sm transition-colors duration-700 shadow-sm border border-white/20 dark:border-white/5">
                     <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    写作时间：{postData.date}
+                    Written: {postData.date}
                   </div>
 
                   {postData.tags.map((tag: string) => (

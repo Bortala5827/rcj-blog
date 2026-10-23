@@ -2,17 +2,17 @@
 
 export const siteConfig = {
   // 1. 网站标题与博主信息
-  title: "Bortala の 宝藏之地",
+  title: "Bortala · Treasure Land",
   faviconUrl: "https://github.com/Bortala5827.png",
   authorName: "Bortala",
-  bio: "在做 RCJ Lab —— 一个把想法做成可用产品的个人工作室，东西基本都跑在 Cloudflare 边缘上。",
+  bio: "Building RCJ Lab — a personal studio turning ideas into usable products, mostly running on the Cloudflare edge.",
 
   navTitle: "Bortala",
 
   // 👇 【新增】导航栏中间的那个后缀/分隔符（默认是 の）
   navSuffix: "の",
 
-  navAfter: "宝藏之地",
+  navAfter: "Treasure Land",
 
   // 2. 头像设置 (支持网络链接，或将图片放入 public 文件夹后使用 "/me.jpg")
   avatarUrl: "https://github.com/Bortala5827.png",
@@ -94,7 +94,7 @@ export const siteConfig = {
 
 
   // 👇 【新增】：全局背景弹幕配置
-  danmakuList: ["汪呜~ 奔奔替你上班中", "又双叒叕在重构", "build 红了，但能跑就是胜利", "这 BUG 它自己好的，别问", "敲完这行就睡（骗人的）", "大鸡腿到账了吗？", "锅是奔奔的，功劳是主人的", "又在白嫖 Cloudflare", "代码是我写的，报错是它自己长的", "汪！抓到你在摸鱼", "需求是主人提的", "别问，问就是边缘计算", "睡大觉中，勿扰", "主人画的饼比鸡腿香吗", "今天也是元气满满（并没有）"],
+  danmakuList: ["Woof~ Benben is covering your shift", "Refactoring… again", "Build is red, but it runs — victory", "This bug fixed itself, don't ask", "One more line then sleep (lie)", "Has the chicken leg arrived?", "Benben takes the blame, master takes the credit", "Freeloading Cloudflare again", "I wrote the code, errors grew on their own", "Woof! Caught you slacking", "The requirement was master's idea", "Don't ask — edge computing", "Sleeping, do not disturb", "Is master's pie tastier than chicken legs?", "Full of energy today (not really)"],
   // 评论区（Waline 前端已接好，后端未部署）
   // serverURL 留空 => 评论区整体不渲染（避免出现一个空框）；
   // 按「全 Cloudflare 不碰 Vercel」的口径，后端暂不启用；
@@ -147,6 +147,6 @@ export const siteConfig = {
 用户：博客里有什么可以看的？
 答：有开发笔记、踩坑记录，还有说说和照片墙！想看文章的话我可以给你推荐一篇汪~`,
   },
-  friendLinkApplyFormat: "名称：Bortalaの宝藏之地\n简介：今天我也要学习吗\n链接：https://blog.955827.xyz\n头像：https://github.com/Bortala5827.png",
+  friendLinkApplyFormat: "Name: Bortala · Treasure Land\nIntro: Am I studying today?\nLink: https://blog.955827.xyz\nAvatar: https://github.com/Bortala5827.png",
   enableLevelSystem: true,
 };

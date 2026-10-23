@@ -20,7 +20,7 @@ import PageTransition from '../../components/PageTransition';
 import AboutClient from '../../components/AboutClient';
 import { Suspense } from 'react';
 
-function getDirActivities(dirName: string, typeLabel: '文章', linkPrefix: string) {
+function getDirActivities(dirName: string, typeLabel: 'Post', linkPrefix: string) {
   const dirPath = path.join(process.cwd(), dirName);
   if (!fs.existsSync(dirPath)) return [];
 
@@ -41,7 +41,7 @@ function getDirActivities(dirName: string, typeLabel: '文章', linkPrefix: stri
 
 export default async function AboutPage() {
   const fullPath = path.join(process.cwd(), 'app', 'about', 'about.md');
-  let contentHtml = "博主很懒，还没有写自我介绍哦...";
+  let contentHtml = "The author is too lazy to write an intro yet...";
   let coverImage = "https://bu.dusays.com/2026/03/24/69c23dc278c78.jpg";
 
   try {
@@ -88,10 +88,10 @@ export default async function AboutPage() {
 
     contentHtml = processedContent.toString();
   } catch (e) {
-    console.error("读取 about.md 失败", e);
+    console.error("Failed to read about.md", e);
   }
 
-  const posts = getDirActivities('posts', '文章', 'posts');
+  const posts = getDirActivities('posts', 'Post', 'posts');
 
   const allActivities = [...posts].sort((a, b) => {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -214,7 +214,7 @@ export default async function AboutPage() {
             }
           `}} />
 
-          <Suspense fallback={<div className="h-96 flex items-center justify-center text-slate-500 font-bold animate-pulse">正在载入档案...</div>}>
+          <Suspense fallback={<div className="h-96 flex items-center justify-center text-slate-500 font-bold animate-pulse">Loading archive...</div>}>
             {/* 🌟 组件原封不动，安全可靠 */}
             <AboutClient
               contentHtml={contentHtml}

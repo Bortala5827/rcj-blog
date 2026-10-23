@@ -151,7 +151,7 @@ export default function MusicClient() {
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center animate-pulse gap-4">
           <Disc3 size={48} className="text-indigo-500 animate-spin" />
-          <span className="font-black text-slate-500 tracking-widest text-sm">唤醒音频引擎中...</span>
+          <span className="font-black text-slate-500 tracking-widest text-sm">Waking the audio engine…</span>
         </div>
       </div>
     );
@@ -171,8 +171,8 @@ export default function MusicClient() {
       <PageTransition>
         <div className="w-full max-w-7xl mx-auto mt-24 md:mt-28 px-4 sm:px-6 md:px-10 relative z-10">
           <div className="animate-fade-in-up mb-6 md:mb-10 text-center md:text-left">
-            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest mb-1 md:mb-2 transition-colors duration-700">云端乐律</h1>
-            <p className="text-xs md:text-base text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">在代码的缝隙中寻找灵魂的共鸣</p>
+            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest mb-1 md:mb-2 transition-colors duration-700">Cloud Melody</h1>
+            <p className="text-xs md:text-base text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">Finding the resonance of souls in the cracks of code</p>
           </div>
 
           <div className="flex flex-col md:grid md:grid-cols-12 gap-6 md:gap-8 w-full md:items-stretch md:h-[calc(100vh-320px)] md:min-h-[600px] md:max-h-[720px]">
@@ -261,7 +261,7 @@ export default function MusicClient() {
                               <div className="h-full flex items-center justify-center">
                                  <div className="flex flex-col items-center gap-3 md:gap-4">
                                     <Disc3 className="animate-spin text-indigo-500/40" size={32} />
-                                    <p className="text-base md:text-xl font-black text-indigo-500 animate-pulse">{currentLyric || "正在捕获灵魂旋律..."}</p>
+                                    <p className="text-base md:text-xl font-black text-indigo-500 animate-pulse">{currentLyric || "Capturing the melody of souls…"}</p>
                                  </div>
                               </div>
                             )}
@@ -274,17 +274,17 @@ export default function MusicClient() {
                     {/* 歌单来源：仅 /admin 后台可写（口令 + 服务端校验），前台只读展示，防止被滥用 */}
                     <div className="mb-3 shrink-0 flex items-center gap-2">
                       <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                        <Disc3 size={14} /> 云端歌单
+                        <Disc3 size={14} /> Cloud playlist
                         {playlistTotal > 0 && <span className="bg-indigo-500 text-white rounded-full px-1.5 text-[10px]">{playlistTotal}</span>}
                       </span>
                       <span className="text-[10px] text-slate-400 font-medium">
-                        {playlistTotal > 0 ? <>已同步 {playlistTotal} 首 · <a href="/admin" className="hover:text-indigo-500 transition-colors">后台管理</a></> : <>歌单由<a href="/admin" className="hover:text-indigo-500 transition-colors">后台</a>维护</>}
+                        {playlistTotal > 0 ? <>Synced {playlistTotal} tracks · <a href="/admin" className="hover:text-indigo-500 transition-colors">Admin</a></> : <>Playlist is maintained in the <a href="/admin" className="hover:text-indigo-500 transition-colors">admin</a></>}
                       </span>
                     </div>
                     <div className="relative w-full max-w-md mx-auto group mb-4 md:mb-8 shrink-0">
                       <div className="absolute inset-0 bg-indigo-500/5 blur-xl group-focus-within:bg-indigo-500/10 transition-all rounded-full" />
                       <Search className="w-4 h-4 md:w-5 md:h-5 absolute left-4 top-1/2 -translate-y-1/2 z-10 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-                      <input type="text" placeholder="搜索音轨..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-10 md:pr-12 bg-white/30 dark:bg-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-full text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/40 shadow-inner transition-all" />
+                      <input type="text" placeholder="Search tracks…" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full h-10 md:h-12 pl-10 md:pl-12 pr-10 md:pr-12 bg-white/30 dark:bg-slate-900/60 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-full text-xs md:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/40 shadow-inner transition-all" />
                       {searchQuery && (<button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-black/10 rounded-full transition-colors"><X size={14} className="text-slate-500" /></button>)}
                     </div>
                     <div ref={playlistListRef} className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-14 md:pb-16 flex flex-col gap-2 md:gap-2.5">

@@ -70,14 +70,14 @@ export default function Navbar() {
   }, [lastScrollY]);
 
   const navLinks: { name: string; href: string; external?: boolean }[] = [
-    { name: '首页', href: '/' },
-    { name: '项目', href: '/projects' },
-    { name: '归档', href: '/timeline' },
-    { name: '光影画廊', href: '/photowall' },
-    { name: '留言墙', href: '/board' },
-    { name: '音乐', href: '/music' },
-    { name: '友链', href: '/friends' },
-    { name: '关于', href: '/about' },
+    { name: 'Home', href: '/' },
+    { name: 'Projects', href: '/projects' },
+    { name: 'Archive', href: '/timeline' },
+    { name: 'Gallery', href: '/photowall' },
+    { name: 'Wall', href: '/board' },
+    { name: 'Music', href: '/music' },
+    { name: 'Friends', href: '/friends' },
+    { name: 'About', href: '/about' },
     // 精简说明（2026-09-28）：
     // - 「后台」：管理员入口走直链 /admin + 密码门，不暴露在公共导航
     // - 「加入频道」：挪到首页 ProfileCard 社交图标行（siteConfig.social.qqChannel）
@@ -95,7 +95,7 @@ export default function Navbar() {
           <Link href="/" className="text-xl font-black text-slate-800 dark:text-white tracking-tighter hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300">
             {siteConfig.navTitle || siteConfig.authorName}
             <span className="text-indigo-500 mx-1">{siteConfig.navSuffix || 'の'}</span>
-            {siteConfig.navAfter || '宝藏之地'}
+            {siteConfig.navAfter || 'Treasure Land'}
           </Link>
           <nav className="flex gap-8 text-sm font-bold">
             {/* PC端依然使用全量的 navLinks */}

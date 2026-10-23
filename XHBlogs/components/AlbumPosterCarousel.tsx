@@ -17,7 +17,7 @@ export default function AlbumPosterCarousel({ albums }: { albums: Album[] }) {
   // 相册为空时兜底用封面
   const photos: PhotoRef[] = allPhotos.length > 0
     ? allPhotos
-    : [{ url: '/blog-photo-1.png', albumTitle: '光影画廊', albumDesc: '查看全部作品' }];
+    : [{ url: '/blog-photo-1.png', albumTitle: 'Gallery', albumDesc: 'View all works' }];
 
   const [idx, setIdx] = useState(0);
 

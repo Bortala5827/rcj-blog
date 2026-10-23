@@ -79,9 +79,9 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
     <div className="w-full max-w-5xl mx-auto mt-28 px-4 sm:px-10 relative z-10">
 
       <div className="text-center mb-12 relative z-20">
-        <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">归档与探索</h1>
+        <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">Archive & Explore</h1>
         <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-2 italic">
-          <Sparkles size={16} className="text-indigo-500" /> 总计 {posts.length} 篇研究记录
+          <Sparkles size={16} className="text-indigo-500" /> Total {posts.length} research entries
         </p>
       </div>
 
@@ -90,7 +90,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
         <div className="relative w-full max-w-lg group" ref={searchContainerRef}>
           <input
             type="text"
-            placeholder="搜寻被封存的知识..."
+            placeholder="Search archived knowledge…"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -135,7 +135,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                   </div>
                 ) : (
                   <div className="px-6 py-8 text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
-                    赛博空间里找不到这个印记 🌌
+                    No such mark found in cyberspace 🌌
                   </div>
                 )}
               </motion.div>
@@ -146,7 +146,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
         <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md p-4 rounded-3xl border border-white/20 dark:border-white/5">
           <div className="flex flex-wrap justify-center md:justify-start gap-2 flex-1">
             <button onClick={() => setSelectedTag('All')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${selectedTag === 'All' ? 'bg-indigo-500 text-white shadow-md' : 'bg-white/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 hover:bg-white'}`}>
-              全部档案
+              All entries
             </button>
             {tags.map(tag => (
               <button key={tag.name} onClick={() => setSelectedTag(tag.name)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${selectedTag === tag.name ? 'bg-indigo-500 text-white shadow-md' : 'bg-white/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 hover:bg-white'}`}>
@@ -159,11 +159,11 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
           <div className="hidden md:flex bg-white/50 dark:bg-slate-900/50 p-1 rounded-2xl shadow-inner shrink-0">
             <button onClick={() => setViewMode('timeline')} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 ${viewMode === 'timeline' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
               <ListTree size={16} />
-              <span>中枢链路</span>
+              <span>Timeline</span>
             </button>
             <button onClick={() => setViewMode('card')} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 ${viewMode === 'card' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
               <LayoutGrid size={16} />
-              <span>矩阵网格</span>
+              <span>Grid</span>
             </button>
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                         {/* 🌟 文本边距和字号全方位缩放 */}
                         <div className="p-3 md:p-5 flex-1 flex flex-col">
                           <h3 className="text-xs sm:text-sm md:text-lg font-bold text-slate-800 dark:text-slate-100 mb-1 md:mb-2 line-clamp-2 transition-colors group-hover:text-indigo-500">{post.title}</h3>
-                          <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-2 md:mb-4 line-clamp-2 flex-1 leading-snug">{post.description || "暂时没有描述喵..."}</p>
+                          <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-2 md:mb-4 line-clamp-2 flex-1 leading-snug">{post.description || "No description yet…"}</p>
                           <div className="flex flex-wrap gap-1 sm:gap-2 mt-auto">
                             {post.tags.map((tag: string) => (
                               <span key={tag} className="text-[8px] md:text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 md:px-2 md:py-1 rounded">#{tag}</span>
@@ -238,7 +238,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                   exit={{ opacity: 0, scale: 0.5, y: 10 }}
                   onClick={scrollToTop}
                   className="absolute bottom-4 -right-3 w-9 h-9 flex items-center justify-center bg-gradient-to-t from-purple-500 to-indigo-500 text-white rounded-full shadow-lg shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1 transition-all z-50 group pointer-events-auto"
-                  title="回到顶部"
+                  title="Back to top"
                 >
                   <ArrowUp size={18} className="group-hover:-translate-y-1 transition-transform" />
                 </motion.button>
@@ -273,7 +273,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
 
               {timelinePosts.length === 0 && (
                  <div className="text-center py-20 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-sm">
-                    这个频段没有接收到任何信号 📡
+                    No signal received on this frequency 📡
                  </div>
               )}
             </div>

@@ -31,7 +31,7 @@ export default function CyberCat() {
   const handlePetCat = () => {
     if (isPetted) return;
     setIsPetted(true);
-    speak("呼噜噜... 摸得奔奔很舒服汪~", 2000);
+    speak("Purrr… patting Benben feels great woof~", 2000);
     setTimeout(() => {
       setIsPetted(false);
     }, 2000);
@@ -44,9 +44,9 @@ export default function CyberCat() {
 
     setShowInput(false); // 喂食时关掉输入框
     setIsThinking(true);
-    speak("嗷呜！真好吃汪！奔奔吃饱了要说两句...", 6000);
+    speak("Awoo! So tasty woof! Benben is full and wants to say a few words…", 6000);
 
-    const userMessage = "我刚刚喂了你一根美味的大鸡腿！你有什么表示？";
+    const userMessage = "I just fed you a delicious big chicken leg! Any response?";
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
@@ -64,7 +64,7 @@ export default function CyberCat() {
       ].slice(-12);
       speak(data.reply, 8000);
     } catch (error) {
-      speak("吧唧吧唧... 鸡腿好吃，但奔奔卡壳了汪...", 4000);
+      speak("Munch munch… tasty, but Benben is stuck woof…", 4000);
     } finally {
       setIsThinking(false);
     }
@@ -79,7 +79,7 @@ export default function CyberCat() {
     setInputValue('');
     setShowInput(false);
     setIsThinking(true);
-    speak("让奔奔想想汪...", 10000);
+    speak("Let Benben think woof…", 10000);
 
     try {
       const res = await fetch('/api/chat', {
@@ -98,7 +98,7 @@ export default function CyberCat() {
       ].slice(-12);
       speak(data.reply, 8000);
     } catch (error) {
-      speak("铲屎的网线被老鼠咬断了吧？汪！", 4000);
+      speak("The poop-scooper's network cable got chewed by a mouse? Woof!", 4000);
     } finally {
       setIsThinking(false);
     }
@@ -107,11 +107,11 @@ export default function CyberCat() {
   // --- ⏳ 随机挂机语录 ---
   useEffect(() => {
     const randomBarks = [
-      "汪呜~ 今天天气真不错汪~",
-      "好困哦，想睡觉汪...",
-      "铲屎的，快去敲代码！",
-      "我的大鸡腿藏哪里去了？",
-      "怎么没人理奔奔...",
+      "Woof~ Nice weather today woof~",
+      "So sleepy, wanna nap woof…",
+      "Poop-scooper, go write some code!",
+      "Where did I hide my chicken leg?",
+      "Why is nobody paying attention to Benben…",
     ];
     const randomTalkInterval = setInterval(() => {
       if (!speech && !showInput && !isThinking && Math.random() > 0.8) {
@@ -166,7 +166,7 @@ export default function CyberCat() {
               }}
               // 稍微加了一点半透明背景，让常驻按钮在深色背景下也好看
               className="bg-white/90 dark:bg-slate-700/90 p-2.5 rounded-full shadow-md hover:scale-110 active:scale-95 transition-transform border border-gray-100 dark:border-slate-600 text-blue-500 hover:text-blue-600 flex items-center justify-center backdrop-blur-sm"
-              title="聊天"
+              title="Chat"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                 <path fillRule="evenodd" d="M4.804 21.644A6.707 6.707 0 006 21.75a6.721 6.721 0 003.583-1.029c.774.182 1.584.279 2.417.279 5.322 0 9.75-3.97 9.75-9 0-5.03-4.428-9-9.75-9s-9.75 3.97-9.75 9c0 2.409 1.025 4.587 2.674 6.192.232.226.277.428.254.543a3.73 3.73 0 01-.814 1.686.75.75 0 00.44 1.223zM8.25 10.875a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zM10.875 12a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" clipRule="evenodd" />
@@ -178,7 +178,7 @@ export default function CyberCat() {
               onClick={handleFeed}
               disabled={isThinking}
               className={`bg-white/90 dark:bg-slate-700/90 p-2.5 rounded-full shadow-md hover:scale-110 active:scale-95 transition-transform border border-gray-100 dark:border-slate-600 flex items-center justify-center backdrop-blur-sm ${isThinking ? 'opacity-50 cursor-not-allowed' : ''}`}
-              title="喂大鸡腿"
+              title="Feed chicken leg"
             >
               <span className="text-xl leading-none">🍗</span>
             </button>
@@ -205,7 +205,7 @@ export default function CyberCat() {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="跟奔奔说点啥汪..."
+              placeholder="Say something to Benben woof…"
               className="bg-transparent border-none outline-none text-sm px-3 py-1 w-full dark:text-white placeholder-gray-400"
               disabled={isThinking}
               autoFocus

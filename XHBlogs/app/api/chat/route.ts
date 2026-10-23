@@ -79,7 +79,7 @@ export async function POST(req: Request) {
     };
 
     if (!message || typeof message !== 'string') {
-      return new Response(JSON.stringify({ error: '消息不能为空' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Message cannot be empty' }), { status: 400 });
     }
 
     // 你的 AI 网关（functions/api/ai-chat.js，部署在 955827.xyz）
@@ -109,20 +109,20 @@ export async function POST(req: Request) {
     if (!response.ok) {
       return new Response(
         JSON.stringify({
-          error: `网关拒绝访问: ${response.status}`,
-          details: data?.error || '未知错误',
+          error: `Gateway denied access: ${response.status}`,
+          details: data?.error || 'Unknown error',
         }),
         { status: response.status }
       );
     }
 
-    const reply = data?.reply || '奔奔现在不想理你汪...';
+    const reply = data?.reply || "Benben doesn't want to talk right now woof…";
     return new Response(JSON.stringify({ reply }), {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch {
     // 不把内部异常细节（上游主机/网络错误）回显给调用方
-    return new Response(JSON.stringify({ error: '服务暂时不可用，请稍后再试' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Service temporarily unavailable, please try again later' }), { status: 500 });
   }
 }
 

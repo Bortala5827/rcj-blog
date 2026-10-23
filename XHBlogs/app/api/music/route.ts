@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        const artistName = song.artists?.[0]?.name || '未知歌手'
+        const artistName = song.artists?.[0]?.name || 'Unknown artist'
         const cover = song.album?.picUrl || ''
 
         return {

@@ -31,7 +31,7 @@ function pickCover(slug: string, frontmatterCover?: string) {
 }
 
 function formatUpdateTime(dateString: string) {
-  if (!dateString || dateString === '1970-01-01') return '刚刚更新';
+  if (!dateString || dateString === '1970-01-01') return 'Just updated';
   try {
     const d = new Date(dateString);
     if (isNaN(d.getTime())) return dateString;
@@ -73,7 +73,7 @@ export default function Home() {
       });
     }
   } catch (e) {}
-  const top5Posts = allPosts.length > 0 ? allPosts.slice(0, 5) : [{ slug: 'none', title: '暂无文章', description: '快去写第一篇吧！', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
+  const top5Posts = allPosts.length > 0 ? allPosts.slice(0, 5) : [{ slug: 'none', title: 'No posts yet', description: 'Write your first post!', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
 
   const realPhotoCount = albums.reduce((total, album) => total + album.photos.length, 0);
 
@@ -121,12 +121,12 @@ export default function Home() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full flex-1">
                     <Link href="/projects" className="sm:col-span-2 flex flex-col min-h-[200px] rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl p-5 justify-between transition-all duration-700 hover:scale-[1.02] group">
                       <div>
-                        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-1">项目</h3>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2">RCJ 生态与开源作品</p>
+                        <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mb-1">Projects</h3>
+                        <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2">RCJ ecosystem & open-source work</p>
                       </div>
                       <div className="flex items-end justify-between mt-4">
                         <span className="text-4xl font-black text-indigo-600 dark:text-indigo-400">{projects.length}</span>
-                        <span className="text-sm font-bold text-indigo-500 group-hover:translate-x-1 transition-transform">查看全部 →</span>
+                        <span className="text-sm font-bold text-indigo-500 group-hover:translate-x-1 transition-transform">View all →</span>
                       </div>
                     </Link>
                     <div className="sm:col-span-1 flex flex-col min-h-[120px]">

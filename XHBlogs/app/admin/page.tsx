@@ -42,9 +42,9 @@ export default function AdminDashboard() {
         setUnlocked(true);
         return;
       }
-      setPwdError(d?.error === 'server_not_configured' ? '服务端未配置 ADMIN_PASS，请先在 Cloudflare 配置' : '口令错误，请重试');
+      setPwdError(d?.error === 'server_not_configured' ? 'ADMIN_PASS is not configured on the server — set it in Cloudflare first' : 'Wrong passphrase, try again');
     } catch {
-      setPwdError('校验失败，请检查网络');
+      setPwdError('Verification failed — check your network');
     }
   };
 
@@ -75,10 +75,10 @@ export default function AdminDashboard() {
       if (d?.ok && Array.isArray(d.notes)) {
         setBoardNotes(d.notes);
       } else {
-        setBoardMsg(d?.error === 'no_db' ? '云端未连接（本地无 D1 绑定）' : '读取失败，请检查网络');
+        setBoardMsg(d?.error === 'no_db' ? 'Cloud not connected (no D1 binding)' : 'Load failed — check your network');
       }
     } catch {
-      setBoardMsg('读取失败，请检查网络');
+      setBoardMsg('Load failed — check your network');
     } finally {
       setBoardLoading(false);
     }
@@ -91,12 +91,12 @@ export default function AdminDashboard() {
       if (r.ok && d?.ok) {
         setBoardNotes((prev) => prev.filter((n) => n.id !== id));
       } else if (d?.error === 'unauthorized') {
-        setBoardMsg('口令校验未通过，请重新解锁后台');
+        setBoardMsg('Passphrase check failed — unlock the admin again');
       } else {
-        setBoardMsg('删除失败，请重试');
+        setBoardMsg('Delete failed, try again');
       }
     } catch {
-      setBoardMsg('删除失败，请检查网络');
+      setBoardMsg('Delete failed — check your network');
     }
   }, []);
 
@@ -203,7 +203,7 @@ export default function AdminDashboard() {
     const matched = newId.trim().match(/\d{4,}/);
     const id = matched ? matched[0] : newId.trim();
     if (!/^\d+$/.test(id)) {
-      setQueryError('请输入网易云歌曲 ID 或分享链接');
+      setQueryError('Enter a NetEase song ID or share link');
       setQueryResult(null);
       return;
     }
@@ -213,10 +213,10 @@ export default function AdminDashboard() {
       const data = await res.json();
       const song = Array.isArray(data) ? data[0] : data;
       if (song && song.url && !song.error) setQueryResult(song);
-      else if (song?.error) setQueryError('该歌曲已下架或暂不可用');
-      else setQueryError('未找到该歌曲，或外链暂不可用');
+      else if (song?.error) setQueryError('This song is removed or unavailable');
+      else setQueryError('Song not found, or external link unavailable');
     } catch {
-      setQueryError('查询失败，请检查网络');
+      setQueryError('Query failed — check your network');
     } finally {
       setQueryLoading(false);
     }
@@ -245,11 +245,11 @@ export default function AdminDashboard() {
   };
 
   const menuItems = [
-    { id: 'dashboard', name: '全息仪表盘', icon: '🌌' },
-    { id: 'music', name: '歌单管理', icon: '🎵' },
-    { id: 'board', name: '便签管理', icon: '🗒️' },
-    { id: 'gallery', name: '光影画廊', icon: '🖼️' },
-    { id: 'settings', name: '系统核心配置', icon: '⚙️' },
+    { id: 'dashboard', name: 'Dashboard', icon: '🌌' },
+    { id: 'music', name: 'Playlist', icon: '🎵' },
+    { id: 'board', name: 'Notes', icon: '🗒️' },
+    { id: 'gallery', name: 'Gallery', icon: '🖼️' },
+    { id: 'settings', name: 'Settings', icon: '⚙️' },
   ];
 
   // ============ 锁屏 ============
@@ -264,8 +264,8 @@ export default function AdminDashboard() {
         >
           <div className="flex flex-col items-center mb-6">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-3xl shadow-lg shadow-indigo-500/30 mb-3">🔐</div>
-            <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-wider">管理面板已加锁</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">请输入访问口令</p>
+            <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-wider">Admin panel locked</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Enter the access passphrase</p>
           </div>
           <input
             type="password"
@@ -280,7 +280,7 @@ export default function AdminDashboard() {
             onClick={doUnlock}
             className="w-full mt-4 h-12 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-black shadow-lg shadow-indigo-500/30 transition-all active:scale-95"
           >
-            解 锁
+            Unlock
           </button>
         </motion.div>
       </div>
@@ -325,7 +325,7 @@ export default function AdminDashboard() {
           onClick={() => { try { sessionStorage.removeItem(UNLOCK_KEY); } catch {} clearAdminPass(); setUnlocked(false); }}
           className="px-4 py-3 rounded-2xl bg-white/30 dark:bg-slate-800/30 text-slate-500 hover:text-red-500 font-bold text-sm border border-white/40 dark:border-slate-700/50 transition-colors"
         >
-          🚪 锁定退出
+          🚪 Lock & exit
         </button>
       </motion.div>
 
@@ -343,7 +343,7 @@ export default function AdminDashboard() {
             onClick={() => router.push('/music')}
             className="h-12 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-black text-sm shadow-lg shadow-indigo-500/30 flex items-center gap-2 transition-all active:scale-95"
           >
-            🎧 前往播放页
+            🎧 Go to player
           </button>
         </div>
 
@@ -351,10 +351,10 @@ export default function AdminDashboard() {
         {activeTab === 'dashboard' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: '🌐', label: '部署平台', value: 'Cloudflare Pages', sub: 'git 绑定自动构建' },
-              { icon: '🎶', label: '主曲目', value: '白色巨塔 (Jupiter)', sub: 'R2 自托管 · AAC' },
-              { icon: '📥', label: '已导入网易云', value: `${ids.length} 首`, sub: cloudState === 'synced' ? '云端 D1 同步' : cloudState === 'local' ? '仅本地缓存' : '外链直连播放' },
-              { icon: '🔗', label: '站点地址', value: 'blog.955827.xyz', sub: 'RCJ 生态 · Bortala' },
+              { icon: '🌐', label: 'Platform', value: 'Cloudflare Pages', sub: 'git-bound auto build' },
+              { icon: '🎶', label: 'Main track', value: '白色巨塔 (Jupiter)', sub: 'R2 self-hosted · AAC' },
+              { icon: '📥', label: 'NetEase imported', value: `${ids.length} tracks`, sub: cloudState === 'synced' ? 'synced to D1 cloud' : cloudState === 'local' ? 'local cache only' : 'direct external playback' },
+              { icon: '🔗', label: 'Site URL', value: 'blog.955827.xyz', sub: 'RCJ ecosystem · Bortala' },
             ].map((card) => (
               <div key={card.label} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-5 shadow-lg hover:-translate-y-1 transition-transform">
                 <div className="text-3xl mb-3">{card.icon}</div>
@@ -369,15 +369,15 @@ export default function AdminDashboard() {
         {/* ============ 歌单管理 ============ */}
         {activeTab === 'music' && (
           <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
-            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">🎵 歌单管理与查询</h2>
+            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">🎵 Playlist management & lookup</h2>
 
             {/* 导入框 */}
             <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-3xl p-5 mb-6 space-y-4">
-              <p className="text-[10px] font-black text-slate-400 uppercase">校验并添加新 ID（支持粘贴网易云分享链接，自动提取数字 ID）</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase">Verify & add new IDs (paste NetEase share links — numeric IDs are extracted automatically)</p>
               <div className="flex gap-2">
-                <input type="text" placeholder="例如 186016 或 https://music.163.com/song?id=186016" value={newId} onChange={e => setNewId(e.target.value)} onKeyDown={e => e.key === 'Enter' && queryMusic()} className="flex-1 bg-white dark:bg-slate-900 border-none rounded-2xl px-4 py-3 text-sm outline-none shadow-sm" />
+                <input type="text" placeholder="e.g. 186016 or https://music.163.com/song?id=186016" value={newId} onChange={e => setNewId(e.target.value)} onKeyDown={e => e.key === 'Enter' && queryMusic()} className="flex-1 bg-white dark:bg-slate-900 border-none rounded-2xl px-4 py-3 text-sm outline-none shadow-sm" />
                 <button onClick={queryMusic} disabled={queryLoading} className="px-6 py-3 bg-pink-500 text-white rounded-2xl text-xs font-black shadow-lg shadow-pink-500/20 disabled:opacity-50">
-                  {queryLoading ? "请求中..." : "真实查询"}
+                  {queryLoading ? "Querying…" : "Query now"}
                 </button>
               </div>
               <AnimatePresence>
@@ -386,26 +386,26 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-3">
                       <img src={queryResult.cover} alt="cover" referrerPolicy="no-referrer" className="w-10 h-10 rounded-lg object-cover" />
                       <div>
-                        <p className="text-[10px] font-black text-green-600">获取成功</p>
+                        <p className="text-[10px] font-black text-green-600">Fetched</p>
                         <p className="text-xs font-bold line-clamp-1">{queryResult.name}</p>
                         <p className="text-[10px] text-slate-500">{queryResult.artist}</p>
                       </div>
                     </div>
-                    <button onClick={confirmAddMusic} className="px-3 py-2 bg-green-500 text-white rounded-xl text-[10px] font-black shrink-0 hover:bg-green-600 transition-colors">存入列表</button>
+                    <button onClick={confirmAddMusic} className="px-3 py-2 bg-green-500 text-white rounded-xl text-[10px] font-black shrink-0 hover:bg-green-600 transition-colors">Add to list</button>
                   </motion.div>
                 )}
               </AnimatePresence>
               {queryError && <p className="text-[11px] text-red-500 font-medium">{queryError}</p>}
               <div className="text-[11px] text-slate-400 leading-relaxed bg-white/40 dark:bg-slate-900/40 rounded-2xl p-4 border border-white/30">
-                💡 网易云音乐支持外链直连，导入后歌曲通过 <code className="font-mono text-pink-500">/api/music</code> 实时解析封面与标题，并在 <span className="font-black text-indigo-500">/music</span> 页面直接播放，无需落地任何音频文件。
+                💡 NetEase supports direct external playback. After importing, <code className="font-mono text-pink-500">/api/music</code> resolves cover & title on the fly and <span className="font-black text-indigo-500">/music</span> plays it directly — no audio files are stored.
               </div>
             </div>
 
             {/* 真实歌单：已导入网易云（与 /music 实时同步） */}
-            <p className="text-[10px] font-black text-slate-400 uppercase ml-1 mb-3">当前播放歌单（与 /music 实时同步）</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase ml-1 mb-3">Current playlist (synced live with /music)</p>
             <div className="max-h-[420px] overflow-y-auto pr-2 space-y-2 custom-scrollbar">
               {ids.length === 0 && (
-                <p className="text-sm text-slate-400 py-6 text-center">还没有导入网易云歌曲，上方粘贴 ID 试试 🎶</p>
+                <p className="text-sm text-slate-400 py-6 text-center">No NetEase songs imported yet — paste an ID above 🎶</p>
               )}
 
               {ids.map((id, index) => {
@@ -428,9 +428,9 @@ export default function AdminDashboard() {
                             <span className="text-[10px] text-slate-500 font-medium truncate">{detail.artist}</span>
                           </>
                         ) : isError ? (
-                          <span className="text-xs font-bold text-red-500 truncate">已下架 / 未找到</span>
+                          <span className="text-xs font-bold text-red-500 truncate">Removed / not found</span>
                         ) : (
-                          <span className="text-xs text-slate-400 truncate">{detailsLoading ? '解析中…' : '未找到'}</span>
+                          <span className="text-xs text-slate-400 truncate">{detailsLoading ? 'Resolving…' : 'Not found'}</span>
                         )}
                         <span className="text-[10px] font-mono text-pink-500 mt-0.5">#{id}</span>
                       </div>
@@ -443,7 +443,7 @@ export default function AdminDashboard() {
 
             {ids.length > 0 && (
               <button onClick={clearAll} className="mt-4 text-[11px] text-slate-400 hover:text-red-500 font-medium transition-colors">
-                清空全部导入歌单
+                Clear all imported tracks
               </button>
             )}
           </div>
@@ -453,14 +453,14 @@ export default function AdminDashboard() {
         {activeTab === 'board' && (
           <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-black text-slate-800 dark:text-white">🗒️ 便签管理（留言墙）</h2>
+              <h2 className="text-xl font-black text-slate-800 dark:text-white">🗒️ Notes (wall)</h2>
               <button onClick={loadBoardNotes} disabled={boardLoading} className="h-10 px-4 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:bg-indigo-500/20 transition-colors disabled:opacity-50">
-                {boardLoading ? '加载中…' : '刷新列表'}
+                {boardLoading ? 'Loading…' : 'Refresh'}
               </button>
             </div>
             {boardMsg && <p className="text-xs text-amber-600 dark:text-amber-400 mb-4">{boardMsg}</p>}
             {boardNotes.length === 0 && !boardLoading ? (
-              <p className="text-sm text-slate-400 py-6 text-center">墙上还没有便签</p>
+              <p className="text-sm text-slate-400 py-6 text-center">No notes on the wall yet</p>
             ) : (
               <div className="space-y-3">
                 {boardNotes.map((n) => (
@@ -475,7 +475,7 @@ export default function AdminDashboard() {
                     </div>
                     <button
                       onClick={() => deleteBoardNote(n.id)}
-                      title="撤下这张便签"
+                      title="Remove this note"
                       className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center"
                     >
                       ✕
@@ -484,15 +484,15 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
-            <p className="text-[11px] text-slate-400 mt-4">💡 便签存于 Cloudflare D1（与歌单同库），删除即时生效且不可恢复；访客每分钟最多钉 1 张。</p>
+            <p className="text-[11px] text-slate-400 mt-4">💡 Notes live in Cloudflare D1 (same DB as the playlist). Deletes are instant and irreversible; visitors can pin at most 1 per minute.</p>
           </div>
         )}
 
         {/* ============ 光影画廊 ============ */}
         {activeTab === 'gallery' && (
           <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
-            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">🖼️ 光影画廊</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">博客已融入的两张个人照片（本地资源，无外链依赖）：</p>
+            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">🖼️ Gallery</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Two personal photos embedded in the blog (local assets, no external dependencies):</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {['/blog-photo-1.png', '/blog-photo-2.jpg'].map((src) => (
                 <div key={src} className="rounded-2xl overflow-hidden border border-white/40 shadow-lg aspect-square bg-slate-100 dark:bg-slate-800">
@@ -501,7 +501,7 @@ export default function AdminDashboard() {
               ))}
             </div>
             <button onClick={() => router.push('/photowall')} className="mt-6 h-12 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-black text-sm shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-all active:scale-95">
-              📷 前往光影画廊
+              📷 Go to gallery
             </button>
           </div>
         )}
@@ -509,15 +509,15 @@ export default function AdminDashboard() {
         {/* ============ 系统核心配置 ============ */}
         {activeTab === 'settings' && (
           <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-3xl p-6 shadow-lg">
-            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">⚙️ 系统核心配置</h2>
+            <h2 className="text-xl font-black text-slate-800 dark:text-white mb-6">⚙️ Core settings</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { k: '站点标题', v: siteConfig.title },
-                { k: '作者', v: siteConfig.authorName },
-                { k: '部署平台', v: 'Cloudflare Pages（git 绑定自动部署）' },
-                { k: '音乐源', v: 'R2 自托管（AAC，cdn.955827.xyz）' },
-                { k: '默认曲目', v: '白色巨塔 (Jupiter)' },
-                { k: '管理口令', v: '已启用（服务端校验 · 仅会话内有效）' },
+                { k: 'Site title', v: siteConfig.title },
+                { k: 'Author', v: siteConfig.authorName },
+                { k: 'Platform', v: 'Cloudflare Pages (git-bound auto deploy)' },
+                { k: 'Music source', v: 'R2 self-hosted (AAC, cdn.955827.xyz)' },
+                { k: 'Default track', v: '白色巨塔 (Jupiter)' },
+                { k: 'Admin passphrase', v: 'Enabled (server-verified · session-scoped)' },
               ].map((row) => (
                 <div key={row.k} className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 border border-white/30">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{row.k}</p>
@@ -526,7 +526,7 @@ export default function AdminDashboard() {
               ))}
             </div>
             <p className="text-[11px] text-slate-400 leading-relaxed bg-white/40 dark:bg-slate-900/40 rounded-2xl p-4 border border-white/30 mt-4">
-              🔒 管理面板为客户端口令防护（sessionStorage 解锁，刷新会话需重新输入），适用于个人自娱博客的轻量隔离。如需更强保护，应将校验移至服务端。
+              🔒 The admin panel is protected by a client-side passphrase (sessionStorage unlock; re-enter after refresh) — lightweight isolation for a personal blog. For stronger protection, move verification to the server.
             </p>
           </div>
         )}

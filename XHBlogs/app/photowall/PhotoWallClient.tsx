@@ -47,7 +47,7 @@ function Polaroid({ src, caption, onClick, seed, eager }: { src: string; caption
         <div className="overflow-hidden">
           <img
             src={src}
-            alt={caption || '照片'}
+            alt={caption || 'Photo'}
             loading={eager ? 'eager' : 'lazy'}
             className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
@@ -128,10 +128,10 @@ export default function PhotoWallClient() {
               <div className="mb-16 flex flex-col items-center justify-between gap-6 md:flex-row">
                 <div>
                   <h1 className="mb-2 text-3xl font-black tracking-tight md:text-4xl" style={{ color: '#2b241f' }}>
-                    光影画廊
+                    Gallery
                   </h1>
                   <p className="text-sm tracking-wider" style={{ color: INK_SOFT }}>
-                    定格时间，封存泰拉与现实的每一次心跳
+                    Freeze time, sealing every heartbeat of Terra and reality
                   </p>
                 </div>
 
@@ -147,7 +147,7 @@ export default function PhotoWallClient() {
                   </svg>
                   <input
                     type="text"
-                    placeholder="搜索相册名或照片描述..."
+                    placeholder="Search album or photo description…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="h-12 w-full rounded-full pl-12 pr-4 text-sm outline-none transition-shadow focus:shadow-md"
@@ -161,7 +161,7 @@ export default function PhotoWallClient() {
                   <div className="mb-16">
                     <h3 className="mb-6 flex items-center gap-2 text-lg font-bold" style={{ color: INK }}>
                       <span className="h-5 w-2 rounded-full" style={{ background: ACCENT }} />
-                      匹配的单张照片（{matchedPhotos.length}）
+                      Matching photos ({matchedPhotos.length})
                     </h3>
                     <div className="columns-1 gap-6 space-y-6 sm:columns-2 md:columns-3 lg:columns-4">
                       {matchedPhotos.map((photo, index) => (
@@ -185,7 +185,7 @@ export default function PhotoWallClient() {
                 {activeQuery && matchedAlbums.length > 0 && (
                   <h3 className="mb-6 flex items-center gap-2 text-lg font-bold" style={{ color: INK }}>
                     <span className="h-5 w-2 rounded-full" style={{ background: '#e0b487' }} />
-                    相关相册（{matchedAlbums.length}）
+                    Related albums ({matchedAlbums.length})
                   </h3>
                 )}
 
@@ -249,7 +249,7 @@ export default function PhotoWallClient() {
                           {album.description}
                         </p>
                         <p className="mt-1 text-xs font-bold opacity-0 transition-opacity duration-400 group-hover:opacity-100" style={{ color: ACCENT }}>
-                          {album.photos.length} 张照片 · Click to Open
+                          {album.photos.length} photos · Click to Open
                         </p>
                       </div>
                     </div>
@@ -258,7 +258,7 @@ export default function PhotoWallClient() {
 
                 {activeQuery && matchedAlbums.length === 0 && matchedPhotos.length === 0 && (
                   <div className="py-20 text-center font-medium" style={{ color: INK_SOFT }}>
-                    在泰拉大陆的任何角落都没找到相关的记忆...
+                    No related memories found anywhere on Terra…
                   </div>
                 )}
               </div>
@@ -283,7 +283,7 @@ export default function PhotoWallClient() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                       </span>
-                      返回画廊
+                      Back to gallery
                     </button>
                     <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'rgba(163,138,128,0.5)' }} />
                     <span className="text-xs font-black uppercase tracking-widest" style={{ color: INK_SOFT }}>
@@ -302,7 +302,7 @@ export default function PhotoWallClient() {
                   className="rounded-2xl px-5 py-2.5 text-sm font-bold"
                   style={{ background: 'rgba(255,255,255,0.5)', border: '0.57px solid rgba(255,255,255,0.7)', color: INK_SOFT }}
                 >
-                  共 <span className="text-lg" style={{ color: ACCENT }}>{currentAlbum.photos.length}</span> 瞬间
+                  Total <span className="text-lg" style={{ color: ACCENT }}>{currentAlbum.photos.length}</span> moments
                 </div>
               </div>
 
@@ -338,7 +338,7 @@ export default function PhotoWallClient() {
           }}
         >
           <button
-            aria-label="关闭"
+            aria-label="Close"
             className="absolute right-6 top-6 rounded-full bg-white/10 p-2 text-white/60 transition-colors hover:bg-white/20 hover:text-white"
             onClick={(e) => {
               e.stopPropagation();
@@ -353,7 +353,7 @@ export default function PhotoWallClient() {
           {viewer.list.length > 1 && (
             <>
               <button
-                aria-label="上一张"
+                aria-label="Previous"
                 className="absolute left-2 top-1/2 z-10 rounded-full bg-white/10 p-2.5 text-white/70 transition-all hover:scale-110 hover:bg-white/25 hover:text-white sm:left-6"
                 style={{ transform: 'translateY(-50%)' }}
                 onClick={(e) => {
@@ -366,7 +366,7 @@ export default function PhotoWallClient() {
                 </svg>
               </button>
               <button
-                aria-label="下一张"
+                aria-label="Next"
                 className="absolute right-2 top-1/2 z-10 rounded-full bg-white/10 p-2.5 text-white/70 transition-all hover:scale-110 hover:bg-white/25 hover:text-white sm:right-6"
                 style={{ transform: 'translateY(-50%)' }}
                 onClick={(e) => {
@@ -387,7 +387,7 @@ export default function PhotoWallClient() {
             style={{ maxWidth: '90vw', maxHeight: '88vh', transform: 'rotate(-1deg)' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <img src={viewer.list[viewer.index].url} alt={viewer.list[viewer.index].caption || '全屏照片'} className="max-h-[72vh] max-w-full object-contain" />
+            <img src={viewer.list[viewer.index].url} alt={viewer.list[viewer.index].caption || 'Fullscreen photo'} className="max-h-[72vh] max-w-full object-contain" />
             {viewer.list[viewer.index].caption && (
               <p className="mt-3 text-center text-sm" style={{ color: '#6b5d52', fontFamily: SERIF, fontStyle: 'italic' }}>
                 {viewer.list[viewer.index].caption}

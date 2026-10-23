@@ -73,7 +73,7 @@ export default function PixelBenben({
       className={className}
       style={{ width: size, height: size, imageRendering: 'pixelated' }}
       role="img"
-      aria-label="像素小狗奔奔"
+      aria-label="Pixel puppy Benben"
     />
   );
 }

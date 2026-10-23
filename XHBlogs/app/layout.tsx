@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.title}`,
   },
   description: siteConfig.bio,
-  keywords: ['博客', '技术博客', '独立开发', 'Cloudflare', 'RCJ Lab', 'Bortala', '前端', '全栈', '个人作品集'],
+  keywords: ['Blog', 'Tech Blog', 'Indie Dev', 'Cloudflare', 'RCJ Lab', 'Bortala', 'Frontend', 'Fullstack', 'Portfolio'],
   authors: [{ name: siteConfig.authorName, url: 'https://blog.955827.xyz' }],
   creator: siteConfig.authorName,
   publisher: siteConfig.authorName,
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'zh_CN',
+    locale: 'en_US',
     url: 'https://blog.955827.xyz',
     siteName: siteConfig.title,
     title: siteConfig.title,
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    title: '宝藏之地',
+    title: 'Treasure Land',
     statusBarStyle: 'black-translucent',
   },
 };
@@ -107,7 +107,7 @@ const siteJsonLd = {
       url: 'https://blog.955827.xyz',
       name: siteConfig.title,
       description: siteConfig.bio,
-      inLanguage: 'zh-CN',
+      inLanguage: 'en-US',
       publisher: { '@id': 'https://blog.955827.xyz/#person' },
       potentialAction: {
         '@type': 'SearchAction',
@@ -120,7 +120,7 @@ const siteJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
         <style
           suppressHydrationWarning

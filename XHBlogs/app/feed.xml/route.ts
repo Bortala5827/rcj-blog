@@ -7,9 +7,9 @@ import { siteConfig } from '../../siteConfig';
 export const dynamic = 'force-static';
 
 const SITE_URL = 'https://blog.955827.xyz';
-const SITE_TITLE = 'Bortala の 宝藏之地';
+const SITE_TITLE = 'Bortala · Treasure Land';
 const SITE_DESC =
-  '在做 RCJ Lab —— 一个把想法做成可用产品的个人工作室，东西基本都跑在 Cloudflare 边缘上。';
+  'Building RCJ Lab — a personal studio turning ideas into usable products, mostly running on the Cloudflare edge.';
 const AUTHOR = 'Bortala';
 // 邮箱跟随 siteConfig.social.email（已迁移主域），不再硬编码旧 Gmail
 const EMAIL = siteConfig.social?.email || '';

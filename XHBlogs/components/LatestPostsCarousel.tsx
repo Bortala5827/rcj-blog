@@ -25,7 +25,7 @@ export default function LatestPostsCarousel({ posts }: { posts: any[] }) {
     <div className="md:col-span-4 rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl overflow-hidden relative group min-h-[420px] h-full flex flex-col">
 
       {/* 整个卡片的点击跳转区域 */}
-      <Link href={currentPost.slug === 'none' ? '#' : `/posts/${currentPost.slug}`} className="absolute inset-0 z-20" aria-label={`阅读 ${currentPost.title}`} />
+      <Link href={currentPost.slug === 'none' ? '#' : `/posts/${currentPost.slug}`} className="absolute inset-0 z-20" aria-label={`Read ${currentPost.title}`} />
 
       {/* 带有渐变交叉淡入淡出的图片背景 */}
       <AnimatePresence mode="wait">
@@ -67,7 +67,7 @@ export default function LatestPostsCarousel({ posts }: { posts: any[] }) {
                 setCurrentIndex(i);
               }}
               className={`h-1.5 rounded-full transition-all duration-500 ${i === currentIndex ? 'w-6 bg-indigo-400' : 'w-2 bg-white/40 hover:bg-white/80'}`}
-              aria-label={`切换到第 ${i + 1} 篇文章`}
+              aria-label={`Go to post ${i + 1}`}
             />
           ))}
         </div>

@@ -2,11 +2,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import PixelBenben from './PixelBenben';
+
+// 🎵 听歌指令识别：命中即本地短路（不调 /api/chat），带铲屎官跳 /music 并自动播放
+const MUSIC_INTENT_RE = /听.{0,3}歌|聽.{0,3}歌|听.{0,3}音乐|聽.{0,3}音樂|放.{0,3}(歌|音乐|音樂)|来.{0,4}首|來.{0,4}首|播.{0,2}(首|音乐|音樂)|播放|我要听歌|music|play\b/i;
+// 否定/暂停类词排除：「我不想听歌」「暂停音乐」不应触发跳转
+const MUSIC_NEG_RE = /(不想|不要|别|勿|先不|暂停|暫停|停止|关掉|關掉|静音|靜音|stop|pause|mute)/i;
 
 export default function CyberCat() {
   const pathname = usePathname();
+  const router = useRouter();
   const isMusic = pathname === '/music';
   const [isPetted, setIsPetted] = useState(false);
   const [speech, setSpeech] = useState<string | null>(null);
@@ -76,6 +82,23 @@ export default function CyberCat() {
     if (!inputValue.trim() || isThinking) return;
 
     const userMessage = inputValue;
+
+    // 🎵 听歌指令：本地短路零延迟，先发播放事件（用户手势链路内，自动播放不被拦截）再站内跳转
+    if (MUSIC_INTENT_RE.test(userMessage) && !MUSIC_NEG_RE.test(userMessage)) {
+      setInputValue('');
+      setShowInput(false);
+      speak("汪！跟紧我，带你去音乐馆 woof~ ♪", 5000);
+      const reply = "汪！已带铲屎官抵达音乐馆，自动播放中♪";
+      historyRef.current = [
+        ...historyRef.current,
+        { role: 'user' as const, content: userMessage },
+        { role: 'assistant' as const, content: reply },
+      ].slice(-12);
+      window.dispatchEvent(new CustomEvent('rcj:music:play'));
+      if (pathname !== '/music') router.push('/music');
+      return;
+    }
+
     setInputValue('');
     setShowInput(false);
     setIsThinking(true);
@@ -205,7 +228,7 @@ export default function CyberCat() {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Say something to Benben woof…"
+              placeholder='Say something… try "我要听歌"'
               className="bg-transparent border-none outline-none text-sm px-3 py-1 w-full dark:text-white placeholder-gray-400"
               disabled={isThinking}
               autoFocus

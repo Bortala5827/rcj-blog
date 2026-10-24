@@ -336,6 +336,19 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // 🐕 奔奔指令「我要听歌」：CyberCat dispatch 自定义事件 → 这里自动开播。
+  // 事件在用户点击手势链路内发出，浏览器自动播放策略放行；跨页跳转时 Provider 常驻 layout 不卸载，audio 状态无缝保留。
+  useEffect(() => {
+    const onBenbenMusic = () => {
+      if (!audioRef.current) return;
+      setIsPlaying(true);
+      const p = audioRef.current.play();
+      if (p !== undefined) p.catch(() => setIsPlaying(false));
+    };
+    window.addEventListener('rcj:music:play', onBenbenMusic);
+    return () => window.removeEventListener('rcj:music:play', onBenbenMusic);
+  }, []);
+
   // 🌟 5. 重写 nextSong，加入对随机模式的处理
   const nextSong = () => {
     if (playMode === 'random') {

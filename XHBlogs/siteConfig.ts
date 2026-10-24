@@ -82,7 +82,7 @@ export const siteConfig = {
     { id: 'local-woxiangdasheng-2', lrcPath: '/music/lyrics/woxiangdasheng-2.lrc', title: '我想大声告诉你（二）', artist: '樊凡', duration: 239, src: 'https://cdn.955827.xyz/music/woxiangdasheng-2.m4a', cover: 'https://cdn.955827.xyz/covers/woxiangdasheng.jpg' },
     { id: 'local-wodeweilaibushimeng', lrcPath: '/music/lyrics/wodeweilaibushimeng.lrc', title: '我的未来不是梦', artist: '张雨生', duration: 276, src: 'https://cdn.955827.xyz/music/wodeweilaibushimeng.m4a', cover: 'https://cdn.955827.xyz/covers/wodeweilaibushimeng.jpg?v=1' },
     { id: 'local-zhangshengxiangqilai', lrcPath: '/music/lyrics/zhangshengxiangqilai.lrc', title: '掌声响起来', artist: '凤飞飞', duration: 230, src: 'https://cdn.955827.xyz/music/zhangshengxiangqilai.m4a', cover: 'https://cdn.955827.xyz/covers/zhangshengxiangqilai.jpg?v=1' },
-    { id: 'local-xiangsi', lrcPath: '/music/lyrics/xiangsi.lrc', title: '相思', artist: '毛阿敏', duration: 145, src: 'https://cdn.955827.xyz/music/xiangsi.m4a', cover: 'https://cdn.955827.xyz/covers/xiangsi.jpg?v=1' },
+    { id: 'local-xiangsi', lrcPath: '/music/lyrics/xiangsi.lrc', title: '相思', artist: '毛阿敏', duration: 134, src: 'https://cdn.955827.xyz/music/xiangsi.m4a', cover: 'https://cdn.955827.xyz/covers/xiangsi.jpg?v=1' },
   ],
   social: {
     email: "zhouqiang@955827.xyz",

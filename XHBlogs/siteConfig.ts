@@ -83,6 +83,11 @@ export const siteConfig = {
     { id: 'local-wodeweilaibushimeng', lrcPath: '/music/lyrics/wodeweilaibushimeng.lrc', title: '我的未来不是梦', artist: '张雨生', duration: 276, src: 'https://cdn.955827.xyz/music/wodeweilaibushimeng.m4a', cover: 'https://cdn.955827.xyz/covers/wodeweilaibushimeng.jpg?v=1' },
     { id: 'local-zhangshengxiangqilai', lrcPath: '/music/lyrics/zhangshengxiangqilai.lrc', title: '掌声响起来', artist: '凤飞飞', duration: 230, src: 'https://cdn.955827.xyz/music/zhangshengxiangqilai.m4a', cover: 'https://cdn.955827.xyz/covers/zhangshengxiangqilai.jpg?v=1' },
     { id: 'local-xiangsi', lrcPath: '/music/lyrics/xiangsi.lrc', title: '相思', artist: '毛阿敏', duration: 134, src: 'https://cdn.955827.xyz/music/xiangsi.m4a', cover: 'https://cdn.955827.xyz/covers/xiangsi.jpg?v=1' },
+    // ---- 2026-10-28 第四批（yt-dlp 1027）：董小姐 + 相思/掌声/未来不是梦（二）重录版；音频/封面存 R2，LRC 为 whisper 听写打轴并按官方歌词校正 ----
+    { id: 'local-dongxiaojie', lrcPath: '/music/lyrics/dongxiaojie.lrc', title: '董小姐', artist: '宋冬野', duration: 278, src: 'https://cdn.955827.xyz/music/dongxiaojie.m4a', cover: 'https://cdn.955827.xyz/covers/dongxiaojie.jpg' },
+    { id: 'local-xiangsi-2', lrcPath: '/music/lyrics/xiangsi-2.lrc', title: '相思（二）', artist: '毛阿敏', duration: 68, src: 'https://cdn.955827.xyz/music/xiangsi-2.m4a', cover: 'https://cdn.955827.xyz/covers/xiangsi.jpg' },
+    { id: 'local-zhangshengxiangqilai-2', lrcPath: '/music/lyrics/zhangshengxiangqilai-2.lrc', title: '掌声响起来（二）', artist: '凤飞飞', duration: 90, src: 'https://cdn.955827.xyz/music/zhangshengxiangqilai-2.m4a', cover: 'https://cdn.955827.xyz/covers/zhangshengxiangqilai.jpg' },
+    { id: 'local-wodeweilaibushimeng-2', lrcPath: '/music/lyrics/wodeweilaibushimeng-2.lrc', title: '我的未来不是梦（二）', artist: '张雨生', duration: 296, src: 'https://cdn.955827.xyz/music/wodeweilaibushimeng-2.m4a', cover: 'https://cdn.955827.xyz/covers/wodeweilaibushimeng.jpg' },
   ],
   social: {
     email: "zhouqiang@955827.xyz",

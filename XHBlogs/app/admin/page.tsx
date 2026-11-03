@@ -352,7 +352,7 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: '🌐', label: 'Platform', value: 'Cloudflare Pages', sub: 'git-bound auto build' },
-              { icon: '🎶', label: 'Main track', value: '白色巨塔 (Jupiter)', sub: 'R2 self-hosted · AAC' },
+              { icon: '🎶', label: 'Main track', value: siteConfig.localTracks[0]?.title || '—', sub: 'R2 self-hosted · AAC' },
               { icon: '📥', label: 'NetEase imported', value: `${ids.length} tracks`, sub: cloudState === 'synced' ? 'synced to D1 cloud' : cloudState === 'local' ? 'local cache only' : 'direct external playback' },
               { icon: '🔗', label: 'Site URL', value: 'blog.955827.xyz', sub: 'RCJ ecosystem · Bortala' },
             ].map((card) => (
@@ -516,7 +516,7 @@ export default function AdminDashboard() {
                 { k: 'Author', v: siteConfig.authorName },
                 { k: 'Platform', v: 'Cloudflare Pages (git-bound auto deploy)' },
                 { k: 'Music source', v: 'R2 self-hosted (AAC, cdn.955827.xyz)' },
-                { k: 'Default track', v: '白色巨塔 (Jupiter)' },
+                { k: 'Default track', v: siteConfig.localTracks[0]?.title || '—' },
                 { k: 'Admin passphrase', v: 'Enabled (server-verified · session-scoped)' },
               ].map((row) => (
                 <div key={row.k} className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 border border-white/30">

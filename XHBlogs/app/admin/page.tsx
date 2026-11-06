@@ -65,6 +65,11 @@ export default function AdminDashboard() {
   const [boardNotes, setBoardNotes] = useState<any[]>([]);
   const [boardLoading, setBoardLoading] = useState(false);
   const [boardMsg, setBoardMsg] = useState('');
+  // 便签行内编辑
+  const [editingId, setEditingId] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [savingId, setSavingId] = useState('');
 
   const loadBoardNotes = useCallback(async () => {
     setBoardLoading(true);
@@ -99,6 +104,46 @@ export default function AdminDashboard() {
       setBoardMsg('Delete failed — check your network');
     }
   }, []);
+
+  // 便签行内编辑：进入 / 取消 / 保存
+  const startEditNote = (n: any) => {
+    setEditingId(n.id);
+    setEditName(n.name || '');
+    setEditContent(n.content || '');
+    setBoardMsg('');
+  };
+  const cancelEditNote = () => {
+    setEditingId('');
+    setEditName('');
+    setEditContent('');
+  };
+  const saveBoardNote = async (id: string) => {
+    const name = editName.trim().slice(0, 16) || 'Anonymous';
+    const content = editContent.trim();
+    if (!content) { setBoardMsg('Content cannot be empty'); return; }
+    setSavingId(id);
+    setBoardMsg('');
+    try {
+      const r = await fetch(`/api/notes?id=${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: adminHeaders({ 'content-type': 'application/json' }),
+        body: JSON.stringify({ name, content }),
+      });
+      const d = await r.json().catch(() => null);
+      if (r.ok && d?.ok) {
+        setBoardNotes((prev) => prev.map((n) => (n.id === id ? { ...n, name, content } : n)));
+        cancelEditNote();
+      } else if (d?.error === 'unauthorized') {
+        setBoardMsg('Passphrase check failed — unlock the admin again');
+      } else {
+        setBoardMsg('Save failed, try again');
+      }
+    } catch {
+      setBoardMsg('Save failed — check your network');
+    } finally {
+      setSavingId('');
+    }
+  };
 
   // 首次切到便签管理时自动加载
   useEffect(() => {
@@ -435,7 +480,7 @@ export default function AdminDashboard() {
                         <span className="text-[10px] font-mono text-pink-500 mt-0.5">#{id}</span>
                       </div>
                     </div>
-                    <button onClick={() => removeSong(index)} className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center">✕</button>
+                    <button onClick={() => removeSong(index)} className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center">✕</button>
                   </div>
                 );
               })}
@@ -464,27 +509,66 @@ export default function AdminDashboard() {
             ) : (
               <div className="space-y-3">
                 {boardNotes.map((n) => (
-                  <div key={n.id} className="group flex items-center gap-4 rounded-2xl border border-white/40 dark:border-slate-700/40 bg-white/50 dark:bg-slate-800/40 px-4 py-3">
-                    <span className="w-4 h-4 shrink-0 rounded-full border border-black/10" style={{ background: n.color }} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-slate-800 dark:text-slate-200 truncate">
-                        <span className="font-black mr-2">{n.name}</span>
-                        {n.content}
-                      </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">{n.id} · {new Date(n.ts).toLocaleString('zh-CN')}</p>
+                  <div key={n.id} className="flex items-start gap-4 rounded-2xl border border-white/40 dark:border-slate-700/40 bg-white/50 dark:bg-slate-800/40 px-4 py-3">
+                    <span className="w-4 h-4 mt-1 shrink-0 rounded-full border border-black/10" style={{ background: n.color }} />
+                    {editingId === n.id ? (
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          maxLength={16}
+                          placeholder="Name"
+                          className="w-full max-w-[180px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500/30"
+                        />
+                        <textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          maxLength={300}
+                          rows={2}
+                          placeholder="Content"
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none resize-y focus:ring-2 focus:ring-indigo-500/30"
+                        />
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => saveBoardNote(n.id)} disabled={savingId === n.id} className="px-3 py-1.5 rounded-lg bg-indigo-500 text-white text-[11px] font-black disabled:opacity-50">
+                            {savingId === n.id ? 'Saving…' : 'Save'}
+                          </button>
+                          <button onClick={cancelEditNote} className="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] font-bold">
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-slate-800 dark:text-slate-200">
+                          <span className="font-black mr-2">{n.name}</span>
+                          {n.content}
+                        </p>
+                        <p className="text-[10px] text-slate-400 mt-0.5">{n.id} · {new Date(n.ts).toLocaleString('zh-CN')}</p>
+                      </div>
+                    )}
+                    <div className="flex shrink-0 items-center gap-1">
+                      {editingId !== n.id && (
+                        <button
+                          onClick={() => startEditNote(n)}
+                          title="Edit this note"
+                          className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-500 transition-all hover:bg-indigo-500 hover:text-white flex items-center justify-center"
+                        >
+                          ✎
+                        </button>
+                      )}
+                      <button
+                        onClick={() => deleteBoardNote(n.id)}
+                        title="Remove this note"
+                        className="w-8 h-8 rounded-lg bg-red-500/10 text-red-500 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center"
+                      >
+                        ✕
+                      </button>
                     </div>
-                    <button
-                      onClick={() => deleteBoardNote(n.id)}
-                      title="Remove this note"
-                      className="w-8 h-8 shrink-0 rounded-lg bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white flex items-center justify-center"
-                    >
-                      ✕
-                    </button>
                   </div>
                 ))}
               </div>
             )}
-            <p className="text-[11px] text-slate-400 mt-4">💡 Notes live in Cloudflare D1 (same DB as the playlist). Deletes are instant and irreversible; visitors can pin at most 1 per minute.</p>
+            <p className="text-[11px] text-slate-400 mt-4">💡 Notes live in Cloudflare D1 (same DB as the playlist). Edit and delete are instant and irreversible; visitors can pin at most 1 per minute.</p>
           </div>
         )}
 

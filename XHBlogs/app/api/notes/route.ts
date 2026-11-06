@@ -9,6 +9,7 @@
 // GET    /api/notes                -> { ok:true, notes:[{id,name,content,color,ts}] }（空表时自动播 3 条种子）
 // POST   /api/notes {name,content} -> { ok:true, note } / 429 太快 / 400 参数
 // DELETE /api/notes?id=xxx         -> 需 x-rcj-pass === ADMIN_PASS，{ ok:true }
+// PATCH  /api/notes?id=xxx {name,content} -> 需 x-rcj-pass === ADMIN_PASS，{ ok:true, note }
 import { NextRequest, NextResponse } from 'next/server'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 
@@ -119,6 +120,42 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, note: { id, name, content, color, ts } }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (e) {
     console.error('notes POST error:', e)
+    return NextResponse.json({ ok: false, error: 'db_error' }, { status: 500 })
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  const id = new URL(request.url).searchParams.get('id') || ''
+  if (!id) return NextResponse.json({ ok: false, error: 'bad_id' }, { status: 400 })
+
+  const expected = getAdminPass()
+  if (!expected) return NextResponse.json({ ok: false, error: 'server_not_configured' }, { status: 503 })
+  if (request.headers.get('x-rcj-pass') !== expected) {
+    return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 })
+  }
+
+  let body: any = null
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ ok: false, error: 'bad_json' }, { status: 400 })
+  }
+
+  const name = String(body?.name ?? '').trim().slice(0, MAX_NAME) || 'Anonymous'
+  const content = String(body?.content ?? '').trim()
+  if (!content || content.length > MAX_CONTENT) {
+    return NextResponse.json({ ok: false, error: 'bad_content' }, { status: 400 })
+  }
+
+  const db = getDB()
+  if (!db) return NextResponse.json({ ok: false, error: 'no_db' }, { status: 503 })
+
+  try {
+    await ensureTables(db)
+    await db.prepare('UPDATE notes SET name = ?, content = ? WHERE id = ?').bind(name, content, id).run()
+    return NextResponse.json({ ok: true, note: { id, name, content } }, { headers: { 'Cache-Control': 'no-store' } })
+  } catch (e) {
+    console.error('notes PATCH error:', e)
     return NextResponse.json({ ok: false, error: 'db_error' }, { status: 500 })
   }
 }
